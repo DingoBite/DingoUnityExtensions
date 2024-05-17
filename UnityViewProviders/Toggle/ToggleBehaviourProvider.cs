@@ -1,0 +1,23 @@
+using DingoUnityExtensions.UnityViewProviders.Core;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
+{
+    public abstract class ToggleBehaviourProvider<TView> : UnityViewProvider<TView, bool> where TView : Component
+    {
+        [SerializeField] private bool _nonInteractablePlaceholder;
+        [FormerlySerializedAs("_toggleSwapInfo")] [SerializeField] protected ToggleSwapInfoBase ToggleSwapInfo;
+
+        protected override bool NonInteractablePlaceholder => _nonInteractablePlaceholder;
+
+        protected abstract void SetViewValueWithoutNotify(bool value);
+        
+        public override void SetValueWithoutNotify(bool value)
+        {
+            SetViewValueWithoutNotify(value);
+            if (ToggleSwapInfo != null)
+                ToggleSwapInfo.SetViewActive(value);
+        }
+    }
+}
