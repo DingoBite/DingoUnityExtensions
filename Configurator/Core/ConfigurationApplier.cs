@@ -1,5 +1,5 @@
+using DingoUnityExtensions.Utils;
 using UnityEngine;
-using Utils.Inspector;
 
 namespace DingoUnityExtensions.Configurator.Core
 {

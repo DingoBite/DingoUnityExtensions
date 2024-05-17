@@ -1,8 +1,8 @@
 using System;
 using System.Globalization;
 using DG.Tweening;
+using DingoUnityExtensions.Tweens;
 using UnityEngine;
-using Utils.Tweens;
 
 namespace DingoUnityExtensions.UnityViewProviders.Text
 {

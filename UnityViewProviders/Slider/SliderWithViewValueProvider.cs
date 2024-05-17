@@ -1,4 +1,4 @@
-using AppStructure.Generic.Text;
+using DingoUnityExtensions.UnityViewProviders.Text;
 using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Slider

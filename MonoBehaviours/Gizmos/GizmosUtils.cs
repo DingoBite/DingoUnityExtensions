@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DingoUnityExtensions.MathAndGeometry;
-using DingoUnityExtensions.Utils;
 using UnityEngine;
 
 namespace DingoUnityExtensions.MonoBehaviours.Gizmos

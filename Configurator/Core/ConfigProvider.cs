@@ -5,12 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using DingoUnityExtensions.Utils;
 using NaughtyAttributes;
 using NaughtyAttributes.ColorKeyProperties;
 using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
-using Utils.Inspector;
 
 namespace DingoUnityExtensions.Configurator.Core
 {

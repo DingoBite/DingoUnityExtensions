@@ -1,20 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AppStructure.Generic.UnityViewProviders.Core;
+using DingoUnityExtensions.Extensions;
 using DingoUnityExtensions.UnityViewProviders;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
+using DingoUnityExtensions.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Utils;
-using Utils.Extensions;
 
 namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
 {
-    public class SearchDropdown : global::Utils.UI.UISubscribableBehaviour
+    public class SearchDropdown : SubscribableBehaviour
     {
         public const int NONE_ID = int.MinValue;
         
@@ -25,7 +24,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
         [SerializeField] private SelectableButton _buttonPrefab;
         [SerializeField] private TMP_InputField _inputField;
         [SerializeField] private ScrollRect _scrollRect;
-        [SerializeField] private global::Utils.UI.LayoutRebuildProvider _layoutContent;
+        [SerializeField] private LayoutRebuildProvider _layoutContent;
         [SerializeField] private bool _invertSearch;
         [SerializeField] private EventContainer _closeDropdownBackground;
         [SerializeField] private bool _interactable;
