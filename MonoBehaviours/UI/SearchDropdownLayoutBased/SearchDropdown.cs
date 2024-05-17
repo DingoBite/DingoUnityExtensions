@@ -285,7 +285,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             
             if (_closeDropdownBackground != null)
             {
-                _closeDropdownBackground.SafeSubscribe(CloseSearch);
+                _closeDropdownBackground.OnEvent -= CloseSearch;
+                _closeDropdownBackground.OnEvent += CloseSearch;
                 _closeDropdownBackground.gameObject.SetActive(true);
             }
             _startInput = _inputField.text;
@@ -520,8 +521,12 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
                 callback = () => SelectValue(dropdownValue.Id);
                 _buttonCallbacks.Add(dropdownValue.Id, callback);
             }
+
             if (gameObject.activeInHierarchy)
-                button.SafeSubscribe(callback);
+            {
+                button.OnEvent -= callback;
+                button.OnEvent += callback;
+            }
             button.name = $"--{dropdownValue.OptionName}_{dropdownValue.Id}";
             button.SetTitle(dropdownValue.OptionName);
             return button;
@@ -568,7 +573,10 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             {
                 var button = _buttons.GetButton(id);
                 if (button != null)
-                    button.SafeSubscribe(callback);
+                {
+                    button.OnEvent -= callback;
+                    button.OnEvent += callback;
+                }
             }
         }
 

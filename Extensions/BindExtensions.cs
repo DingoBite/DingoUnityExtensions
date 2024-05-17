@@ -1,4 +1,5 @@
 using System;
+#if BIND_EXISTS
 using Bind;
 using DingoUnityExtensions.UnityViewProviders.Core;
 
@@ -51,3 +52,4 @@ namespace DingoUnityExtensions.Extensions
         }
     }
 }
+#endif

@@ -48,6 +48,12 @@ namespace Packages.DingoUnityExtensions.Editor
                 select type).Any();
             if (naughtyAttributesColorKeysNamespaceFound)
                 yield return "NAUGHTYATTRIBUTES_CK_EXISTS";
+            
+            var bindNamespaceFound = (from type in types
+                where type.Namespace == "Bind"
+                select type).Any();
+            if (bindNamespaceFound)
+                yield return "BIND_EXISTS";
 
         }
     }
