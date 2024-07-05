@@ -8,9 +8,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Slider
     {
         [SerializeField] private bool _convertToSliderLerpValue;
 
-        private float _value;
-        public override float Value => _value;
-
         protected override void OnSetInteractable(bool value)
         {
             View.interactable = value;
@@ -18,12 +15,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Slider
                 View.handleRect.gameObject.SetActive(value);
         }
 
-        public override void SetValueWithoutNotify(float value)
-        {
-            _value = value;
-            View.SetValueWithoutNotify(_value);
-        }
-        
+        protected override void SetValueWithoutNotify(float value) => View.SetValueWithoutNotify(value);
         public float GetFinalValue(float percent) => _convertToSliderLerpValue ? Mathf.Lerp(View.minValue, View.maxValue, percent) : percent;
         public float GetPercentValue(float finalValue) => _convertToSliderLerpValue ? (finalValue - View.minValue) / (View.maxValue - View.minValue) : finalValue;
         

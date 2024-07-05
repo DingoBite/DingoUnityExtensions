@@ -12,12 +12,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
         protected override bool NonInteractablePlaceholder => _nonInteractablePlaceholder;
 
         protected abstract void SetViewValueWithoutNotify(bool value);
-        
-        public override void SetValueWithoutNotify(bool value)
+
+        protected override void SetValueWithoutNotify(bool value)
         {
             SetViewValueWithoutNotify(value);
             if (ToggleSwapInfo != null)
-                ToggleSwapInfo.SetViewActive(value);
+                ToggleSwapInfo.SetViewActive(Value);
         }
     }
 }

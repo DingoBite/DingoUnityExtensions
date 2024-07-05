@@ -11,12 +11,11 @@ namespace DingoUnityExtensions.UnityViewProviders
     {
         [field: SerializeField] public RectTransform RectTransform { get; private set; }
         [SerializeField] private TMP_Text _title;
-        
-        public event Action OnSelect;
-        public event Action OnDeselect;
-
         [SerializeField] private ToggleSwapInfoBase _toggleSwapInfo;
 
+        public event Action OnSelect;
+        public event Action OnDeselect;
+        
         public void SetTitle(string title)
         {
             _title.text = title;

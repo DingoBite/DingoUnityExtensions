@@ -10,13 +10,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
         [SerializeField] private bool _lockInputDisable;
         [SerializeField] private bool _invert;
         
-        private bool _value;
-
-        public override bool Value => _value;
-        protected override void OnSetInteractable(bool value)
-        {
-            View.interactable = value;
-        }
+        protected override void OnSetInteractable(bool value) => View.interactable = value;
 
         protected virtual void OnButtonClick()
         {
@@ -28,9 +22,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
 
         protected override void SubscribeOnly() => View.onClick.AddListener(OnButtonClick);
         protected override void UnsubscribeOnly() => View.onClick.RemoveListener(OnButtonClick);
-        protected override void SetViewValueWithoutNotify(bool value)
-        {
-            _value = _invert ? !value : value;
-        }
+        protected override void SetViewValueWithoutNotify(bool value) => Value = _invert ? !value : value;
     }
 }

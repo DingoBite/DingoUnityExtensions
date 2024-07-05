@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Random = System.Random;
+
+#if UNITASK_EXISTS
+using Cysharp.Threading.Tasks;
+#endif
 
 namespace DingoUnityExtensions.Extensions
 {
@@ -165,6 +168,7 @@ namespace DingoUnityExtensions.Extensions
             }
         }
         
+#if UNITASK_EXISTS
         public static async UniTask ProcessCollectionErrorHandleAsync<T>(this IEnumerable<T> collection, Func<T, UniTask> processAction, Func<T, string> catchMessage)
         {
             if (collection == null)
@@ -183,5 +187,6 @@ namespace DingoUnityExtensions.Extensions
                 }
             }
         }
+#endif
     }
 }

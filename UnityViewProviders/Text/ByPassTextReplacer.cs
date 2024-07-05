@@ -11,7 +11,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
         {
             foreach (var t in _textReplacers)
             {
-                t.SetValueWithoutNotify(text);
+                t.UpdateValueWithoutNotify(text);
             }
         }
     }

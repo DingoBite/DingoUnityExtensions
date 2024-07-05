@@ -16,16 +16,12 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
         private float _currentTimeToMoveNext;
         private int _dir;
         
-        private int _value;
-        
         private bool _down;
         private bool _up;
         private bool _anyKeyDown;
         private bool _escapeDown;
         private bool _returnDown;
         private bool _anyMouseDown;
-
-        public override int Value => _value;
 
         protected override int NonInteractablePlaceholder => SearchDropdown.NONE_ID;
 
@@ -49,11 +45,10 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             View.Interactable = value;
         }
 
-        public override void SetValueWithoutNotify(int value) => View.SelectValueWithoutNotify(value);
+        protected override void SetValueWithoutNotify(int value) => View.SelectValueWithoutNotify(value);
 
         private void OnSelect(SearchDropdownValue dropdownValue)
         {
-            _value = dropdownValue.Id;
             SetValueWithNotify(dropdownValue.Id);
             if (dropdownValue.Id < 0 && View.CustomValueSupport)
                 SelectCustomValue?.Invoke(dropdownValue);

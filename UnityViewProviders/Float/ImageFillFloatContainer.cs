@@ -5,16 +5,15 @@ using UnityEngine.UI;
 
 namespace DingoUnityExtensions.UnityViewProviders.Float
 {
-    public class ColorFloatView : ValueContainer<float>
+    public class ImageFillFloatContainer : ValueContainer<float>
     {
-        [SerializeField] private Gradient _gradient;
-        [SerializeField] private List<Graphic> _graphics;
+        [SerializeField] private List<Image> _images;
 
         protected override void SetValueWithoutNotify(float value)
         {
-            foreach (var graphic in _graphics)
+            foreach (var image in _images)
             {
-                graphic.color = _gradient.Evaluate(value);
+                image.fillAmount = value;
             }
         }
     }

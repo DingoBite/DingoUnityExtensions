@@ -7,6 +7,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 {
     public abstract class ContainerBase : SubscribableBehaviour
     {
+        protected override void SubscribeOnly() { }
+        protected override void UnsubscribeOnly() { }
     }
 
     public abstract class ValueContainer<TValue> : ContainerBase
@@ -18,19 +20,20 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         private Transform _blocker;
 
         [SerializeField] private bool _isInteractable = true;
-        [Tooltip("Is view value managed from scripts or from input in place")]
-        [SerializeField] private bool _isExternalValueManager;
+        // [Tooltip("Is view value managed from scripts or from input in place")]
+        // [SerializeField] private bool _isExternalValueManager;
         [Foldout(FINALIZING_VIEW), Tooltip("Update view OnValidate from _debugDefaultValue")]
         [SerializeField] private bool _debugDefaultValueUpdate;
         [Foldout(FINALIZING_VIEW), ShowIf(nameof(_debugDefaultValueUpdate))]
         [SerializeField] private TValue _debugDefaultValue;
         [Foldout(FINALIZING_VIEW), Tooltip("Change view by value, that default on Not Interactable")]
         [SerializeField] private bool _placeholderAtNonInteractable;
-
+        
         [HideInInspector]
         [SerializeField] private TValue _previousNotInteractablePlaceholder;
 
         protected virtual TValue NonInteractablePlaceholder => default;
+        public bool ValueChangeFromExternalSource { get; set; }
 
         public bool Interactable
         {
@@ -57,28 +60,47 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
             }
         }
 
+        private void Awake()
+        {
+            if (_debugDefaultValueUpdate)
+                UpdateValueWithoutNotify(_debugDefaultValue);
+            OnAwake();
+        }
+
+        protected virtual void OnAwake() {}
+
         public event Action<TValue> OnValueChange;
 
-        public abstract TValue Value { get; }
+        public TValue Value { get; protected set; }
 
         protected void SetValueWithNotify(TValue value)
         {
-            OnValueChange?.Invoke(value);
-            if (!_isExternalValueManager)
-                SetValueWithoutNotify(value);
+            if (!ValueChangeFromExternalSource)
+            {
+                UpdateValueWithoutNotify(value);
+                OnValueChange?.Invoke(Value);
+            }
+            else
+            {
+                OnValueChange?.Invoke(value);
+            }
         }
 
-        protected virtual void OnSetInteractable(bool value)
+        protected virtual void OnSetInteractable(bool value) { }
+
+        public void UpdateValueWithoutNotify(TValue value)
         {
+            Value = value;
+            SetValueWithoutNotify(value);
         }
-
-        public abstract void SetValueWithoutNotify(TValue value);
+        
+        protected abstract void SetValueWithoutNotify(TValue value);
 
         private void OnValidate()
         {
             Validate();
             Interactable = _isInteractable;
-            if (!_debugDefaultValueUpdate || !Interactable)
+            if (!_debugDefaultValueUpdate || !Interactable || Application.isPlaying)
                 return;
             
             try

@@ -11,15 +11,19 @@ namespace DingoUnityExtensions.Extensions
         public static void BindTwoSideModel<TValue>(this ValueContainer<TValue> view, Bind<TValue> model)
         {
             view.SafeSubscribe(model.SetValue);
-            model.OnValueChange -= view.SetValueWithoutNotify;
-            model.OnValueChange += view.SetValueWithoutNotify;
+            model.OnValueChange -= view.UpdateValueWithoutNotify;
+            model.OnValueChange += view.UpdateValueWithoutNotify;
+
+            view.ValueChangeFromExternalSource = true;
         }
         
         public static void BindTwoSideModel<TValue>(this ValueContainer<TValue> view, Action<TValue> modelAction, IReadonlyBind<TValue> model)
         {
             view.SafeSubscribe(modelAction);
-            model.OnValueChange -= view.SetValueWithoutNotify;
-            model.OnValueChange += view.SetValueWithoutNotify;
+            model.OnValueChange -= view.UpdateValueWithoutNotify;
+            model.OnValueChange += view.UpdateValueWithoutNotify;
+            
+            view.ValueChangeFromExternalSource = true;
         }
 
         public static void BindTwoSideModel<TValue, TViewValue>(this ValueContainer<TViewValue> view, Action<TViewValue> viewChangeAction, Action<TValue> modelChangeAction, IReadonlyBind<TValue> model)

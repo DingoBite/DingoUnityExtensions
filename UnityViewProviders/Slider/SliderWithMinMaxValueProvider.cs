@@ -17,9 +17,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Slider
             View.maxValue = max;
 
             if (_minText != null)
-                _minText.SetValueWithoutNotify(ConvertValue(min));
+                _minText.UpdateValueWithoutNotify(ConvertValue(min));
             if (_maxText != null)
-                _maxText.SetValueWithoutNotify(ConvertValue(max));
+                _maxText.UpdateValueWithoutNotify(ConvertValue(max));
         }
 
         protected override void Validate() => SetMinMax(_min, _max);

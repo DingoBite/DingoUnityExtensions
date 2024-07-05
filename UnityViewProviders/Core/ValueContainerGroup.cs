@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DingoUnityExtensions.UnityViewProviders.Core;
 
-namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
+namespace DingoUnityExtensions.UnityViewProviders.Core
 {
     public class ValueContainerGroup<TId, TValue>
     {
@@ -12,14 +11,17 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
         private readonly Dictionary<TId, ValueContainer<TValue>> _eventContainers = new();
         private readonly Dictionary<TId, Action<TValue>> _eventById = new();
 
-        public IEnumerable<ValueContainer<TValue>> GetButtons() => _eventContainers.Values;
-        public ValueContainer<TValue> GetButton(TId id) => _eventContainers.GetValueOrDefault(id, null);
+        public IEnumerable<ValueContainer<TValue>> GetContainers() => _eventContainers.Values;
+        public ValueContainer<TValue> GetContainer(TId id) => _eventContainers.GetValueOrDefault(id, null);
+
+        protected IReadOnlyDictionary<TId, ValueContainer<TValue>> EventContainers => _eventContainers;
         
         public void Initialize(IEnumerable<(TId, ValueContainer<TValue>)> eventContainers)
         {
             Clear();
             foreach (var (id, eventContainer) in eventContainers)
             {
+                eventContainer.ValueChangeFromExternalSource = true;
                 _eventContainers.Add(id, eventContainer);
             }
 
@@ -31,6 +33,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
             Clear();
             foreach (var (id, eventContainer) in eventContainers)
             {
+                eventContainer.ValueChangeFromExternalSource = true;
                 _eventContainers.Add(id, eventContainer);
             }
 
@@ -42,6 +45,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
             Clear();
             foreach (var (id, eventContainer) in eventContainers)
             {
+                eventContainer.ValueChangeFromExternalSource = true;
                 _eventContainers.Add(id, eventContainer);
             }
 
@@ -54,13 +58,19 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
             _eventContainers.Clear();
             _eventById.Clear();
         }
+
+        protected virtual void UpdateContainerValues(TId id, TValue value)
+        {
+            _eventContainers[id].UpdateValueWithoutNotify(value);
+        }
         
         private void ValueChange(TId id, TValue value)
         {
+            UpdateContainerValues(id, value);
             OnValueChange?.Invoke(id, value);
         }
-        
-        protected void SubscribeOnly()
+
+        private void SubscribeOnly()
         {
             foreach (var (id, eventContainer) in _eventContainers)
             {
@@ -74,7 +84,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
             }
         }
 
-        protected void UnsubscribeOnly()
+        private void UnsubscribeOnly()
         {
             foreach (var (id, eventContainer) in _eventContainers.Where(p => p.Value != null))
             {

@@ -1,12 +1,11 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace DingoUnityExtensions.UnityViewProviders.Text
 {
     public class SingleKeyText : KeyTextReplacer
     {
-        [FormerlySerializedAs("_tmpText")] [SerializeField] protected TMP_Text Text;
+        [SerializeField] protected TMP_Text Text;
 
         private void Reset()
         {
@@ -16,8 +15,15 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
 
         protected override void ReplaceKeyBy(string text)
         {
-            var resultText = Pattern.Replace(TemplateString, text);
-            Text.text = resultText;
+            if (!Pattern.IsMatch(TemplateString))
+            {
+                Text.text = text;
+            }
+            else
+            {
+                var resultText = Pattern.Replace(TemplateString, text);
+                Text.text = resultText;
+            }
         }
     }
 }

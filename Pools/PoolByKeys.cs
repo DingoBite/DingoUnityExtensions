@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using AYellowpaper.SerializedCollections;
 using UnityEngine;
 
-namespace _Project.Utils.MonoBehaviours
+namespace DingoUnityExtensions.Pools
 {
     public class PoolByKeys<TKey, T> : MonoBehaviour where T : Component
     {

@@ -10,6 +10,12 @@ namespace Packages.DingoUnityExtensions.Editor
     {
         static OnLoad()
         {
+            ManualProcessDefines();
+        }
+
+        [MenuItem("Edit/Manual Process Defines")]
+        private static void ManualProcessDefines()
+        {
             var definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
             var allDefines = definesString.Split(';').ToList();
             allDefines.AddRange(GetSymbols().Except(allDefines));

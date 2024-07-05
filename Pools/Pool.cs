@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace _Project.Utils.MonoBehaviours
+namespace DingoUnityExtensions.Pools
 {
     public class Pool<T> : MonoBehaviour where T : MonoBehaviour
     {
@@ -12,7 +13,7 @@ namespace _Project.Utils.MonoBehaviours
         private readonly Queue<T> _queue = new();
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
-        
+
         public T PullElement()
         {
             if (_queue.TryDequeue(out var element))

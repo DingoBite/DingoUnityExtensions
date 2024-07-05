@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using DingoUnityExtensions.MonoBehaviours;
 using UnityEngine;
 #if UNITASK_EXISTS
+using Cysharp.Threading.Tasks;
 #endif
 
 
@@ -34,7 +34,7 @@ namespace DingoUnityExtensions
         }
 
         public static void AddLateUpdater(object obj, Action updateAction) => Instance._lateUpdaters[obj] = updateAction;
-        public static void RemoveLateUpdater(object obj, Action updateAction) => Instance._lateUpdaters[obj] = updateAction;
+        public static void RemoveLateUpdater(object obj) => Instance._lateUpdaters.Remove(obj);
         public static void AddUpdater(object obj, Action updateAction) => Instance._updaters[obj] = updateAction;
         public static void RemoveUpdater(object obj) => Instance._updaters.Remove(obj);
 
@@ -63,10 +63,25 @@ namespace DingoUnityExtensions
             return coroutine;
         }
         
+        public static Coroutine InvokeAfterAsyncMethodWithCanceling(object sender, Func<Task> asyncAction, Action action)
+        {
+            if (Instance._actions.TryGetValue(sender, out var coroutine) && coroutine != null)
+                Instance.StopCoroutine(coroutine);
+            coroutine = InvokeAfterAsyncMethod(asyncAction, action);
+            Instance._actions[sender] = coroutine;
+            return coroutine;
+        }
+        
         public static Coroutine InvokeAfterAsyncMethod<T>(Func<Task<T>> asyncAction, Action<Task<T>> action)
         {
             var task = asyncAction.Invoke();
             return Instance.StartCoroutine(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), () => action(task)));
+        }
+        
+        public static Coroutine InvokeAfterAsyncMethod(Func<Task> asyncAction, Action action)
+        {
+            var task = asyncAction.Invoke();
+            return Instance.StartCoroutine(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), action));
         }
 
         public static Coroutine InvokeAfterSeconds(float seconds, Action action)
@@ -85,6 +100,11 @@ namespace DingoUnityExtensions
         {
             return Instance.StartCoroutine(WaitAndInvokeC(yieldInstruction, action));
         }
+        
+        public static Coroutine WaitAndInvoke(YieldInstruction yieldInstruction, Action action)
+        {
+            return Instance.StartCoroutine(WaitAndInvokeC(yieldInstruction, action));
+        }       
         
         public static IEnumerator WaitAndInvokeC(YieldInstruction yieldInstruction, Action action)
         {

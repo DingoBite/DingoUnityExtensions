@@ -12,9 +12,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
         [SerializeField] private string _notInteractablePlaceholder = "None";
         [FormerlySerializedAs("_templateString")] [SerializeField, TextArea] protected string Template;
         
-        private string _value;
-        public override string Value => _value;
-
         protected override string NonInteractablePlaceholder => _notInteractablePlaceholder;
 
         public string TemplateString
@@ -28,20 +25,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
             }
         }
 
-        public override void SetValueWithoutNotify(string text)
-        {
-            _value = text;
-            ReplaceKeyBy(text);
-        }
-        
+        protected override void SetValueWithoutNotify(string value) => ReplaceKeyBy(value);
         protected abstract void ReplaceKeyBy(string text);
-
-        protected override void SubscribeOnly()
-        {
-        }
-
-        protected override void UnsubscribeOnly()
-        {
-        }
     }
 }
