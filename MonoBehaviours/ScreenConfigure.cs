@@ -1,5 +1,4 @@
-﻿using MobileDepthRecorder.Helpers;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace DingoUnityExtensions.MonoBehaviours
 {
