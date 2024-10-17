@@ -1,0 +1,22 @@
+{
+    "name": "MackySoft.SerializeReferenceExtensions.Editor",
+    "rootNamespace": "",
+    "references": [
+        "NaughtyAttributes.Core",
+        "NaughtyAttributes.Editor",
+        "MackySoft.SerializeReferenceExtensions"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_2019_3_OR_NEWER"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
