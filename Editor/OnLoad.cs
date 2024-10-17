@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 
-namespace Packages.DingoUnityExtensions.Editor
+namespace DingoUnityExtensions.Editor
 {
     [InitializeOnLoad]
     public class OnLoad : UnityEditor.Editor

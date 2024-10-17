@@ -1,6 +1,4 @@
-using DingoUnityExtensions.UnityViewProviders.Core;
-
-namespace DingoUnityExtensions.UnityViewProviders.Toggle
+namespace DingoUnityExtensions.UnityViewProviders.Core
 {
     public abstract class ViewValueContainer<TViewValue, TValue> : UnityViewProvider<ValueContainer<TViewValue>, TValue>
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DingoUnityExtensions.Utils
+namespace DingoUnityExtensions.Utils.Search
 {
     public class SearchGroup<T, TOrderValue>  where T : Component where TOrderValue : IComparable<TOrderValue>
     {

@@ -1,4 +1,4 @@
-namespace MobileExerciseAnalyzerView.View.Screens.History.ResultsScroll
+namespace DingoUnityExtensions.Utils.Search
 {
     public interface IFilterable
     {

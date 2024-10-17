@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DingoUnityExtensions.UnityViewProviders.Core;
 
-namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
+namespace DingoUnityExtensions.UnityViewProviders.Core
 {
     public class ButtonContainerGroup<TId> : EventContainerGroup<TId, EventContainer> { }
     

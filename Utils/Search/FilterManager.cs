@@ -1,9 +1,8 @@
-using DingoUnityExtensions.Extensions;
 using DingoUnityExtensions.MonoBehaviours;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using UnityEngine;
 
-namespace MobileExerciseAnalyzerView.View.Screens.History.ResultsScroll
+namespace DingoUnityExtensions.Utils.Search
 {
     public class FilterManager : SubscribableBehaviour
     {
@@ -16,7 +15,7 @@ namespace MobileExerciseAnalyzerView.View.Screens.History.ResultsScroll
 
         private void Filter(string nameFilter) => Filterable?.Filter(nameFilter);
 
-        protected override void SubscribeOnly() => _inputField.SafeSubscribe(Filter);
-        protected override void UnsubscribeOnly() => _inputField.UnSubscribe(Filter);
+        protected override void SubscribeOnly() => _inputField.OnValueChange += Filter;
+        protected override void UnsubscribeOnly() => _inputField.OnValueChange -= Filter;
     }
 }

@@ -1,3 +1,4 @@
+using DingoUnityExtensions.UnityViewProviders.Core;
 using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 
 namespace DingoUnityExtensions.UnityViewProviders
