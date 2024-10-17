@@ -6,15 +6,18 @@ namespace DingoUnityExtensions.Serialization
 {
     public static class JsonOptions
     {
-        public static readonly JsonSerializerSettings Options = new ();
+        public static readonly JsonSerializerSettings PythonOptions = new ();
+        public static readonly JsonSerializerSettings CSharpOptions = new ();
 
         static JsonOptions()
         {
-            Options.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            Options.ContractResolver = new DefaultContractResolver
+            PythonOptions.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            PythonOptions.ContractResolver = new DefaultContractResolver
             {
                 NamingStrategy = new SnakeCaseNamingStrategy()
             };
+            
+            CSharpOptions.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
         }
     }
 }

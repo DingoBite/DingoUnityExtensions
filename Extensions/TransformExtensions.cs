@@ -12,7 +12,6 @@ namespace DingoUnityExtensions.Extensions
             transform.localPosition = pos;
         }
         
-        
         public static void FromMatrix(this Transform transform, Matrix4x4 matrix)
         {
             transform.localScale = matrix.ExtractScale();

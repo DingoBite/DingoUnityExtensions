@@ -20,7 +20,7 @@ namespace DingoUnityExtensions.Utils
             TemporaryCache,
         }
 
-        public static readonly IReadOnlyList<string> Extensions = new List<string> { ".jpg", ".png" };
+        public static readonly IReadOnlyList<string> Extensions = new List<string> { ".jpg", ".png", ".jpeg" };
 
         private static readonly Dictionary<PathPrefix, string> PrefixDictionary;
 

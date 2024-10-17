@@ -29,8 +29,5 @@ namespace DingoUnityExtensions.UnityViewProviders
         }
 
         private static int Round(float value) => (int)Math.Round(value);
-        
-        protected override void SubscribeOnly() { }
-        protected override void UnsubscribeOnly() { }
     }
 }

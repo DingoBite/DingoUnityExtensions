@@ -1,8 +1,9 @@
 using DingoUnityExtensions.UnityViewProviders.Core;
+using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
+namespace DingoUnityExtensions.UnityViewProviders.Toggle
 {
     public abstract class ToggleBehaviourProvider<TView> : UnityViewProvider<TView, bool> where TView : Component
     {

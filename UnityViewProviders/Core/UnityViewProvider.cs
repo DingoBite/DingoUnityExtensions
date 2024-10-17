@@ -71,6 +71,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         public event Action<TValue> OnValueChange;
 
+        private bool _disabledValueChanged;
+        private bool _updateOnEnable;
+        
         public TValue Value { get; protected set; }
 
         protected void SetValueWithNotify(TValue value)
@@ -90,6 +93,17 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         public void UpdateValueWithoutNotify(TValue value)
         {
+            if (!_updateOnEnable && (!gameObject.activeInHierarchy || !enabled))
+            {
+                Value = value;
+                _disabledValueChanged = true;
+                return;
+            }
+            if (_updateOnEnable && _disabledValueChanged)
+            {
+                _disabledValueChanged = false;
+                _updateOnEnable = false;
+            }
             Value = value;
             SetValueWithoutNotify(value);
         }
@@ -100,7 +114,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         {
             Validate();
             Interactable = _isInteractable;
-            if (!_debugDefaultValueUpdate || !Interactable || Application.isPlaying)
+            if (!_debugDefaultValueUpdate)
                 return;
             
             try
@@ -114,6 +128,15 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         }
         
         protected virtual void Validate() {}
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            if (!_disabledValueChanged)
+                return;
+            _updateOnEnable = true;
+            UpdateValueWithoutNotify(Value);
+        }
     }
 
     public abstract class EventContainer : SubscribableBehaviour
@@ -138,7 +161,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         public event Action OnEvent;
 
-        protected void EventInvoke() => OnEvent?.Invoke();
+        protected virtual void EventInvoke() => OnEvent?.Invoke();
         protected abstract void OnSetInteractable(bool value);
 
         private void OnValidate()

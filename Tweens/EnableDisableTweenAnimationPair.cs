@@ -15,36 +15,37 @@ namespace DingoUnityExtensions.Tweens
         [SerializeField] private float _disableDuration;
         [SerializeField] private float _disableDelay;
 
-        public float EnableDuration => _enableDelay + _enableDuration;
-        public float EnableDelay => _enableDelay;
-        public float DisableDuration => _disableDelay + _disableDuration;
         public float DisableDelay => _disableDelay;
-
-        public AnimationCurve EnableAnimationCurve => _enableAnimationCurve;
-        public AnimationCurve DisableAnimationCurve => _disableAnimationCurve;
+        public float EnableDelay => _enableDelay;
+        public float DisableDuration => DisableDelay + _disableDuration;
+        public float EnableDuration => EnableDelay + _enableDuration;
         
         public Tween MakeEnableTween(Func<float, Tween> tweenFactoryMethod) => MakeEnableTween(tweenFactoryMethod, out _);
-        
-        public Tween MakeEnableTween(Func<float, Tween> tweenFactoryMethod, out float fullDuration)
+        public Tween MakeEnableTween(Func<float, Tween> tweenFactoryMethod, float addDelay) => MakeEnableTween(tweenFactoryMethod, out _, addDelay);
+
+        public Tween MakeEnableTween(Func<float, Tween> tweenFactoryMethod, out float fullDuration, float addDelay = 0)
         {
             var tween = tweenFactoryMethod(_enableDuration);
-            if (_enableDelay > Vector2.kEpsilon)
-                tween.SetDelay(_enableDelay);
+            var enableDelay = _enableDelay + addDelay;
+            if (enableDelay > Vector2.kEpsilon)
+                tween.SetDelay(enableDelay);
             if (_enableAnimationCurve != null)
                 tween.SetEase(_enableAnimationCurve);
-            fullDuration = _enableDelay + _enableDuration;
+            fullDuration = enableDelay + _enableDuration;
             return tween;
         }
 
         public Tween MakeDisableTween(Func<float, Tween> tweenFactoryMethod) => MakeDisableTween(tweenFactoryMethod, out _);
-        public Tween MakeDisableTween(Func<float, Tween> tweenFactoryMethod, out float fullDuration)
+        public Tween MakeDisableTween(Func<float, Tween> tweenFactoryMethod, float addDelay) => MakeDisableTween(tweenFactoryMethod, out _, addDelay);
+        public Tween MakeDisableTween(Func<float, Tween> tweenFactoryMethod, out float fullDuration, float addDelay = 0)
         {
             var tween = tweenFactoryMethod(_disableDuration);
-            if (_disableDelay > Vector2.kEpsilon)
-                tween.SetDelay(_disableDelay);
+            var disableDelay = _disableDelay + addDelay;
+            if (disableDelay > Vector2.kEpsilon)
+                tween.SetDelay(disableDelay);
             if (_disableAnimationCurve != null)
                 tween.SetEase(_disableAnimationCurve);
-            fullDuration = _disableDelay + _disableDuration;
+            fullDuration = disableDelay + _disableDuration;
             return tween;
         }
     }

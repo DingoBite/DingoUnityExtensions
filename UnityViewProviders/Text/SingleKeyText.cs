@@ -9,7 +9,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
 
         private void Reset()
         {
-            Text = GetComponent<TMP_Text>();
+            Text ??= GetComponent<TMP_Text>();
             Template = Text.text;
         }
 

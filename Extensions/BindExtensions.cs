@@ -31,6 +31,8 @@ namespace DingoUnityExtensions.Extensions
             view.SafeSubscribe(viewChangeAction);
             model.OnValueChange -= modelChangeAction;
             model.OnValueChange += modelChangeAction;
+            
+            view.ValueChangeFromExternalSource = true;
         }
         
         public static void UnSubscribe<TValue>(this ValueContainer<TValue> view, Action<TValue> callback)

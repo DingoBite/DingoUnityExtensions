@@ -1,4 +1,5 @@
 using DingoUnityExtensions.MonoBehaviours;
+using DingoUnityExtensions.MonoBehaviours.Singletons;
 using UnityEngine;
 
 namespace DingoUnityExtensions.Utils

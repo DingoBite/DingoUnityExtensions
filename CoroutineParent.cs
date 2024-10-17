@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DingoUnityExtensions.MonoBehaviours;
+using DingoUnityExtensions.MonoBehaviours.Singletons;
 using UnityEngine;
 #if UNITASK_EXISTS
 using Cysharp.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace DingoUnityExtensions
         private readonly Dictionary<object, Action> _updaters = new();
         private readonly Dictionary<object, Action> _lateUpdaters = new();
         private readonly Dictionary<object, Coroutine> _actions = new();
+        private readonly Dictionary<object, Coroutine> _coroutinesWithCanceling = new();
         
         public static WaitForSeconds CachedWaiter(float seconds)
         {
@@ -44,6 +46,21 @@ namespace DingoUnityExtensions
         public static Coroutine YieldTaskCoroutine(Task task, Action<Exception> exceptionHandler = null) => YieldTaskCoroutine(task.AsUniTask(), exceptionHandler);
         public static Coroutine YieldTaskCoroutine<T>(Task<T> task, Action<T> resultHandler = null, Action<Exception> exceptionHandler = null) => YieldTaskCoroutine(task.AsUniTask(), resultHandler, exceptionHandler);
 #endif
+
+        public static Coroutine StartCoroutineWithCanceling(object key, Func<IEnumerator> factory)
+        {
+            if (Instance._coroutinesWithCanceling.TryGetValue(key, out var coroutine) && coroutine != null)
+                Instance.StopCoroutine(coroutine);
+            coroutine = Instance.StartCoroutine(factory());
+            Instance._coroutinesWithCanceling[key] = coroutine;
+            return coroutine;
+        }
+
+        public static void CancelCoroutine(object key)
+        {
+            if (Instance._coroutinesWithCanceling.TryGetValue(key, out var coroutine) && coroutine != null)
+                Instance.StopCoroutine(coroutine);
+        }
         
         public static Coroutine InvokeAfterSecondsWithCanceling(object sender, float seconds, Action action)
         {

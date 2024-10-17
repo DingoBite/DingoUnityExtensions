@@ -19,6 +19,11 @@ namespace DingoUnityExtensions.MonoBehaviours
                     return _component;
                 }
             }
+
+            private void Reset()
+            {
+                _component = GetComponent<T>();
+            }
         }
         
         [SerializeField] private T _component;
@@ -33,6 +38,11 @@ namespace DingoUnityExtensions.MonoBehaviours
 
                 return _component;
             }
+        }
+
+        private void Reset()
+        {
+            _component = GetComponent<T>();
         }
     }
 }

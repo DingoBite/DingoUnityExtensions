@@ -1,12 +1,12 @@
 using UnityEngine;
 
-namespace DingoUnityExtensions.MonoBehaviours
+namespace DingoUnityExtensions.MonoBehaviours.Singletons
 {
     public class SingletonProtectedBehaviour<T> : MonoBehaviour where T : SingletonProtectedBehaviour<T>
     {
         private static T _instance;
-        private static readonly object _lock = new object();
-        private static bool _applicationIsQuitting = false;
+        private static readonly object _lock = new();
+        private static bool _applicationIsQuitting;
 
         protected static T Instance
         {

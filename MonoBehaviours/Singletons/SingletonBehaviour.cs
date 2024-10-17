@@ -1,12 +1,12 @@
 using UnityEngine;
 
-namespace DingoUnityExtensions.MonoBehaviours
+namespace DingoUnityExtensions.MonoBehaviours.Singletons
 {
-    public class SingletonBehaviour<T> : MonoBehaviour where T : SingletonBehaviour<T>
+    public abstract class SingletonBehaviour<T> : MonoBehaviour where T : SingletonBehaviour<T>
     {
         private static T _instance;
-        private static readonly object _lock = new object();
-        private static bool _applicationIsQuitting = false;
+        private static readonly object _lock = new();
+        private static bool _applicationIsQuitting;
 
         public static T Instance
         {
@@ -26,9 +26,7 @@ namespace DingoUnityExtensions.MonoBehaviours
 
                         if (instances.Length == 0)
                         {
-                            var obj = new GameObject($"S_{typeof(T).Name}");
-                            _instance = obj.AddComponent<T>();
-                            DontDestroyOnLoad(obj);
+                            Debug.LogError($"[Singleton] No instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
                         }
                         else if (instances.Length == 1)
                         {
@@ -42,7 +40,7 @@ namespace DingoUnityExtensions.MonoBehaviours
                             DontDestroyOnLoad(_instance.gameObject);
                             for (var i = 1; i < instances.Length; i++)
                             {
-                                Destroy(instances[i].gameObject);
+                                instances[i].gameObject.SetActive(false);
                             }
                         }
                     }
@@ -66,11 +64,11 @@ namespace DingoUnityExtensions.MonoBehaviours
         }
     }
 
-    public class ProtectedSingletonBehaviour<T> : MonoBehaviour where T : ProtectedSingletonBehaviour<T>
+    public abstract class ProtectedSingletonBehaviour<T> : MonoBehaviour where T : ProtectedSingletonBehaviour<T>
     {
         private static T _instance;
-        private static readonly object _lock = new object();
-        private static bool _applicationIsQuitting = false;
+        private static readonly object _lock = new();
+        private static bool _applicationIsQuitting;
 
         protected static T Instance
         {
@@ -90,9 +88,7 @@ namespace DingoUnityExtensions.MonoBehaviours
 
                         if (instances.Length == 0)
                         {
-                            var obj = new GameObject($"S_{typeof(T).Name}");
-                            _instance = obj.AddComponent<T>();
-                            DontDestroyOnLoad(obj);
+                            Debug.LogError($"[Singleton] No instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
                         }
                         else if (instances.Length == 1)
                         {
@@ -106,7 +102,7 @@ namespace DingoUnityExtensions.MonoBehaviours
                             DontDestroyOnLoad(_instance.gameObject);
                             for (var i = 1; i < instances.Length; i++)
                             {
-                                Destroy(instances[i].gameObject);
+                                instances[i].gameObject.SetActive(false);
                             }
                         }
                     }

@@ -4,12 +4,28 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.Pools
 {
-    public class Pool<T> : MonoBehaviour where T : MonoBehaviour
+    public interface IPoolGetOnly<out T> where T : MonoBehaviour
+    {
+        public IReadOnlyList<T> PulledElements { get; }
+        public T PullElement();
+        public void Clear();
+    }
+
+    public enum SortTransformOrderOption
+    {
+        None,
+        AsLast,
+        AsFirst
+    }
+    
+    public class Pool<T> : MonoBehaviour, IPoolGetOnly<T> where T : MonoBehaviour
     {
         [SerializeField] private T _prefab;
+        [SerializeField] private bool _syncLayer = true;
         [SerializeField] private bool _manageActiveness = true;
+        [SerializeField] private SortTransformOrderOption _sortTransformOrder;
 
-        private readonly List<T> _pulledElements = new List<T>();
+        private readonly List<T> _pulledElements = new();
         private readonly Queue<T> _queue = new();
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
@@ -21,12 +37,14 @@ namespace DingoUnityExtensions.Pools
                 if (_manageActiveness)
                     element.gameObject.SetActive(true);
                 _pulledElements.Add(element);
+                Sort(element);
                 return element;
             }
             element = InstantiateComponent();
             if (_manageActiveness)
                 element.gameObject.SetActive(true);
             _pulledElements.Add(element);
+            Sort(element);
             return element;
         }
 
@@ -53,8 +71,27 @@ namespace DingoUnityExtensions.Pools
         private T InstantiateComponent()
         {
             var component = Instantiate(_prefab, transform);
-            component.name = $"--{_queue.Count}_{ComponentName}";
+            if (_syncLayer)
+                component.gameObject.layer = gameObject.layer;
+            component.name = $"--{_pulledElements.Count}_{ComponentName}";
             return component;
+        }
+
+        private void Sort(T element)
+        {
+            switch (_sortTransformOrder)
+            {
+                case SortTransformOrderOption.None:
+                    break;
+                case SortTransformOrderOption.AsLast:
+                    element.transform.SetAsLastSibling();
+                    break;
+                case SortTransformOrderOption.AsFirst:
+                    element.transform.SetAsFirstSibling();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }
