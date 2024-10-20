@@ -16,6 +16,8 @@ namespace DingoUnityExtensions.Tweens
         [SerializeField] private Matrix4x4 _disableTransform;
         [SerializeField] private float _addictiveEnableDelay;
         [SerializeField] private float _addictiveDisableDelay;
+
+        public bool ValidAnimation => Animation != null;
         
         public void SetDefaultValues(Transform transform)
         {

@@ -8,26 +8,28 @@ namespace DingoUnityExtensions.Tweens
     public class RevealCanvasGroup : AnimatableBehaviour
     {
         [SerializeField] protected CanvasGroup CanvasGroup;
-        [SerializeField] private bool _fade = true;
         [SerializeField] protected EnableDisableTweenAnimationPair FadeAnimation;
+        [SerializeField] private float _addictiveEnableDelay;
+        [SerializeField] private float _addictiveDisableDelay;
+        [SerializeField] private bool _bakeButtons;
 
-        [SerializeField, ShowIf(nameof(ValidAnimationParams))] private bool _useTransformTranslation;
-        [SerializeField, ShowIf(nameof(ValidAnimationParams))] private bool _bakeButtons;
+        [SerializeField] private TransformAnimationEndpoints _bakeAnimationEndpoints;
 
-        [SerializeField, ShowIf(nameof(ValidAnimationParams))] private TransformAnimationEndpoints _bakeAnimationEndpoints;
-
-        protected override bool ValidAnimationParams => ValidFadeAnimationParams && ValidTransformAnimationParams;
+        protected override bool ValidAnimationParams => IsFade || IsTransformTranslation;
         
-        private bool ValidTransformAnimationParams => !_useTransformTranslation || _useTransformTranslation && _bakeAnimationEndpoints != null;
-        private bool ValidFadeAnimationParams => !_fade || _fade && FadeAnimation != null;
-
+        private bool IsFade => FadeAnimation != null;
+        private bool IsTransformTranslation => _bakeAnimationEndpoints.ValidAnimation;
+        
         protected override IEnumerable<Tween> CollectEnableTweens(bool isPlaying, float addDelay)
         {
-            var animationDelay = isPlaying ? 0 : FadeAnimation.EnableDelay + addDelay;
-            yield return FadeAnimation.MakeEnableTween(d => CanvasGroup.DOFade(1, d)).SetDelay(animationDelay);
-            if (_useTransformTranslation)
+            if (IsFade && CanvasGroup != null)
             {
-                foreach (var tween in _bakeAnimationEndpoints.Enable(transform, addDelay: isPlaying ? 0 : addDelay))
+                var animationDelay = isPlaying ? 0 : FadeAnimation.EnableDelay + addDelay + _addictiveEnableDelay;
+                yield return FadeAnimation.MakeEnableTween(d => CanvasGroup.DOFade(1, d)).SetDelay(animationDelay);
+            }
+            if (IsTransformTranslation)
+            {
+                foreach (var tween in _bakeAnimationEndpoints.Enable(GameObject.transform, addDelay: isPlaying ? 0 : addDelay))
                 {
                     yield return tween;
                 }
@@ -36,48 +38,82 @@ namespace DingoUnityExtensions.Tweens
 
         protected override IEnumerable<Tween> CollectDisableTweens(bool isPlaying, float addDelay)
         {
-            var animationDelay = isPlaying ? 0 : FadeAnimation.DisableDelay + addDelay;
-            yield return FadeAnimation.MakeDisableTween(d => CanvasGroup.DOFade(_fade ? 0 : 1, d)).SetDelay(animationDelay);
-            if (_useTransformTranslation)
+            if (IsFade && CanvasGroup != null)
             {
-                foreach (var tween in _bakeAnimationEndpoints.Disable(transform, addDelay: isPlaying ? 0 : addDelay))
+                var animationDelay = isPlaying ? 0 : FadeAnimation.DisableDelay + addDelay + _addictiveDisableDelay;
+                yield return FadeAnimation.MakeDisableTween(d => CanvasGroup.DOFade(IsFade ? 0 : 1, d)).SetDelay(animationDelay);
+            }
+            if (IsTransformTranslation)
+            {
+                foreach (var tween in _bakeAnimationEndpoints.Disable(GameObject.transform, addDelay: isPlaying ? 0 : addDelay))
                 {
                     yield return tween;
                 }
             }
         }
 
-        protected override void SetFullActive(bool value, bool force = false)
+        protected override void SetFullActive(AnimateState state, bool force = false)
         {
-            base.SetFullActive(value, force);
-            if (value)
+            base.SetFullActive(state, force);
+            if (state is AnimateState.Enabled)
             {
-                if (force)
-                    CanvasGroup.alpha = _fade ? 1 : CanvasGroup.alpha;
-                if (_useTransformTranslation)
-                    _bakeAnimationEndpoints.SetTargetValues(transform);
+                if (force && CanvasGroup != null)
+                    CanvasGroup.alpha = IsFade ? 1 : CanvasGroup.alpha;
+                if (IsTransformTranslation)
+                    _bakeAnimationEndpoints.SetTargetValues(GameObject.transform);
             }
-            else
+            else if (state is AnimateState.Disabled)
             {
-                if (force)
-                    CanvasGroup.alpha = _fade ? 0 : CanvasGroup.alpha;
-                if (_useTransformTranslation)
-                    _bakeAnimationEndpoints.SetDisableValues(transform);
+                if (force && CanvasGroup != null)
+                    CanvasGroup.alpha = IsFade ? 0 : CanvasGroup.alpha;
+                if (IsTransformTranslation)
+                {
+                    if (force)
+                        _bakeAnimationEndpoints.SetDefaultValues(GameObject.transform);
+                    else 
+                        _bakeAnimationEndpoints.SetDisableValues(GameObject.transform);
+                }
             }
         }
 
         [Button]
-        private void SetDefaultValues() => _bakeAnimationEndpoints.SetDefaultValues(transform);
+        private void SetDefaultValues()
+        {
+            _bakeAnimationEndpoints.SetDefaultValues(GameObject.transform);
+            foreach (var animatableBehaviour in Stack)
+            {
+                if (animatableBehaviour is RevealCanvasGroup revealCanvasGroup)
+                    revealCanvasGroup._bakeAnimationEndpoints.SetDefaultValues(revealCanvasGroup.GameObject.transform);
+            }
+        }
+
         [Button]
-        private void SetTargetValues() => _bakeAnimationEndpoints.SetTargetValues(transform);
+        private void SetTargetValues()
+        {
+            _bakeAnimationEndpoints.SetTargetValues(GameObject.transform);
+            foreach (var animatableBehaviour in Stack)
+            {
+                if (animatableBehaviour is RevealCanvasGroup revealCanvasGroup)
+                    revealCanvasGroup._bakeAnimationEndpoints.SetTargetValues(revealCanvasGroup.GameObject.transform);
+            }
+        }
+
         [Button]
-        private void SetDisableValues() => _bakeAnimationEndpoints.SetDisableValues(transform);
-        
+        private void SetDisableValues()
+        {
+            _bakeAnimationEndpoints.SetDisableValues(GameObject.transform);
+            foreach (var animatableBehaviour in Stack)
+            {
+                if (animatableBehaviour is RevealCanvasGroup revealCanvasGroup)
+                    revealCanvasGroup._bakeAnimationEndpoints.SetDisableValues(revealCanvasGroup.GameObject.transform);
+            }
+        }
+
         [Button, ShowIf(nameof(_bakeButtons))]
-        private void BakeDefaultValues() => _bakeAnimationEndpoints.BakeDefaultValues(transform);
+        private void BakeDefaultValues() => _bakeAnimationEndpoints.BakeDefaultValues(GameObject.transform);
         [Button, ShowIf(nameof(_bakeButtons))]
-        private void BakeTargetValues() => _bakeAnimationEndpoints.BakeTargetValues(transform);
+        private void BakeTargetValues() => _bakeAnimationEndpoints.BakeTargetValues(GameObject.transform);
         [Button, ShowIf(nameof(_bakeButtons))]
-        private void BakeDisableValues() => _bakeAnimationEndpoints.BakeDisableValues(transform);
+        private void BakeDisableValues() => _bakeAnimationEndpoints.BakeDisableValues(GameObject.transform);
     }
 }

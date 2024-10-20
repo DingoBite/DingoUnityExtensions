@@ -2,9 +2,9 @@
     "name": "MackySoft.SerializeReferenceExtensions.Editor",
     "rootNamespace": "",
     "references": [
-        "NaughtyAttributes.Core",
-        "NaughtyAttributes.Editor",
-        "MackySoft.SerializeReferenceExtensions"
+        "GUID:e9756ee54ce9bf24e9f10c902fa44774",
+        "GUID:8e196de1d50e66a499c9d6d74c807e29",
+        "GUID:bed2fc2cd10c19f48b9ff499cdeafaa3"
     ],
     "includePlatforms": [
         "Editor"

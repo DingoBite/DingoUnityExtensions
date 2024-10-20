@@ -32,19 +32,19 @@ namespace DingoUnityExtensions.MonoBehaviours.UI
         
         private IEnumerator Rebuild_C(Action callback = null)
         {
-            yield return new WaitForEndOfFrame();
+            yield return null;
             Rebuild();
             callback?.Invoke();
         }
         
         private IEnumerator RebuildAndDisable_C(Action callback = null)
         {
-            yield return new WaitForEndOfFrame();
+            yield return null;
             if (TryGetComponent<ContentSizeFitter>(out var sizeFitter))
             {
                 sizeFitter.enabled = false;
             }
-            yield return new WaitForEndOfFrame();
+            yield return null;
             Rebuild();
             if (TryGetComponent<HorizontalOrVerticalLayoutGroup>(out var layout))
             {

@@ -71,7 +71,9 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                 {
                     _invertedMaskMaterial = new Material(base.materialForRendering);
                     _invertedMaskMaterial.SetInt(StencilComp, (int)_parentMaskCompareFunction);
+#if UNITY_EDITOR
                     Debug.LogWarning(e);
+#endif
                 }
                 return _invertedMaskMaterial;
             }

@@ -38,16 +38,16 @@ namespace DingoUnityExtensions.Utils
             try
             {
 #if UNITY_ANDROID
-                 path = PathUtils.AbsoluteFilePathToUri(path);
-                 using var unityWebRequest = UnityWebRequestTexture.GetTexture(path);
-                 unityWebRequest.timeout = 5;
-                 await unityWebRequest.SendWebRequest();
-                 var loadingRequest = await UnityWebRequest.Get(path).SendWebRequest();
-                 Texture2D result;
-                 if (loadingRequest.result == UnityWebRequest.Result.Success)
-                     result = DownloadHandlerTexture.GetContent(unityWebRequest);
-                 else
-                     result = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                path = PathUtils.AbsoluteFilePathToUri(path);
+                using var unityWebRequest = UnityWebRequestTexture.GetTexture(path);
+                unityWebRequest.timeout = 5;
+                await unityWebRequest.SendWebRequest();
+                var loadingRequest = await UnityWebRequest.Get(path).SendWebRequest();
+                Texture2D result;
+                if (loadingRequest.result == UnityWebRequest.Result.Success)
+                    result = DownloadHandlerTexture.GetContent(unityWebRequest);
+                else
+                    result = new Texture2D(2, 2, TextureFormat.RGBA32, false);
 #else
                 var result = new Texture2D(2, 2, TextureFormat.RGBA32, false);
                 var thumbnailImageData = await File.ReadAllBytesAsync(path);

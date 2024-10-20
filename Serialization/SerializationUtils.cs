@@ -32,31 +32,26 @@ namespace DingoUnityExtensions.Serialization
 
             string json;
             T value;
-            var saveCache = false;
             if (catchException)
             {
                 try
                 {
                     json = await File.ReadAllTextAsync(path);
                     value = settings == null ? JsonConvert.DeserializeObject<T>(json) : JsonConvert.DeserializeObject<T>(json, settings);
-                    saveCache = true;
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Cannot load and deserialize at: {path}");
                     Debug.LogException(e);
                     value = defaultValue;
-                    saveCache = false;
                 }
             }
             else
             {
                 json = await File.ReadAllTextAsync(path);
                 value = settings == null ? JsonConvert.DeserializeObject<T>(json) : JsonConvert.DeserializeObject<T>(json, settings);
-                saveCache = true;
             }
 
-            if (saveCache && (cacheOption == CacheOption.ForceUpdateCachedValue || cacheOption == CacheOption.TryGetCachedValue && !StaticCache<T>.CachedValues.ContainsKey(path)))
+            if (cacheOption == CacheOption.ForceUpdateCachedValue || cacheOption == CacheOption.TryGetCachedValue && !StaticCache<T>.CachedValues.ContainsKey(path))
                 StaticCache<T>.CachedValues.AddOrUpdate(path, value, (k, v) => value);
 
             return value;

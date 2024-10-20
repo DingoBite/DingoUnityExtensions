@@ -1,4 +1,3 @@
-using DingoUnityExtensions.MonoBehaviours;
 using DingoUnityExtensions.MonoBehaviours.Singletons;
 using UnityEngine;
 
@@ -10,6 +9,7 @@ namespace DingoUnityExtensions.Utils
         {
 #if UNITY_EDITOR
             Debug.Log($"Share text {message}");
+            GUIUtility.systemCopyBuffer = message;
             return;
 #endif
 

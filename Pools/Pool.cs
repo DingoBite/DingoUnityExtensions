@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DingoUnityExtensions.Extensions;
 using UnityEngine;
 
 namespace DingoUnityExtensions.Pools
@@ -21,10 +22,10 @@ namespace DingoUnityExtensions.Pools
     public class Pool<T> : MonoBehaviour, IPoolGetOnly<T> where T : MonoBehaviour
     {
         [SerializeField] private T _prefab;
-        [SerializeField] private bool _syncLayer = true;
         [SerializeField] private bool _manageActiveness = true;
         [SerializeField] private SortTransformOrderOption _sortTransformOrder;
-
+        [SerializeField] private bool _layerFromPool = true;
+        
         private readonly List<T> _pulledElements = new();
         private readonly Queue<T> _queue = new();
         private string ComponentName => typeof(T).Name;
@@ -71,12 +72,15 @@ namespace DingoUnityExtensions.Pools
         private T InstantiateComponent()
         {
             var component = Instantiate(_prefab, transform);
-            if (_syncLayer)
-                component.gameObject.layer = gameObject.layer;
+            if (_layerFromPool)
+                component.gameObject.SetLayerRecursive(gameObject.layer);
             component.name = $"--{_pulledElements.Count}_{ComponentName}";
+            OnInstantiate(component);
             return component;
         }
 
+        protected virtual void OnInstantiate(T component){}
+        
         private void Sort(T element)
         {
             switch (_sortTransformOrder)
