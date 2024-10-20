@@ -43,7 +43,7 @@ public class DummyComponentEditor : Editor
         {
             editorDropDownNoLabel.stringValue = s;
             serializedObject.ApplyModifiedProperties();
-        }, false, true, null, GUILayout.Width(200));
+        }, false, true, false, "/", null, GUILayout.Width(200));
         AutoCompleteDropDown.EditorGUILayout.AutoCompleteDropDown("Allow Custom", editorDropDownAllowCustoms.stringValue, options, s =>
         {
             editorDropDownAllowCustoms.stringValue = s;

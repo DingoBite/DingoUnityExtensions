@@ -30,9 +30,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static void AutoCompleteDropDown(string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null, params GUILayoutOption[] options)
             {
-                AutoCompleteDropDown("", text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, orderFunc, options);
+                AutoCompleteDropDown("", text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, returnFullPath, separator, orderFunc, options);
             }
             /// <summary>
             /// Make a Dropdown that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -49,9 +49,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static void AutoCompleteDropDown(string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null, params GUILayoutOption[] options)
             {
-                AutoCompleteDropDown("", text, style, entries, onItemAdded, allowCustom, allowEmpty, orderFunc, options);
+                AutoCompleteDropDown("", text, style, entries, onItemAdded, allowCustom, allowEmpty, returnFullPath, separator, orderFunc, options);
             }
             /// <summary>
             /// Make a Dropdown that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -68,9 +68,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(string label, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static void AutoCompleteDropDown(string label, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null, params GUILayoutOption[] options)
             {
-                AutoCompleteDropDown(label, text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, orderFunc, options);
+                AutoCompleteDropDown(label, text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, returnFullPath, separator, orderFunc, options);
             }
             /// <summary>
             /// Make a Dropdown that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -88,9 +88,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(string label, string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static void AutoCompleteDropDown(string label, string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null, params GUILayoutOption[] options)
             {
-                AutoCompleteDropDown(new GUIContent(label), text, style, entries, onItemAdded, allowCustom, allowEmpty, orderFunc, options);
+                AutoCompleteDropDown(new GUIContent(label), text, style, entries, onItemAdded, allowCustom, allowEmpty, returnFullPath, separator, orderFunc, options);
             }
             /// <summary>
             /// Make a Dropdown that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -107,9 +107,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(GUIContent label, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static void AutoCompleteDropDown(GUIContent label, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null, params GUILayoutOption[] options)
             {
-                AutoCompleteDropDown(label, text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, orderFunc, options);
+                AutoCompleteDropDown(label, text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, returnFullPath, separator, orderFunc, options);
             }
             
             #endregion Polymorphism
@@ -130,13 +130,13 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(GUIContent label, string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static void AutoCompleteDropDown(GUIContent label, string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null, params GUILayoutOption[] options)
             {
                 //Get the rect to draw the text field
                 Rect lastRect = UnityEditor.EditorGUILayout.GetControlRect(!string.IsNullOrEmpty(label.text), UnityEditor.EditorGUIUtility.singleLineHeight, style, options);
 
                 //Draw it without using layout
-                EditorGUI.AutoCompleteDropDown(lastRect, label, text, style, entries, onItemAdded, allowCustom: allowCustom, allowEmpty: allowEmpty, orderFunc);
+                EditorGUI.AutoCompleteDropDown(lastRect, label, text, style, entries, onItemAdded, allowCustom: allowCustom, allowEmpty: allowEmpty, returnFullPath: returnFullPath, separator: separator, orderFunc);
             }
         }
 
@@ -157,9 +157,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(Rect position, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null)
+            public static void AutoCompleteDropDown(Rect position, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null)
             {
-                AutoCompleteDropDown(position, "", text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, orderFunc);
+                AutoCompleteDropDown(position, "", text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, returnFullPath, separator, orderFunc);
             }
             /// <summary>
             /// Make a Dropdown that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -172,9 +172,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(Rect position, string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null)
+            public static void AutoCompleteDropDown(Rect position, string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null)
             {
-                 AutoCompleteDropDown(position, "", text, style, entries, onItemAdded, allowCustom, allowEmpty, orderFunc);
+                 AutoCompleteDropDown(position, "", text, style, entries, onItemAdded, allowCustom, allowEmpty, returnFullPath, separator, orderFunc);
             }
             /// <summary>
             /// Make a Dropdown that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -187,9 +187,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(Rect position, string label, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null)
+            public static void AutoCompleteDropDown(Rect position, string label, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null)
             {
-                AutoCompleteDropDown(position, label, text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, orderFunc);
+                AutoCompleteDropDown(position, label, text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom, allowEmpty, returnFullPath, separator, orderFunc);
             }
             /// <summary>
             /// Make a Dropdown that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -203,9 +203,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(Rect position, string label, string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null)
+            public static void AutoCompleteDropDown(Rect position, string label, string text, GUIStyle style, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null)
             {
-                AutoCompleteDropDown(position, new GUIContent(label), text, style, entries, onItemAdded, allowCustom: allowCustom, allowEmpty: allowEmpty, orderFunc);
+                AutoCompleteDropDown(position, new GUIContent(label), text, style, entries, onItemAdded, allowCustom: allowCustom, allowEmpty: allowEmpty, returnFullPath, separator, orderFunc);
             }
             /// <summary>
             /// Make a Dropdown that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -218,9 +218,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(Rect position, GUIContent label, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null)
+            public static void AutoCompleteDropDown(Rect position, GUIContent label, string text, string[] entries, System.Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null)
             {
-                AutoCompleteDropDown(position, label, text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom: allowCustom, allowEmpty: allowEmpty, orderFunc);
+                AutoCompleteDropDown(position, label, text, AutoCompleteBase.M_dropdownStyle, entries, onItemAdded, allowCustom: allowCustom, allowEmpty: allowEmpty, returnFullPath: returnFullPath, separator: separator, orderFunc);
             }
             #endregion Polymorphism
 
@@ -237,7 +237,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(Rect position, GUIContent label, string text, GUIStyle style, string[] entries, Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null)
+            public static void AutoCompleteDropDown(Rect position, GUIContent label, string text, GUIStyle style, string[] entries, Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", Func<string, float> orderFunc = null)
             {
                 Rect pos = UnityEditor.EditorGUI.PrefixLabel(position, label);
                 
@@ -249,7 +249,7 @@ namespace RotaryHeart.Lib.AutoComplete
                 }
 
                 position.x = pos.x;
-                AutoCompleteBase._AutoCompleteLogic(position, label, text, entries, allowCustom, allowEmpty, true, null, onItemAdded, orderFunc:orderFunc);
+                AutoCompleteBase._AutoCompleteLogic(position, label, text, entries, allowCustom, allowEmpty, returnFullPath, separator, true, null, onItemAdded, orderFunc:orderFunc);
             }
         }
 
@@ -356,7 +356,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <param name="windowStyle">Contains the style to use for the window (colors, textures, etc)</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static void AutoCompleteDropDown(Rect position, GUIContent label, string text, GUIStyle inputStyle, string[] entries, Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, IStyle windowStyle = null, Func<string,float> orderFunc = null)
+            public static void AutoCompleteDropDown(Rect position, GUIContent label, string text, GUIStyle inputStyle, string[] entries, Action<string> onItemAdded, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, string separator = "/", IStyle windowStyle = null, Func<string,float> orderFunc = null)
             {
                 Rect labelPos = new Rect(position.position, inputStyle.CalcSize(label));
                 UnityEngine.GUI.Label(labelPos, label, inputStyle);
@@ -371,7 +371,7 @@ namespace RotaryHeart.Lib.AutoComplete
                 }
                 
                 position.y = position.yMax;
-                AutoCompleteBase._AutoCompleteLogic(position, label, text, entries, allowCustom, allowEmpty, false, null, onItemAdded, orderFunc:orderFunc);
+                AutoCompleteBase._AutoCompleteLogic(position, label, text, entries, allowCustom, allowEmpty, returnFullPath, separator, false, null, onItemAdded, orderFunc:orderFunc);
             }
         }
     }

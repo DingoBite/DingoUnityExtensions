@@ -2,7 +2,8 @@
     "name": "RotaryHeart.AutoCompleteTextField.Editor",
     "references": [
         "RotaryHeart.AutoCompleteTextField",
-        "RotaryHeart"
+        "RotaryHeart",
+        "NaughtyAttributes.Editor"
     ],
     "includePlatforms": [
         "Editor"

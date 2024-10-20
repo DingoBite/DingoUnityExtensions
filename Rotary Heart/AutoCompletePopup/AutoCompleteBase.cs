@@ -119,7 +119,7 @@ namespace RotaryHeart.Lib.AutoComplete
             return text;
         }
 
-        internal static void _AutoCompleteLogic(Rect position, GUIContent label, string text, string[] entries, bool allowCustom, bool allowEmpty, bool fromEditor,
+        internal static void _AutoCompleteLogic(Rect position, GUIContent label, string text, string[] entries, bool allowCustom, bool allowEmpty, bool returnFullPath, string separator, bool fromEditor,
             IStyle windowStyle, Action<string> onItemAdded, Func<string, float> orderFunc)
         {
             Rect lastRect = position;
@@ -144,14 +144,14 @@ namespace RotaryHeart.Lib.AutoComplete
                     newRect.x += UnityEditor.EditorGUI.indentLevel * 15;
                     newRect.width -= UnityEditor.EditorGUI.indentLevel * 15;
 
-                    EditorAddItemWindow.Show(newRect, entries, new[] { text }, onItemAdded, "/", returnFullPath: false, allowCustom: allowCustom,
+                    EditorAddItemWindow.Show(newRect, entries, new[] { text }, onItemAdded, separator, returnFullPath: returnFullPath, allowCustom: allowCustom,
                         allowEmpty: allowEmpty, orderFunc:orderFunc);
 #endif
                 }
                 else
                 {
                     M_addItemWindow = new AddItemWindow();
-                    M_addItemWindow.Show(newRect, entries, new[] { text }, onItemAdded, "/", returnFullPath: false, allowCustom: allowCustom,
+                    M_addItemWindow.Show(newRect, entries, new[] { text }, onItemAdded, separator, returnFullPath: returnFullPath, allowCustom: allowCustom,
                         style: windowStyle, allowEmpty: allowEmpty, orderFunc:orderFunc);
                 }
             }
