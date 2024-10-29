@@ -1,5 +1,6 @@
 {
     "name": "Newtonsoft.Json.UnityConverters.Editor",
+    "rootNamespace": "",
     "references": [
         "Newtonsoft.Json.UnityConverters"
     ],
@@ -12,5 +13,8 @@
     "precompiledReferences": [
         "Newtonsoft.Json.dll"
     ],
-    "autoReferenced": false
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

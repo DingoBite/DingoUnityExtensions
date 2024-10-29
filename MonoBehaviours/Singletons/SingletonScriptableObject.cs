@@ -38,7 +38,7 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
                         {
                             _instance = instances[0];
                         }
-                        else
+                        else if (Application.isPlaying)
                         {
                             Debug.LogError($"[Singleton] No instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
                         }
@@ -99,7 +99,7 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
                         {
                             _instance = instances[0];
                         }
-                        else
+                        else if (Application.isPlaying)
                         {
                             Debug.LogError($"[Singleton] No instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
                         }

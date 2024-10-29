@@ -23,7 +23,8 @@ namespace DingoUnityExtensions.UnityViewProviders
         protected override void OnAwake()
         {
             _deleteButtons.OnClick += DeleteButton;
-            _addButton.SafeSubscribe(AddElement);
+            _addButton.OnEvent -= AddElement;
+            _addButton.OnEvent += AddElement;
         }
 
         protected abstract TValue DefaultValueFactory();
@@ -38,7 +39,8 @@ namespace DingoUnityExtensions.UnityViewProviders
                 {
                     var view = _pool.PullElement();
                     view.UpdateValueWithoutNotify(altisJoint);
-                    view.SafeSubscribe(SomeValueChanged);
+                    view.OnValueChange -= SomeValueChanged;
+                    view.OnValueChange += SomeValueChanged;
                 }
             }
             
