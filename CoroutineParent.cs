@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DingoUnityExtensions.MonoBehaviours;
 using DingoUnityExtensions.MonoBehaviours.Singletons;
 using UnityEngine;
 #if UNITASK_EXISTS
@@ -12,17 +11,50 @@ using Cysharp.Threading.Tasks;
 
 namespace DingoUnityExtensions
 {
+    public struct TimeStamp
+    {
+        public readonly float TimeDelta;
+
+        public TimeStamp(float timeDelta)
+        {
+            TimeDelta = timeDelta;
+        }
+    }
+    
+    public interface IUpdater
+    {
+        public void Update(in TimeStamp timeStamp) {}
+    }
+    
+    public interface ILateUpdater
+    {
+        public void LateUpdate(in TimeStamp timeStamp) {}
+    }
+    
+    public interface IFixedUpdater
+    {
+        public void FixedUpdate(in TimeStamp timeStamp) {}
+    }
+    
     public class CoroutineParent : SingletonBehaviour<CoroutineParent>
     {
         private static readonly Dictionary<float, WaitForSeconds> WaitForSecondsMap = new ();
 
-        private static readonly List<Action> CachedUpdaters = new ();
-        private static readonly List<Action> CachedLateUpdaters = new ();
+        private static readonly List<Action> CachedUpdatersDelegates = new ();
+        private static readonly List<Action> CachedLateUpdatersDelegates = new ();
         
-        private readonly Dictionary<object, Action> _updaters = new();
-        private readonly Dictionary<object, Action> _lateUpdaters = new();
+        private static readonly List<IUpdater> CachedUpdaters = new ();
+        private static readonly List<ILateUpdater> CachedLateUpdaters = new ();
+        private static readonly List<IFixedUpdater> CachedFixedUpdaters = new ();
+        
+        private readonly Dictionary<object, Action> _updatersDelegates = new();
+        private readonly Dictionary<object, Action> _lateUpdatersDelegates = new();
         private readonly Dictionary<object, Coroutine> _actions = new();
         private readonly Dictionary<object, Coroutine> _coroutinesWithCanceling = new();
+
+        private readonly Dictionary<object, IUpdater> _updaters = new();
+        private readonly Dictionary<object, ILateUpdater> _lateUpdaters = new();
+        private readonly Dictionary<object, IFixedUpdater> _fixedUpdaters = new();
         
         public static WaitForSeconds CachedWaiter(float seconds)
         {
@@ -35,11 +67,20 @@ namespace DingoUnityExtensions
             return waitForSeconds;
         }
 
-        public static void AddLateUpdater(object obj, Action updateAction) => Instance._lateUpdaters[obj] = updateAction;
-        public static void RemoveLateUpdater(object obj) => Instance._lateUpdaters.Remove(obj);
-        public static void AddUpdater(object obj, Action updateAction) => Instance._updaters[obj] = updateAction;
-        public static void RemoveUpdater(object obj) => Instance._updaters.Remove(obj);
+        public static void AddLateUpdater(object obj, Action updateAction) => Instance._lateUpdatersDelegates[obj] = updateAction;
+        public static void RemoveLateUpdater(object obj) => Instance._lateUpdatersDelegates.Remove(obj);
+        public static void AddUpdater(object obj, Action updateAction) => Instance._updatersDelegates[obj] = updateAction;
+        public static void RemoveUpdater(object obj) => Instance._updatersDelegates.Remove(obj);
+        
+        public static void AddUpdater(IUpdater updater) => Instance._updaters[updater] = updater;
+        public static void RemoveUpdater(IUpdater updater) => Instance._updaters.Remove(updater);
 
+        public static void AddLateUpdater(ILateUpdater updater) => Instance._lateUpdaters[updater] = updater;
+        public static void RemoveLateUpdater(ILateUpdater updater) => Instance._lateUpdaters.Remove(updater);
+        
+        public static void AddFixedUpdater(IFixedUpdater updater) => Instance._fixedUpdaters[updater] = updater;
+        public static void RemoveFixedUpdater(IFixedUpdater updater) => Instance._fixedUpdaters.Remove(updater);
+        
 #if UNITASK_EXISTS
         public static Coroutine YieldTaskCoroutine<T>(UniTask<T> task, Action<T> resultHandler = null, Action<Exception> exceptionHandler = null) => Instance.StartCoroutine(task.ToCoroutine(resultHandler, exceptionHandler));
         public static Coroutine YieldTaskCoroutine(UniTask task, Action<Exception> exceptionHandler = null) => Instance.StartCoroutine(task.ToCoroutine(exceptionHandler));
@@ -137,25 +178,54 @@ namespace DingoUnityExtensions
 
         private void Update()
         {
-            if (_updaters.Count == 0)
-                return;
+            if (_updatersDelegates.Count != 0)
+            {
+                CachedUpdatersDelegates.Clear();
+                CachedUpdatersDelegates.AddRange(_updatersDelegates.Values);
+                foreach (var updater in CachedUpdatersDelegates)
+                {
+                    updater();
+                }
+            }
+            
             CachedUpdaters.Clear();
             CachedUpdaters.AddRange(_updaters.Values);
+            var timeStamp = new TimeStamp(Time.deltaTime);
             foreach (var updater in CachedUpdaters)
             {
-                updater();
+                updater.Update(timeStamp);
             }
         }
 
         private void LateUpdate()
         {
-            if (_updaters.Count == 0)
-                return;
+            if (_lateUpdatersDelegates.Count != 0)
+            {
+                CachedLateUpdatersDelegates.Clear();
+                CachedLateUpdatersDelegates.AddRange(_lateUpdatersDelegates.Values);
+                foreach (var lateUpdater in CachedLateUpdatersDelegates)
+                {
+                    lateUpdater();
+                }
+            }
+            
             CachedLateUpdaters.Clear();
             CachedLateUpdaters.AddRange(_lateUpdaters.Values);
-            foreach (var lateUpdater in CachedLateUpdaters)
+            var timeStamp = new TimeStamp(Time.deltaTime);
+            foreach (var updater in CachedLateUpdaters)
             {
-                lateUpdater();
+                updater.LateUpdate(timeStamp);
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            CachedFixedUpdaters.Clear();
+            CachedFixedUpdaters.AddRange(_fixedUpdaters.Values);
+            var timeStamp = new TimeStamp(Time.deltaTime);
+            foreach (var updater in CachedFixedUpdaters)
+            {
+                updater.FixedUpdate(timeStamp);
             }
         }
     }
