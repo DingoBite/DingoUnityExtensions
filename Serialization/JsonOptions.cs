@@ -1,6 +1,7 @@
 #if NEWTONSOFT_EXISTS
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.UnityConverters.Math;
 
 namespace DingoUnityExtensions.Serialization
 {
@@ -18,6 +19,10 @@ namespace DingoUnityExtensions.Serialization
             };
             
             CSharpOptions.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            CSharpOptions.Converters.Add(new Vector2Converter());
+            CSharpOptions.Converters.Add(new Vector3Converter());
+            CSharpOptions.Converters.Add(new QuaternionConverter());
+            CSharpOptions.Converters.Add(new Matrix4x4Converter());
         }
     }
 }
