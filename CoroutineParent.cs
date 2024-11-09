@@ -59,6 +59,10 @@ namespace DingoUnityExtensions
         private readonly Dictionary<object, (IUpdater updater, int order)> _updaters = new();
         private readonly Dictionary<object, (ILateUpdater updater, int order)> _lateUpdaters = new();
         private readonly Dictionary<object, (IFixedUpdater updater, int order)> _fixedUpdaters = new();
+
+        private readonly List<(Action action, int order)> _singleUpdateActions = new();
+        private readonly List<(Action action, int order)> _singleLateUpdateActions = new();
+        private readonly List<(Action action, int order)> _singleFixedUpdateActions = new();
         
         public static WaitForSeconds CachedWaiter(float seconds)
         {
@@ -89,6 +93,30 @@ namespace DingoUnityExtensions
         public static void AddFixedUpdater(IFixedUpdater updater) => AddFixedUpdater(updater, 0);
         public static void AddFixedUpdater(IFixedUpdater updater, int order) => Instance._fixedUpdaters[updater] = (updater, order);
         public static void RemoveFixedUpdater(IFixedUpdater updater) => Instance._fixedUpdaters.Remove(updater);
+
+        public static Action AddSingleUpdate(Action action) => AddSingleUpdate(action, 0);
+        public static Action AddSingleUpdate(Action action, int order)
+        {
+            var tuple = (action, order);
+            Instance._singleUpdateActions.Add(tuple);
+            return () => Instance._singleUpdateActions.Remove(tuple);
+        }
+        
+        public static Action AddSingleLateUpdate(Action action) => AddSingleLateUpdate(action, 0);
+        public static Action AddSingleLateUpdate(Action action, int order)
+        {
+            var tuple = (action, order);
+            Instance._singleLateUpdateActions.Add(tuple);
+            return () => Instance._singleLateUpdateActions.Remove(tuple);
+        }
+        
+        public static Action AddSingleFixedUpdate(Action action) => AddSingleFixedUpdate(action, 0);
+        public static Action AddSingleFixedUpdate(Action action, int order)
+        {
+            var tuple = (action, order);
+            Instance._singleFixedUpdateActions.Add(tuple);
+            return () => Instance._singleFixedUpdateActions.Remove(tuple);
+        }
         
 #if UNITASK_EXISTS
         public static Coroutine YieldTaskCoroutine<T>(UniTask<T> task, Action<T> resultHandler = null, Action<Exception> exceptionHandler = null) => Instance.StartCoroutine(task.ToCoroutine(resultHandler, exceptionHandler));
@@ -193,16 +221,49 @@ namespace DingoUnityExtensions
                 CachedUpdatersDelegates.AddRange(_updatersDelegates.Values.OrderBy(e => e.order).Select(e => e.action));
                 foreach (var updater in CachedUpdatersDelegates)
                 {
-                    updater();
+                    try
+                    {
+                        updater();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
                 }
             }
             
-            CachedUpdaters.Clear();
-            CachedUpdaters.AddRange(_updaters.Values.OrderBy(e => e.order).Select(e => e.updater));
-            var timeStamp = new TimeStamp(Time.deltaTime);
-            foreach (var updater in CachedUpdaters)
+            if (_updaters.Count != 0)
             {
-                updater.Update(timeStamp);
+                CachedUpdaters.Clear();
+                CachedUpdaters.AddRange(_updaters.Values.OrderBy(e => e.order).Select(e => e.updater));
+                var timeStamp = new TimeStamp(Time.deltaTime);
+                foreach (var updater in CachedUpdaters)
+                {
+                    try
+                    {
+                        updater.Update(timeStamp);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+            }
+
+            if (_singleUpdateActions.Count != 0)
+            {
+                foreach (var updateAction in _singleUpdateActions.OrderBy(p => p.order).Select(p => p.action))
+                {
+                    try
+                    {
+                        updateAction?.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+                _singleUpdateActions.Clear();
             }
         }
 
@@ -214,16 +275,49 @@ namespace DingoUnityExtensions
                 CachedLateUpdatersDelegates.AddRange(_lateUpdatersDelegates.Values.OrderBy(e => e.order).Select(e => e.action));
                 foreach (var lateUpdater in CachedLateUpdatersDelegates)
                 {
-                    lateUpdater();
+                    try
+                    {
+                        lateUpdater();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+            }
+
+            if (_lateUpdaters.Count != 0)
+            {
+                CachedLateUpdaters.Clear();
+                CachedLateUpdaters.AddRange(_lateUpdaters.Values.OrderBy(e => e.order).Select(e => e.updater));
+                var timeStamp = new TimeStamp(Time.deltaTime);
+                foreach (var updater in CachedLateUpdaters)
+                {
+                    try
+                    {
+                        updater.LateUpdate(timeStamp);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
                 }
             }
             
-            CachedLateUpdaters.Clear();
-            CachedLateUpdaters.AddRange(_lateUpdaters.Values.OrderBy(e => e.order).Select(e => e.updater));
-            var timeStamp = new TimeStamp(Time.deltaTime);
-            foreach (var updater in CachedLateUpdaters)
+            if (_singleLateUpdateActions.Count != 0)
             {
-                updater.LateUpdate(timeStamp);
+                foreach (var updateAction in _singleLateUpdateActions.OrderBy(p => p.order).Select(p => p.action))
+                {
+                    try
+                    {
+                        updateAction?.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+                _singleLateUpdateActions.Clear();
             }
         }
         
@@ -235,16 +329,49 @@ namespace DingoUnityExtensions
                 CachedFixedUpdatersDelegates.AddRange(_fixedUpdatersDelegates.Values.OrderBy(e => e.order).Select(e => e.action));
                 foreach (var fixedUpdater in CachedFixedUpdatersDelegates)
                 {
-                    fixedUpdater();
+                    try
+                    {
+                        fixedUpdater();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
                 }
             }
             
-            CachedFixedUpdaters.Clear();
-            CachedFixedUpdaters.AddRange(_fixedUpdaters.Values.OrderBy(e => e.order).Select(e => e.updater));
-            var timeStamp = new TimeStamp(Time.deltaTime);
-            foreach (var updater in CachedFixedUpdaters)
+            if (_fixedUpdaters.Count != 0)
             {
-                updater.FixedUpdate(timeStamp);
+                CachedFixedUpdaters.Clear();
+                CachedFixedUpdaters.AddRange(_fixedUpdaters.Values.OrderBy(e => e.order).Select(e => e.updater));
+                var timeStamp = new TimeStamp(Time.deltaTime);
+                foreach (var updater in CachedFixedUpdaters)
+                {
+                    try
+                    {
+                        updater.FixedUpdate(timeStamp);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+            }
+            
+            if (_singleFixedUpdateActions.Count != 0)
+            {
+                foreach (var updateAction in _singleFixedUpdateActions.OrderBy(p => p.order).Select(p => p.action))
+                {
+                    try
+                    {
+                        updateAction?.Invoke();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+                _singleFixedUpdateActions.Clear();
             }
         }
     }
