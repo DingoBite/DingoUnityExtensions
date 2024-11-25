@@ -37,7 +37,7 @@ namespace DingoUnityExtensions
         public void FixedUpdate(in TimeStamp timeStamp) {}
     }
     
-    public class CoroutineParent : SingletonBehaviour<CoroutineParent>
+    public class CoroutineParent : SingletonProtectedBehaviour<CoroutineParent>
     {
         private static readonly Dictionary<float, WaitForSeconds> WaitForSecondsMap = new ();
 

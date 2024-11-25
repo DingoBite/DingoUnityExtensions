@@ -19,7 +19,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI
         public void RebuildOnNextFrame(Action callback)
         {
             if (gameObject.activeSelf)
-                CoroutineParent.Instance.StartCoroutine(Rebuild_C(callback));
+                CoroutineParent.StartCoroutineWithCanceling(this, () => Rebuild_C(callback));
         }
 
         public void RebuildOnNextFrameAndDisable() => RebuildOnNextFrameAndDisable(null);
@@ -27,7 +27,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI
         public void RebuildOnNextFrameAndDisable(Action callback)
         {
             if (gameObject.activeSelf)
-                CoroutineParent.Instance.StartCoroutine(RebuildAndDisable_C(callback));
+                CoroutineParent.StartCoroutineWithCanceling(this, () => RebuildAndDisable_C(callback));
         }
         
         private IEnumerator Rebuild_C(Action callback = null)
