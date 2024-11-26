@@ -11,9 +11,12 @@ namespace DingoUnityExtensions.MonoBehaviours.Gizmos
         
         public static void AddCall(Action drawAction)
         {
+#if UNITY_EDITOR
             Instance._drawActions.Add(drawAction);
+#endif
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             foreach (var drawAction in _drawActions)
@@ -29,5 +32,6 @@ namespace DingoUnityExtensions.MonoBehaviours.Gizmos
             }
             _drawActions.Clear();
         }
+#endif
     }
 }
