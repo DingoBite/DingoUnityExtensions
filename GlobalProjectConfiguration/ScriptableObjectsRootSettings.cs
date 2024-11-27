@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using AYellowpaper.SerializedCollections;
 using DingoUnityExtensions.MonoBehaviours.Singletons;
-using UnityEditor;
 #if UNITY_EDITOR
-using UnityEngine;
+using UnityEditor;
 #endif
+using UnityEngine;
 
 namespace DingoUnityExtensions.GlobalProjectConfiguration
 {
@@ -28,11 +28,13 @@ namespace DingoUnityExtensions.GlobalProjectConfiguration
             if (config == null)
             {
                 Debug.LogException(new NullReferenceException($"Cannot find any config with key {key}"));
+#if UNITY_EDITOR
                 if (!Instance._configs.TryAdd(key, default))
                 {
                     GetSerializedSettings().ApplyModifiedProperties();
                     AssetDatabase.SaveAssets();
                 }
+#endif
             }
             return config;
         }
