@@ -11,6 +11,31 @@ using UnityEditor.IMGUI.Controls;
 
 namespace MackySoft.SerializeReferenceExtensions.Editor
 {
+	public static class TypeExtensions
+	{
+		public static bool IsAssignableToGenericType(this Type givenType, Type genericType)
+		{
+			if (!genericType.IsGenericType)
+				return givenType.IsAssignableFrom(givenType);
+			
+			var interfaceTypes = givenType.GetInterfaces();
+
+			foreach (var it in interfaceTypes)
+			{
+				if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
+					return true;
+			}
+
+			if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
+				return true;
+
+			Type baseType = givenType.BaseType;
+			if (baseType == null) return false;
+
+			return IsAssignableToGenericType(baseType, genericType);
+		}
+	}
+	
 	[CustomPropertyDrawer(typeof(SubclassSelectorAttribute))]
 	public class SubclassSelectorDrawer : PropertyDrawer
 	{
@@ -49,8 +74,10 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 				popupPosition.x += EditorGUIUtility.labelWidth;
 				popupPosition.height = EditorGUIUtility.singleLineHeight;
 
-				if (EditorGUI.DropdownButton(popupPosition,GetTypeName(property),FocusType.Keyboard)) {
-					var popup = GetTypePopup(property);
+				if (EditorGUI.DropdownButton(popupPosition,GetTypeName(property),FocusType.Keyboard))
+				{
+					var attribute = PropertyUtility.GetAttribute<SubclassSelectorAttribute>(property);
+					var popup = GetTypePopup(property, attribute);
 					m_TargetProperty = property;
 					popup.TypePopup.Show(popupPosition);
 				}
@@ -73,7 +100,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 			return null;
 		}
 		
-		TypePopupCache GetTypePopup (SerializedProperty property) {
+		TypePopupCache GetTypePopup(SerializedProperty property, SubclassSelectorAttribute attribute = null) {
 			// Cache this string. This property internally call Assembly.GetName, which result in a large allocation.
 			string managedReferenceFieldTypename = property.managedReferenceFieldTypename;
 
@@ -87,6 +114,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 						!p.IsAbstract &&
 						!p.IsGenericType &&
 						!k_UnityObjectType.IsAssignableFrom(p) &&
+						(attribute?.TypeAssignableRestriction == null || p.IsAssignableToGenericType(attribute.TypeAssignableRestriction)) && 
 						Attribute.IsDefined(p,typeof(SerializableAttribute))
 					),
 					k_MaxTypePopupLineCount,

@@ -6,6 +6,13 @@ using UnityEngine;
 /// Attribute to specify the type of the field serialized by the SerializeReference attribute in the inspector.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field,AllowMultiple = false)]
-public sealed class SubclassSelectorAttribute : PropertyAttribute {
+public sealed class SubclassSelectorAttribute : PropertyAttribute
+{
+    public readonly Type TypeAssignableRestriction;
+
+    public SubclassSelectorAttribute(Type typeAssignableRestriction = null)
+    {
+        TypeAssignableRestriction = typeAssignableRestriction;
+    }
 }
 #endif
