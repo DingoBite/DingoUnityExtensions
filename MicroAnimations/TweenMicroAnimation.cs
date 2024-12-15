@@ -15,29 +15,33 @@ namespace DingoUnityExtensions.MicroAnimations
 
         private readonly Dictionary<object, Tween> _tweens = new();
 
-        private int _lastForwardFrameAnimated;
-        private int _lastBackwardFrameAnimated;
+        private readonly Dictionary<object, int> _lastForwardFrameAnimatedDict = new();
+        private readonly Dictionary<object, int> _lastBackwardFrameAnimatedDict = new();
+
+        protected EnableDisableTweenAnimationPair Animation => _animation;
         
-        protected float PlayTween(object id, Func<float, Tween> tweenFactory, bool forward, float addDelay = 0)
+        protected float PlayTween(object id, TweenUtils.Factory tweenFactory, bool forward, float addDelay = 0, bool useCache = false)
         {
             id = (id, forward);
             var duration = forward ? _animation.EnableDuration : _animation.DisableDuration;
             var fullDuration = Math.Max(duration + _delay + addDelay, 0);
             var newFrame = Time.frameCount;
-            var forwardFrame = newFrame - _lastForwardFrameAnimated < 1;
-            var backwardFrame = newFrame - _lastBackwardFrameAnimated < 1;
+            var lastForwardFrameAnimated = _lastForwardFrameAnimatedDict.GetValueOrDefault(id, 0);
+            var lastBackwardFrameAnimated = _lastBackwardFrameAnimatedDict.GetValueOrDefault(id, 0);
+            var forwardFrame = newFrame - lastForwardFrameAnimated < 1;
+            var backwardFrame = newFrame - lastBackwardFrameAnimated < 1;
             if (forward && forwardFrame || !forward && backwardFrame)
                 return fullDuration;
 
             Tween tween;
             if (forward)
             {
-                _lastForwardFrameAnimated = newFrame;
+                _lastForwardFrameAnimatedDict[id] = newFrame;
                 tween = _animation.MakeEnableTween(tweenFactory).SetDelay(_delay + addDelay);
             }
             else
             {
-                _lastBackwardFrameAnimated = newFrame;
+                _lastBackwardFrameAnimatedDict[id] = newFrame;
                 tween = _animation.MakeDisableTween(tweenFactory).SetDelay(_delay + addDelay);
             }
             tween.Play();

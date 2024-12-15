@@ -1,36 +1,36 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using DingoUnityExtensions.Extensions;
+using DingoUnityExtensions.Generic;
+using Unity.XR.CoreUtils;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DingoUnityExtensions.Pools
 {
-    public interface IPoolGetOnly<out T> where T : MonoBehaviour
+    public class Pool<T> : IPoolGetOnly<T>, IEnumerableContainer<T> where T : MonoBehaviour
     {
-        public IReadOnlyList<T> PulledElements { get; }
-        public T PullElement();
-        public void Clear();
-    }
+        private readonly GameObject _parent;
+        private readonly T _prefab;
+        private readonly bool _manageActiveness;
+        private readonly SortTransformOrderOption _sortTransformOrder;
+        private readonly bool _layerFromPool;
 
-    public enum SortTransformOrderOption
-    {
-        None,
-        AsLast,
-        AsFirst
-    }
-    
-    public class Pool<T> : MonoBehaviour, IPoolGetOnly<T> where T : MonoBehaviour
-    {
-        [SerializeField] private T _prefab;
-        [SerializeField] private bool _manageActiveness = true;
-        [SerializeField] private SortTransformOrderOption _sortTransformOrder;
-        [SerializeField] private bool _layerFromPool = true;
-        
         private readonly List<T> _pulledElements = new();
         private readonly Queue<T> _queue = new();
+
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
+        public IEnumerable<T> ComponentElements => _pulledElements;
 
+        public Pool(T prefab, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true)
+        {
+            _manageActiveness = manageActiveness;
+            _prefab = prefab;
+            _sortTransformOrder = sortTransformOrder;
+            _layerFromPool = layerFromPool;
+            _parent = parent;
+        }
+        
         public T PullElement()
         {
             if (_queue.TryDequeue(out var element))
@@ -71,9 +71,9 @@ namespace DingoUnityExtensions.Pools
         
         private T InstantiateComponent()
         {
-            var component = Instantiate(_prefab, transform);
+            var component = Object.Instantiate(_prefab, _parent.transform);
             if (_layerFromPool)
-                component.gameObject.SetLayerRecursive(gameObject.layer);
+                component.gameObject.SetLayerRecursively(_parent.layer);
             component.name = $"--{_pulledElements.Count}_{ComponentName}";
             OnInstantiate(component);
             return component;

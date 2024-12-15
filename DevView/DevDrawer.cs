@@ -8,6 +8,6 @@ namespace DingoUnityExtensions.DevView
     {
         [SerializeField] private DevDrawerViewPool _drawerViewPool;
 
-        public Pool<DevDrawerView> DevDrawerViewPool => _drawerViewPool;
+        public PoolBehaviour<DevDrawerView> DevDrawerViewPool => _drawerViewPool;
     }
 }

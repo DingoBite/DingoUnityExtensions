@@ -8,6 +8,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 {
     public abstract class ContainerBase : SubscribableBehaviour
     {
+        public virtual void SetDefaultView() {}
         protected override void SubscribeOnly() { }
         protected override void UnsubscribeOnly() { }
     }
@@ -16,7 +17,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
     {
         public abstract class List : ValueContainer<TValue>
         {
-            [SerializeField] private List<ValueContainer<TValue>> _stack;
+            [SerializeField] private List<ValueContainer<TValue>> _stack = new ();
             [SerializeField] private bool _manageActiveness;
 
             protected override void SetValueWithoutNotify(TValue value)
@@ -115,6 +116,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         protected virtual TValue NonInteractablePlaceholder => default;
         public bool ValueChangeFromExternalSource { get; set; }
 
+        private bool _awaked;
+        
         public bool Interactable
         {
             get => gameObject.activeInHierarchy && _isInteractable;
@@ -142,8 +145,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         private void Awake()
         {
-            if (_debugDefaultValueUpdate)
-                UpdateValueWithoutNotify(_debugDefaultValue);
+            if (_awaked)
+                return;
+            _awaked = true;
             OnAwake();
         }
 
@@ -156,8 +160,13 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         
         public TValue Value { get; protected set; }
 
+        protected virtual void PreviousValueFree(TValue previousData){}
+
         protected void SetValueWithNotify(TValue value)
         {
+            if (!_awaked)
+                Awake();
+            
             if (!ValueChangeFromExternalSource)
             {
                 UpdateValueWithoutNotify(value);
@@ -169,14 +178,31 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
             }
         }
 
-        protected void ValueChangeInvoke(TValue value) => OnValueChange?.Invoke(value);
+        protected void ValueChangeInvoke(TValue value)
+        {
+            if (!_awaked)
+                Awake();
+            
+            OnValueChange?.Invoke(value);
+        }
+
+        protected void ForceSetValueAndInvoke(TValue value)
+        {
+            PreviousValueFree(Value);
+            Value = value;
+            ValueChangeInvoke(value);
+        }
 
         protected virtual void OnSetInteractable(bool value) { }
 
         public void UpdateValueWithoutNotify(TValue value)
         {
+            if (!_awaked)
+                Awake();
+            
             if (!_updateOnEnable && (!gameObject.activeInHierarchy || !enabled))
             {
+                PreviousValueFree(Value);
                 Value = value;
                 _disabledValueChanged = true;
                 return;
@@ -186,6 +212,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 _disabledValueChanged = false;
                 _updateOnEnable = false;
             }
+            PreviousValueFree(Value);
             Value = value;
             SetValueWithoutNotify(value);
         }
@@ -225,7 +252,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
     {
         public class List : EventContainer
         {
-            [SerializeField] private List<EventContainer> _stack;
+            [SerializeField] private List<EventContainer> _stack = new();
             [SerializeField] private bool _manageActiveness;
 
             protected override void OnSetInteractable(bool value)

@@ -6,10 +6,22 @@ namespace DingoUnityExtensions.Utils
 {
     public static class PathUtils
     {
+        private const string HTTP = "http:///";
+        private const string HTTPS = "https:///";
+        
         private const string DP_SLASH_1 = ":/";
         private const string DP_SLASH_2 = "://";
         private const string DP_SLASH_3 = ":///";
         private const string FILE = "file";
+
+        private const string MP4 = ".mp4";
+        private const string WAV = ".wav";
+        private const string MOV = ".mov";
+        private const string WEBM = ".webm";
+
+        private const string JPG = ".jpg";
+        private const string PNG = ".png";
+        private const string JPEG = ".jpeg";
 
         public enum PathPrefix
         {
@@ -18,9 +30,12 @@ namespace DingoUnityExtensions.Utils
             Absolute,
             StreamingAssets,
             TemporaryCache,
+            HTTP,
+            HTTPS,
         }
 
-        public static readonly IReadOnlyList<string> Extensions = new List<string> { ".jpg", ".png", ".jpeg" };
+        public static readonly IReadOnlyList<string> ImageExtensions = new List<string> { JPG, PNG, JPEG };
+        public static readonly IReadOnlyList<string> VideoExtensions = new[] { MP4, WAV, MOV, WEBM };
 
         private static readonly Dictionary<PathPrefix, string> PrefixDictionary;
 
@@ -33,15 +48,14 @@ namespace DingoUnityExtensions.Utils
                 { PathPrefix.Absolute, "" },
                 { PathPrefix.StreamingAssets, Application.streamingAssetsPath },
                 { PathPrefix.TemporaryCache, Application.temporaryCachePath },
+                { PathPrefix.HTTP, HTTP },
+                { PathPrefix.HTTPS, HTTPS },
             };
 #if UNITY_ANDROID
             var path = Application.streamingAssetsPath;
             path = AbsoluteFilePathToUri(path);
 
             PrefixDictionary[PathPrefix.StreamingAssets] = path;
-// #elif UNITY_IOS
-            // var path = $"{FILE}{DP_SLASH_3}{Application.dataPath}/AssetBundles/";
-            // PrefixDictionary[PathPrefix.StreamingAssets] = path;
 #endif
         }
 
@@ -59,24 +73,16 @@ namespace DingoUnityExtensions.Utils
 
             return path;
         }
-
-        public static string MakeAssetPath(string folder, string name, string imagesFolder = "images")
-        {
-            foreach (var extension in Extensions)
-            {
-                var imgName = name + extension;
-                var path = Path.Combine(Application.streamingAssetsPath, imagesFolder, folder, imgName);
-                path = path.Replace("\\", "/");
-                if (File.Exists(path))
-                    return path;
-            }
-
-            return null;
-        }
         
         public static string MakeImagePath(string folder, string imageName)
         {
-            foreach (var extension in Extensions)
+#if UNITY_ANDROID
+            if (imageName.StartsWith('/') || folder.EndsWith('/'))
+                return (folder + imageName).Replace("//", "/");
+            return folder + '/' + imageName; 
+#endif
+            imageName = Path.GetFileNameWithoutExtension(imageName);
+            foreach (var extension in ImageExtensions)
             {
                 var fileName = imageName + extension;
                 folder = folder.Replace("\\", "/").Replace("//", "/");
@@ -88,23 +94,22 @@ namespace DingoUnityExtensions.Utils
             return null;
         }
 
-        public static string GetPathPrefix(PathPrefix pathPrefix) => PrefixDictionary[pathPrefix];
-
         public static string MakePathWithPrefix(PathPrefix pathPrefix, string path, bool createDirectory = false)
         {
             path = path.Replace('\\', '/');
             string fullPath;
             var prefix = PrefixDictionary[pathPrefix];
-            Debug.Log($"{pathPrefix} : {prefix} : {path}");
             if (path.StartsWith('/') || prefix == "")
                 fullPath = prefix + path;
             else
                 fullPath = prefix + '/' + path;
             if (createDirectory)
             {
+#if !UNITY_ANDROID
                 var directoryName = Path.GetDirectoryName(fullPath);
                 if (!string.IsNullOrWhiteSpace(directoryName) && directoryName != "/")
                     Directory.CreateDirectory(directoryName);
+#endif
             }
 
             return fullPath;

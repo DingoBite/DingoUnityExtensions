@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using DingoUnityExtensions.Tweens;
 using UnityEngine;
 
 namespace DingoUnityExtensions.MicroAnimations

@@ -2,5 +2,5 @@
 
 namespace DingoUnityExtensions.DevView
 {
-    public class LinePool : Pool<Line>{}
+    public class LinePool : PoolBehaviour<Line>{}
 }

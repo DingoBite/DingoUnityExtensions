@@ -23,6 +23,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
             Text.text = resultText;
         }
 
+        protected override void OnSetInteractable(bool value)
+        {
+            Text.interactable = value;
+            base.OnSetInteractable(value);
+        }
+
         protected override void SubscribeOnly() => Text.onValueChanged.AddListener(SetValueWithNotify);
         protected override void UnsubscribeOnly() => Text.onValueChanged.RemoveListener(SetValueWithNotify);
     }

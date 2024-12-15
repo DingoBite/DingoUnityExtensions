@@ -8,7 +8,7 @@ namespace DingoUnityExtensions.DevView
         [SerializeField] private LinePool _linePool;
         [SerializeField] private PointPool _pointPool;
 
-        public Pool<Point> Points => _pointPool;
-        public Pool<Line> Lines => _linePool;
+        public PoolBehaviour<Point> Points => _pointPool;
+        public PoolBehaviour<Line> Lines => _linePool;
     }
 }

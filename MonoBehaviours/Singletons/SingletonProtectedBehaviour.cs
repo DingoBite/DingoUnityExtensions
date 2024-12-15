@@ -12,11 +12,11 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
         {
             get
             {
-                if (_applicationIsQuitting)
-                {
-                    Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
-                    return null;
-                }
+                // if (_applicationIsQuitting)
+                // {
+                //     Debug.LogWarning($"[Singleton] Instance '{typeof(T)}' already destroyed. Returning null.");
+                //     return null;
+                // }
 
                 lock (_lock)
                 {

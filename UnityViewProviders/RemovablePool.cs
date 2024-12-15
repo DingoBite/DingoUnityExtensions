@@ -15,7 +15,7 @@ namespace DingoUnityExtensions.UnityViewProviders
     
     public abstract class RemovablePool<TContainer, TValue> : ValueContainer<List<TValue>> where TContainer : ValueContainer<TValue>, IRemovableContainer
     {
-        [SerializeField] private Pool<TContainer> _pool;
+        [SerializeField] private PoolBehaviour<TContainer> _pool;
         [SerializeField] private EventContainer _addButton;
         
         private readonly ButtonContainerGroup<int> _deleteButtons = new();

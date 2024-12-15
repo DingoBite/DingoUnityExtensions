@@ -63,7 +63,7 @@ namespace MackySoft.SerializeReferenceExtensions.Editor
 
 		public override void OnGUI (Rect position,SerializedProperty property,GUIContent label)
 		{
-			GUI.contentColor = Colors.White;
+			GUI.contentColor = Color.white;
 			label.text = label.text.Split(' ').Last();
 			EditorGUI.BeginProperty(position,label,property);
 			

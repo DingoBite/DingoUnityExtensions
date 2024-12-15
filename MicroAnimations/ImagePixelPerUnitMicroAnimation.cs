@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using DG.Tweening.Core;
+using DingoUnityExtensions.Tweens;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,7 +35,6 @@ namespace DingoUnityExtensions.MicroAnimations
                 var g = _graphics[i];
                 if (_defaultValues.Count <= i)
                     _defaultValues.Add(g.pixelsPerUnitMultiplier);
-                var i1 = i;
                 PlayTween((this, g), d => DOBlendablePixelPerUnit(g, -_pixelsPerUnitMultiplierDelta, d), false, (_graphics.Count - i - 1) * _eachDelay);
             }
         }

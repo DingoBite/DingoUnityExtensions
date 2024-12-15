@@ -13,7 +13,8 @@ namespace DingoUnityExtensions.MicroAnimations
         [SerializeField] private List<Graphic> _graphics;
         [SerializeField] private Color _color = Color.white;
         [SerializeField] private float _eachDelay;
-
+        [SerializeField] private bool _crossFade = true;
+        
         private readonly List<Color> _defaultValues = new();
         
         public override void ForwardAnimate()
@@ -21,6 +22,11 @@ namespace DingoUnityExtensions.MicroAnimations
             for (var i = 0; i < _graphics.Count; i++)
             {
                 var g = _graphics[i];
+                if (_crossFade)
+                {
+                    g.CrossFadeColor(_color, Animation.EnableDuration, true, true);
+                    continue;
+                }
                 if (_defaultValues.Count <= i)
                     _defaultValues.Add(g.color);
                 var i1 = i;
@@ -33,6 +39,11 @@ namespace DingoUnityExtensions.MicroAnimations
             for (var i = 0; i < _graphics.Count; i++)
             {
                 var g = _graphics[i];
+                if (_crossFade)
+                {
+                    g.CrossFadeColor(Color.white, Animation.DisableDuration, true, true);
+                    continue;
+                }
                 if (_defaultValues.Count <= i)
                     _defaultValues.Add(g.color);
                 var i1 = i;

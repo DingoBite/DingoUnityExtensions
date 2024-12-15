@@ -2,5 +2,5 @@
 
 namespace DingoUnityExtensions.DevView
 {
-    public class DevDrawerViewPool : Pool<DevDrawerView>{}
+    public class DevDrawerViewPool : PoolBehaviour<DevDrawerView>{}
 }

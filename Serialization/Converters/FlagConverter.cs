@@ -2,7 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace DingoUnityExtensions.Serialization
+namespace DingoUnityExtensions.Serialization.Converters
 {
     public class FlagConverter : JsonConverter
     {

@@ -56,12 +56,12 @@ namespace DingoUnityExtensions.Tweens
         public void BakeTargetValues(Transform transform) => _targetTransform = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
         public void BakeDisableValues(Transform transform) => _disableTransform = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
 
-        private Tween MakeDisableAndAdd(EnableDisableTweenAnimationPair animation, Func<float, Tween> tweenFactoryMethod, float addDelay = 0)
+        private Tween MakeDisableAndAdd(EnableDisableTweenAnimationPair animation, TweenUtils.Factory tweenFactoryMethod, float addDelay = 0)
         {
             return animation.MakeDisableTween(tweenFactoryMethod, out _, _addictiveDisableDelay + addDelay);
         }
         
-        private Tween MakeEnableAndAdd(EnableDisableTweenAnimationPair animation, Func<float, Tween> tweenFactoryMethod, float addDelay = 0)
+        private Tween MakeEnableAndAdd(EnableDisableTweenAnimationPair animation, TweenUtils.Factory tweenFactoryMethod, float addDelay = 0)
         {
             return animation.MakeEnableTween(tweenFactoryMethod, out _, _addictiveEnableDelay + addDelay);
         }

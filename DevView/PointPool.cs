@@ -2,5 +2,5 @@
 
 namespace DingoUnityExtensions.DevView
 {
-    public class PointPool : Pool<Point>{}
+    public class PointPool : PoolBehaviour<Point>{}
 }

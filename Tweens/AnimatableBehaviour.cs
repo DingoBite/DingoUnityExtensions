@@ -12,6 +12,7 @@ namespace DingoUnityExtensions.Tweens
         
         protected enum AnimateState
         {
+            None,
             Enabling,
             Enabled,
             Disabling,
@@ -36,15 +37,38 @@ namespace DingoUnityExtensions.Tweens
         }
         
         public bool IsFullyDisabled => State == AnimateState.Disabled;
+        public bool IsFullyEnabled => State == AnimateState.Enabled;
 
         private readonly TweenList _enableTweens = new();
         private readonly TweenList _disableTweens = new();
 
-        public void EnableNoParams() => Enable();
+        public void AnimatableSetActive(bool value)
+        {
+            if (value)
+                EnableNoParams();
+            else 
+                DisableNoParams();
+        }
         
+        public void SetActiveImmediately(bool value)
+        {
+            if (value)
+                EnableImmediately();
+            else 
+                DisableImmediately();
+        }
+        
+        public void EnableNoParams()
+        {
+            if (!Application.isPlaying && Application.isEditor)
+                EnableImmediately();
+            else 
+                Enable();
+        }
+
         public float Enable(float addDelay = 0, Action onComplete = null)
         {
-            if (!ValidAnimationParams)
+            if (!ValidAnimationParams || State == AnimateState.Enabled)
             {
                 EnableImmediately();
                 onComplete?.Invoke();
@@ -55,10 +79,14 @@ namespace DingoUnityExtensions.Tweens
             {
                 animatableBehaviour.Enable(addDelay);
             }
+
+            var prevState = State;
+            if (prevState == AnimateState.None)
+                SetFullActive(AnimateState.Disabled);
             
             SetFullActive(AnimateState.Enabling);
             var isPlaying = IsPlaying(_enableTweens, out var remainingTime, out var elapsedTime);
-            if (!RestartPlayingTween && (isPlaying || State is AnimateState.Enabling or AnimateState.Enabled))
+            if (!RestartPlayingTween && (isPlaying || prevState is AnimateState.Enabling or AnimateState.Enabled))
                 return remainingTime;
             
             Kill();
@@ -75,11 +103,17 @@ namespace DingoUnityExtensions.Tweens
             return _enableTweens.MaxDuration;
         }
 
-        public void DisableNoParams() => Disable();
-        
+        public void DisableNoParams()
+        {
+            if (!Application.isPlaying && Application.isEditor)
+                DisableImmediately();
+            else 
+                Disable();
+        }
+
         public float Disable(float addDelay = 0, Action onComplete = null)
         {
-            if (!ValidAnimationParams)
+            if (!ValidAnimationParams || State == AnimateState.Disabled)
             {
                 DisableImmediately();
                 onComplete?.Invoke();
@@ -91,9 +125,10 @@ namespace DingoUnityExtensions.Tweens
                 animatableBehaviour.Disable(addDelay);
             }
             
+            var prevState = State;
             SetFullActive(AnimateState.Disabling);
             var isPlaying = IsPlaying(_disableTweens, out var remainingTime, out var elapsedTime);
-            if (!RestartPlayingTween && (isPlaying || State is AnimateState.Disabling or AnimateState.Disabled))
+            if (!RestartPlayingTween && (isPlaying || prevState is AnimateState.Disabling or AnimateState.Disabled))
                 return remainingTime;
             
             Kill();

@@ -15,15 +15,18 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
 
         protected override void ReplaceKeyBy(string text)
         {
-            if (!Pattern.IsMatch(TemplateString))
+            Text.text = ReplaceKeyBy(text, TemplateString);
+        }
+        
+        public static string ReplaceKeyBy(string text, string template)
+        {
+            if (!Pattern.IsMatch(template))
             {
-                Text.text = text;
+                return text;
             }
-            else
-            {
-                var resultText = Pattern.Replace(TemplateString, text);
-                Text.text = resultText;
-            }
+
+            var resultText = Pattern.Replace(template, text);
+            return resultText;
         }
     }
 }

@@ -7,7 +7,7 @@ namespace DingoUnityExtensions.MonoBehaviours
     {
         private void Update()
         {
-            if (Input.GetKey(KeyCode.RightShift) && Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKey(KeyCode.RightShift) && Input.GetKey(KeyCode.RightControl) && Input.GetKeyDown(KeyCode.R))
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }

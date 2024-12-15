@@ -12,6 +12,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
             remove => _tabsContainerGroup.OnTabSelect -= value;
         } 
         
+        public event Action OnFullDeselect
+        {
+            add => _tabsContainerGroup.OnFullDeselect += value;
+            remove => _tabsContainerGroup.OnFullDeselect -= value;
+        }
+        
         [SerializeField] private SerializedDictionary<TTabs, ValueContainer<bool>> _tabsToggles;
         
         private readonly TabsContainerGroup<TTabs> _tabsContainerGroup = new();

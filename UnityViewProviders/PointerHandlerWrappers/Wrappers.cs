@@ -27,12 +27,12 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         public event PointerWrapperDelegates.Event BeginDragEvent;
     }
     
-    public interface IEndDragEventWrapper : IBeginDragHandler
+    public interface IEndDragEventWrapper : IEndDragHandler
     {
         public event PointerWrapperDelegates.Event EndDragEvent;
     }
     
-    public interface IDragEventWrapper : IBeginDragHandler
+    public interface IDragEventWrapper : IDragHandler
     {
         public event PointerWrapperDelegates.Event DragEvent;
     }

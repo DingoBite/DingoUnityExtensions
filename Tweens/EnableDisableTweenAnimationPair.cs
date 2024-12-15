@@ -20,10 +20,10 @@ namespace DingoUnityExtensions.Tweens
         public float DisableDuration => DisableDelay + _disableDuration;
         public float EnableDuration => EnableDelay + _enableDuration;
         
-        public Tween MakeEnableTween(Func<float, Tween> tweenFactoryMethod) => MakeEnableTween(tweenFactoryMethod, out _);
-        public Tween MakeEnableTween(Func<float, Tween> tweenFactoryMethod, float addDelay) => MakeEnableTween(tweenFactoryMethod, out _, addDelay);
+        public Tween MakeEnableTween(TweenUtils.Factory tweenFactoryMethod) => MakeEnableTween(tweenFactoryMethod, out _);
+        public Tween MakeEnableTween(TweenUtils.Factory tweenFactoryMethod, float addDelay) => MakeEnableTween(tweenFactoryMethod, out _, addDelay);
 
-        public Tween MakeEnableTween(Func<float, Tween> tweenFactoryMethod, out float fullDuration, float addDelay = 0)
+        public Tween MakeEnableTween(TweenUtils.Factory tweenFactoryMethod, out float fullDuration, float addDelay = 0)
         {
             var tween = tweenFactoryMethod(_enableDuration);
             var enableDelay = _enableDelay + addDelay;
@@ -35,9 +35,9 @@ namespace DingoUnityExtensions.Tweens
             return tween;
         }
 
-        public Tween MakeDisableTween(Func<float, Tween> tweenFactoryMethod) => MakeDisableTween(tweenFactoryMethod, out _);
-        public Tween MakeDisableTween(Func<float, Tween> tweenFactoryMethod, float addDelay) => MakeDisableTween(tweenFactoryMethod, out _, addDelay);
-        public Tween MakeDisableTween(Func<float, Tween> tweenFactoryMethod, out float fullDuration, float addDelay = 0)
+        public Tween MakeDisableTween(TweenUtils.Factory tweenFactoryMethod) => MakeDisableTween(tweenFactoryMethod, out _);
+        public Tween MakeDisableTween(TweenUtils.Factory tweenFactoryMethod, float addDelay) => MakeDisableTween(tweenFactoryMethod, out _, addDelay);
+        public Tween MakeDisableTween(TweenUtils.Factory tweenFactoryMethod, out float fullDuration, float addDelay = 0)
         {
             var tween = tweenFactoryMethod(_disableDuration);
             var disableDelay = _disableDelay + addDelay;

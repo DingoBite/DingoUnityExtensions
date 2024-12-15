@@ -9,9 +9,11 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
         [SerializeField] private UnityEvent _enableEvent;
         [SerializeField] private UnityEvent _disableEvent;
         [SerializeField] private UnityEvent<bool> _toggleEvent;
+        [SerializeField] private bool _invert;
 
         public override void SetViewActive(bool value)
         {
+            value = _invert ? !value : value;
             if (value)
                 _enableEvent.Invoke();
             else 

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace DingoUnityExtensions.Extensions
 {
@@ -38,6 +39,27 @@ namespace DingoUnityExtensions.Extensions
                 return modified[minLength].ToString();
 
             return null;
+        }
+
+        public static int IntConvertOrDefault(this string str)
+        {
+            if (int.TryParse(str, out var i))
+                return i;
+            return 0;
+        }
+
+        public static float FloatConvertOrDefault(this string str)
+        {
+            if (float.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out var i))
+                return i;
+            return 0;
+        }
+        
+        public static int FloatConvertToIntOrDefault(this string str)
+        {
+            if (float.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out var v))
+                return (int)(v + float.Epsilon);
+            return 0;
         }
     }
 }

@@ -73,7 +73,7 @@ namespace DingoUnityExtensions.Tweens
         public void BakeTargetValues(Transform transform) => _targetTransform = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
         public void BakeDisableValues(Transform transform) => _disableTransform = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
 
-        private void MakeDisableAndAdd(EnableDisableTweenAnimationPair animation, Func<float, Tween> tweenFactoryMethod)
+        private void MakeDisableAndAdd(EnableDisableTweenAnimationPair animation, TweenUtils.Factory tweenFactoryMethod)
         {
             if (animation == null)
                 return;
@@ -82,7 +82,7 @@ namespace DingoUnityExtensions.Tweens
             _tweenList.Add(tween, fullDuration);
         }
         
-        private void MakeEnableAndAdd(EnableDisableTweenAnimationPair animation, Func<float, Tween> tweenFactoryMethod)
+        private void MakeEnableAndAdd(EnableDisableTweenAnimationPair animation, TweenUtils.Factory tweenFactoryMethod)
         {
             if (animation == null)
                 return;

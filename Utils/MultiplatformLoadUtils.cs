@@ -1,6 +1,4 @@
-﻿#if UNITASK_EXISTS
-using System;
-using System.IO;
+﻿using System;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -15,6 +13,7 @@ namespace DingoUnityExtensions.Utils
             try
             {
 #if UNITY_ANDROID
+                path = PathUtils.AbsoluteFilePathToUri(path);
                 var unityWebRequest = UnityWebRequest.Get(path);
                 unityWebRequest.timeout = 5;
                 var loadingRequest = await unityWebRequest.SendWebRequest();
@@ -30,6 +29,28 @@ namespace DingoUnityExtensions.Utils
             {
                 Debug.LogException(e);
                 return defaultValue;
+            }
+        }
+        
+        public static async Task<string> LoadSerializedStringAsync(string path)
+        {
+            try
+            {
+#if UNITY_ANDROID
+                path = PathUtils.AbsoluteFilePathToUri(path);
+                var unityWebRequest = UnityWebRequest.Get(path);
+                unityWebRequest.timeout = 5;
+                var loadingRequest = await unityWebRequest.SendWebRequest();
+                var data = loadingRequest.downloadHandler.text;
+#else
+                var data = await File.ReadAllTextAsync(path);
+#endif
+                return data;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return null;
             }
         }
 
@@ -63,4 +84,3 @@ namespace DingoUnityExtensions.Utils
         }
     }
 }
-#endif
