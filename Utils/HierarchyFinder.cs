@@ -281,6 +281,20 @@ namespace DingoUnityExtensions.Utils
             throw new Exception(exceptionString);
         }
         
+        public static T FindComponentWithName<T>(this Transform transform, string subString, bool isNotFoundExceptionThrow)
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.name == subString && child.TryGetComponent<T>(out var component))
+                    return component;
+                var componentInChildren = child.FindComponentWithName<T>(subString, false);
+                if (componentInChildren != null) return componentInChildren;
+            }
+            if (isNotFoundExceptionThrow)
+                DebugErrorSubstringFind(typeof(T), subString);
+            return default;
+        }
+        
         public static T FindComponentWithSubstring<T>(this Transform transform, string subString, bool isNotFoundExceptionThrow)
         {
             foreach (Transform child in transform)
