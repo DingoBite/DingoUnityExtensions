@@ -68,7 +68,7 @@ namespace DingoUnityExtensions.Tweens
             var parentSize = parent != null ? parent.rect.size : Vector2.one;
 
             yield return MakeEnableAndAdd(animation, d => rectTransform.DOAnchorPos(_targetTransform.AnchoredPositionNormalized * parentSize, d), addDelay);
-            yield return MakeEnableAndAdd(animation, d => rectTransform.DORotate(_targetTransform.Rotation.eulerAngles, d), addDelay);
+            yield return MakeEnableAndAdd(animation, d => rectTransform.DOLocalRotate(_targetTransform.Rotation.eulerAngles, d), addDelay);
             yield return MakeEnableAndAdd(animation, d => rectTransform.DOSizeDelta(_targetTransform.SizeDelta, d), addDelay);
             yield return MakeEnableAndAdd(animation, d => rectTransform.DOScale(new Vector3(
                 _targetTransform.Scale.x,
@@ -84,7 +84,7 @@ namespace DingoUnityExtensions.Tweens
             var parentSize = parent != null ? parent.rect.size : Vector2.one;
 
             yield return MakeDisableAndAdd(animation, d => rectTransform.DOAnchorPos(_disableTransform.AnchoredPositionNormalized * parentSize, d), addDelay);
-            yield return MakeDisableAndAdd(animation, d => rectTransform.DORotate(_disableTransform.Rotation.eulerAngles, d), addDelay);
+            yield return MakeDisableAndAdd(animation, d => rectTransform.DOLocalRotate(_disableTransform.Rotation.eulerAngles, d), addDelay);
             yield return MakeDisableAndAdd(animation, d => rectTransform.DOSizeDelta(_disableTransform.SizeDelta, d), addDelay);
             yield return MakeDisableAndAdd(animation, d => rectTransform.DOScale(new Vector3(
                 _disableTransform.Scale.x,

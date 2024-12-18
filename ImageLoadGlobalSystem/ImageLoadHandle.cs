@@ -139,23 +139,19 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             }
 
             bind.V = new TextureLoadData(null, ImageLoadState.Loading, path);
-            Texture2D texture2D = null;
+            var prevTexture = bind.V.Texture;
+            if (prevTexture != null)
+                ImageLoadGlobalCache.UnLink(receiver);
             
             yield return MultiplatformLoadUtils.LoadTexture2DAsync(path)
                 .AsUniTask()
-                .ToCoroutine(t => texture2D = t);
-
-            if (texture2D == null)
-            {
-                bind.V = new TextureLoadData(null, ImageLoadState.NotFound, path);
-            }
-            else
-            {
-                var prevTexture = bind.V.Texture;
-                if (prevTexture != null && prevTexture != texture2D)
-                    ImageLoadGlobalCache.UnLink(receiver);
-                bind.V = new TextureLoadData(texture2D, ImageLoadState.Loaded, path);
-            }
+                .ToCoroutine(t =>
+                {
+                    if (t == null)
+                        bind.V = new TextureLoadData(null, ImageLoadState.NotFound, path);
+                    else
+                        bind.V = new TextureLoadData(t, ImageLoadState.Loaded, path);
+                });
         }
         
         private void ChangeData(TextureLoadData textureLoadData) => _textureFlowWrapper.V = textureLoadData;

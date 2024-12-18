@@ -63,8 +63,7 @@ namespace DingoUnityExtensions.Utils
                 path = PathUtils.AbsoluteFilePathToUri(path);
                 using var unityWebRequest = UnityWebRequestTexture.GetTexture(path);
                 unityWebRequest.timeout = 5;
-                await unityWebRequest.SendWebRequest();
-                var loadingRequest = await UnityWebRequest.Get(path).SendWebRequest();
+                var loadingRequest = await unityWebRequest.SendWebRequest();
                 Texture2D result;
                 if (loadingRequest.result == UnityWebRequest.Result.Success)
                     result = DownloadHandlerTexture.GetContent(unityWebRequest);
