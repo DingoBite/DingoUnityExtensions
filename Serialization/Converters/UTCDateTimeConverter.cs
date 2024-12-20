@@ -11,6 +11,8 @@ namespace DingoUnityExtensions.Serialization.Converters
             object existingValue,
             JsonSerializer serializer)
         {
+            if (reader.Value == null)
+                return null;
             var ts = serializer.Deserialize<long>(reader);
 
             return DateTimeOffset.FromUnixTimeSeconds(ts).UtcDateTime;
@@ -26,7 +28,7 @@ namespace DingoUnityExtensions.Serialization.Converters
             object value,
             JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            return;
         }
 
         public override bool CanRead => true;
