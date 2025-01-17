@@ -23,7 +23,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
             PointerClickEvent?.Invoke(eventData, 0);
         }
 
-        public void OnPointerDown(PointerEventData eventData)
+        public virtual void OnPointerDown(PointerEventData eventData)
         {
             _downTime = Time.time;
             Up = false;
@@ -31,7 +31,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
             PointerDownEvent?.Invoke(eventData, Time.time - _downTime);
         }
 
-        public void OnPointerUp(PointerEventData eventData)
+        public virtual void OnPointerUp(PointerEventData eventData)
         {
             Up = true;
             Down = false;
