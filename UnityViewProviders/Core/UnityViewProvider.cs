@@ -188,9 +188,23 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         protected void ForceSetValueAndInvoke(TValue value)
         {
-            PreviousValueFree(Value);
+            try
+            {
+                PreviousValueFree(Value);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e, this);
+            }
             Value = value;
-            ValueChangeInvoke(value);
+            try
+            {
+                SetValueWithoutNotify(value);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e, this);
+            }
         }
 
         protected virtual void OnSetInteractable(bool value) { }
@@ -212,9 +226,23 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 _disabledValueChanged = false;
                 _updateOnEnable = false;
             }
-            PreviousValueFree(Value);
+            try
+            {
+                PreviousValueFree(value);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e, this);
+            }
             Value = value;
-            SetValueWithoutNotify(value);
+            try
+            {
+                SetValueWithoutNotify(value);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e, this);
+            }
         }
         
         protected abstract void SetValueWithoutNotify(TValue value);
