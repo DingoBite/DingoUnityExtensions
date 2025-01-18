@@ -39,6 +39,16 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             action?.Invoke(_rawImage);
         }
 
+        public void UpdateValueWithLoad(ImageLoadHandle imageLoadHandle)
+        {
+            var isLoad = Value == null || Value != imageLoadHandle;
+            if (isLoad && Value != null)
+                Unload();
+            UpdateValueWithoutNotify(imageLoadHandle);
+            if (isLoad || imageLoadHandle.TextureFlow.V.State == ImageLoadState.None)
+                SetupForLoad();
+        }
+        
         public void SetupForLoad()
         {
             if (_autoManageLifetime)

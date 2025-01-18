@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
 {
-    [RequireComponent(typeof (ScrollRect))]
+    [RequireComponent(typeof(ScrollRect))]
     public class ScrollRectEnsureVisible : MonoBehaviour
     {
         [SerializeField] private TweenAnimation _tweenAnimation;
