@@ -228,7 +228,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
             }
             try
             {
-                PreviousValueFree(value);
+                PreviousValueFree(Value);
             }
             catch (Exception e)
             {

@@ -126,12 +126,12 @@ namespace DingoUnityExtensions.Tweens
             }
             
             var prevState = State;
-            // if (prevState == AnimateState.None)
-            // {
-            //     SetFullActive(AnimateState.Disabled);
-            //     onComplete?.Invoke();
-            //     return 0f;
-            // }
+            if (prevState == AnimateState.None)
+            {
+                SetFullActive(AnimateState.Disabled);
+                onComplete?.Invoke();
+                return 0f;
+            }
             SetFullActive(AnimateState.Disabling);
             var isPlaying = IsPlaying(_disableTweens, out var remainingTime, out var elapsedTime);
             if (!RestartPlayingTween && (isPlaying || prevState is AnimateState.Disabling or AnimateState.Disabled))
