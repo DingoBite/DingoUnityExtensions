@@ -5,19 +5,10 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.Tweens
 {
-    public abstract class AnimatableBehaviour : MonoBehaviour
+    public abstract class AnimatableBehaviour : RevealBehaviour
     {
         [SerializeField] private List<AnimatableBehaviour> _stack;
         [SerializeField] private GameObject _gameObject;
-        
-        protected enum AnimateState
-        {
-            None,
-            Enabling,
-            Enabled,
-            Disabling,
-            Disabled,
-        }
 
         [field: SerializeField] protected bool RestartPlayingTween { get; private set; }
         [SerializeField] private bool _manageActiveness = true;
@@ -42,7 +33,7 @@ namespace DingoUnityExtensions.Tweens
         private readonly TweenList _enableTweens = new();
         private readonly TweenList _disableTweens = new();
 
-        public void AnimatableSetActive(bool value)
+        public override void AnimatableSetActive(bool value)
         {
             if (value)
                 EnableNoParams();
@@ -50,7 +41,7 @@ namespace DingoUnityExtensions.Tweens
                 DisableNoParams();
         }
         
-        public void SetActiveImmediately(bool value)
+        public override void SetActiveImmediately(bool value)
         {
             if (value)
                 EnableImmediately();
@@ -58,7 +49,7 @@ namespace DingoUnityExtensions.Tweens
                 DisableImmediately();
         }
         
-        public void EnableNoParams()
+        public override void EnableNoParams()
         {
             if (!Application.isPlaying && Application.isEditor)
                 EnableImmediately();
@@ -66,7 +57,15 @@ namespace DingoUnityExtensions.Tweens
                 Enable();
         }
 
-        public float Enable(float addDelay = 0, Action onComplete = null)
+        public override void DisableNoParams()
+        {
+            if (!Application.isPlaying && Application.isEditor)
+                DisableImmediately();
+            else 
+                Disable();
+        }
+
+        public override float Enable(float addDelay = 0, Action onComplete = null)
         {
             if (!ValidAnimationParams || State == AnimateState.Enabled)
             {
@@ -103,15 +102,7 @@ namespace DingoUnityExtensions.Tweens
             return _enableTweens.MaxDuration;
         }
 
-        public void DisableNoParams()
-        {
-            if (!Application.isPlaying && Application.isEditor)
-                DisableImmediately();
-            else 
-                Disable();
-        }
-
-        public float Disable(float addDelay = 0, Action onComplete = null)
+        public override float Disable(float addDelay = 0, Action onComplete = null)
         {
             if (!ValidAnimationParams || State == AnimateState.Disabled)
             {
@@ -169,7 +160,7 @@ namespace DingoUnityExtensions.Tweens
             DisableImmediately();
         }
         
-        public void EnableImmediately()
+        public override void EnableImmediately()
         {
             foreach (var animatableBehaviour in _stack)
             {
@@ -184,7 +175,7 @@ namespace DingoUnityExtensions.Tweens
             Kill();
         }
 
-        public void DisableImmediately()
+        public override void DisableImmediately()
         {
             foreach (var animatableBehaviour in _stack)
             {
