@@ -24,5 +24,6 @@ namespace DingoUnityExtensions.Tweens
         public abstract float Disable(float addDelay = 0, Action onComplete = null);
         public abstract void EnableImmediately();
         public abstract void DisableImmediately();
+        public abstract void SetActive(bool value, bool isImmediately);
     }
 }

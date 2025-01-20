@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DingoUnityExtensions.UnityViewProviders.Core;
 
-namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
+namespace DingoUnityExtensions.UnityViewProviders.Core
 {
     public class ButtonContainerGroup<TId> : EventContainerGroup<TId, EventContainer> { }
     
@@ -16,7 +15,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
 
         public IEnumerable<TEventContainer> GetButtons() => _eventContainers.Values;
         public TEventContainer GetButton(TId id) => _eventContainers.GetValueOrDefault(id, null);
-
+        
         public void Initialize(IEnumerable<(TId, TEventContainer)> eventContainers)
         {
             Clear();

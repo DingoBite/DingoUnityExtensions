@@ -32,6 +32,14 @@ namespace DingoUnityExtensions.Tweens
         private readonly TweenList _enableTweens = new();
         private readonly TweenList _disableTweens = new();
 
+        public override void SetActive(bool value, bool isImmediately)
+        {
+            if (isImmediately)
+                SetActiveImmediately(value);
+            else 
+                AnimatableSetActive(value);
+        }
+        
         public override void AnimatableSetActive(bool value)
         {
             if (value)
