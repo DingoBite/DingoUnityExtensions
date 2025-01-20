@@ -14,7 +14,6 @@ namespace DingoUnityExtensions.Tweens
         [SerializeField] private bool _manageActiveness = true;
         
         protected abstract bool ValidAnimationParams { get; }
-        protected AnimateState State { get; private set; }
         protected IReadOnlyList<AnimatableBehaviour> Stack => _stack;
 
         protected GameObject GameObject
