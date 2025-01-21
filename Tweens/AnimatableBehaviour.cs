@@ -233,5 +233,10 @@ namespace DingoUnityExtensions.Tweens
         {
             _gameObject = gameObject;
         }
+
+        private void OnDestroy()
+        {
+            Kill();
+        }
     }
 }

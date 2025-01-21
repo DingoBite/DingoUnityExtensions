@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using NaughtyAttributes;
@@ -12,6 +13,7 @@ namespace DingoUnityExtensions.Tweens
         [SerializeField] private float _addictiveEnableDelay;
         [SerializeField] private float _addictiveDisableDelay;
         [SerializeField] private bool _bakeButtons;
+        [SerializeField] private bool _manageInteractable;
 
         [SerializeField] private TransformAnimationEndpoints _bakeAnimationEndpoints;
 
@@ -55,6 +57,15 @@ namespace DingoUnityExtensions.Tweens
         protected override void SetFullActive(AnimateState state, bool force = false)
         {
             base.SetFullActive(state, force);
+
+            if (_manageInteractable && CanvasGroup != null)
+            {
+                if (state is AnimateState.Enabling or AnimateState.Enabled)
+                    CanvasGroup.interactable = true;
+                else
+                    CanvasGroup.interactable = false;
+            }
+            
             if (state is AnimateState.Enabled)
             {
                 if (force && CanvasGroup != null)

@@ -173,6 +173,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
             void setActive(AnimatableBehaviour animatableBehaviour, bool value)
             {
+                if (animatableBehaviour == null)
+                    return;
                 if (!gameObject.activeInHierarchy)
                     animatableBehaviour.SetActiveImmediately(value);
                 else 
