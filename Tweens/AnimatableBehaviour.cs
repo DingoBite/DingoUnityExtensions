@@ -88,7 +88,7 @@ namespace DingoUnityExtensions.Tweens
 
             var prevState = State;
             if (prevState == AnimateState.None)
-                SetFullActive(AnimateState.Disabled);
+                SetFullActive(AnimateState.Disabled, true);
             
             SetFullActive(AnimateState.Enabling);
             var isPlaying = IsPlaying(_enableTweens, out var remainingTime, out var elapsedTime);
@@ -126,7 +126,7 @@ namespace DingoUnityExtensions.Tweens
             var prevState = State;
             if (prevState == AnimateState.None)
             {
-                SetFullActive(AnimateState.Disabled);
+                SetFullActive(AnimateState.Disabled, true);
                 onComplete?.Invoke();
                 return 0f;
             }
