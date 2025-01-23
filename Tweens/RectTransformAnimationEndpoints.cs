@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using DingoUnityExtensions.Extensions;
 using UnityEngine;
 
 namespace DingoUnityExtensions.Tweens
@@ -8,6 +9,10 @@ namespace DingoUnityExtensions.Tweens
     [Serializable]
     public struct RectTransformData
     {
+        public Vector2 Pivot;
+        public Vector2 MinAnchors;
+        public Vector2 MaxAnchors;
+        
         public Vector2 AnchoredPositionNormalized; // Normalized anchored position
         public Quaternion Rotation;
         public Vector2 Scale; // Normalized scale relative to the parent size
@@ -16,10 +21,20 @@ namespace DingoUnityExtensions.Tweens
         public static RectTransformData FromRectTransform(RectTransform rectTransform)
         {
             var parent = rectTransform.parent.GetComponent<RectTransform>();
+            return FromRectTransform(rectTransform, parent);
+        }
+
+        public static RectTransformData FromRectTransform(RectTransform rectTransform, RectTransform parent)
+        {
+            if (parent == null)
+                parent = rectTransform.parent as RectTransform;
             var parentSize = parent != null ? parent.rect.size : Vector2.one;
 
             return new RectTransformData
             {
+                Pivot = rectTransform.pivot,
+                MinAnchors = rectTransform.anchorMin,
+                MaxAnchors = rectTransform.anchorMax,
                 AnchoredPositionNormalized = rectTransform.anchoredPosition / parentSize,
                 Rotation = rectTransform.localRotation,
                 Scale = rectTransform.localScale,
@@ -30,8 +45,16 @@ namespace DingoUnityExtensions.Tweens
         public void ApplyTo(RectTransform rectTransform)
         {
             var parent = rectTransform.parent as RectTransform;
+            ApplyTo(rectTransform, parent);
+        }
+        
+        public void ApplyTo(RectTransform rectTransform, RectTransform parent)
+        {
+            if (parent == null)
+                parent = rectTransform.parent as RectTransform;
             var parentSize = parent != null ? parent.rect.size : Vector2.one;
 
+            ApplyPositionAnchors(rectTransform);
             rectTransform.anchoredPosition = AnchoredPositionNormalized * parentSize;
             rectTransform.localRotation = Rotation;
             rectTransform.localScale = new Vector3(
@@ -40,6 +63,14 @@ namespace DingoUnityExtensions.Tweens
                 rectTransform.localScale.z
             );
             rectTransform.sizeDelta = SizeDelta;
+        }
+
+        public void ApplyPositionAnchors(RectTransform rectTransform)
+        {
+            return;
+            rectTransform.SetPivot(Pivot);
+            rectTransform.anchorMin = MinAnchors;
+            rectTransform.anchorMax = MaxAnchors;
         }
     }
 
@@ -53,20 +84,25 @@ namespace DingoUnityExtensions.Tweens
         [SerializeField] private RectTransformData _disableTransform;
         [SerializeField] private float _addictiveEnableDelay;
         [SerializeField] private float _addictiveDisableDelay;
-
+        
+        [SerializeField] public RectTransform OverrideParent;
+        
         public bool ValidAnimation => Animation != null;
 
-        public void SetDefaultValues(RectTransform rectTransform) => _defaultTransform.ApplyTo(rectTransform);
-        public void SetTargetValues(RectTransform rectTransform) => _targetTransform.ApplyTo(rectTransform);
-        public void SetDisableValues(RectTransform rectTransform) => _disableTransform.ApplyTo(rectTransform);
+        public void SetDefaultValues(RectTransform rectTransform) => _defaultTransform.ApplyTo(rectTransform, OverrideParent);
+        public void SetTargetValues(RectTransform rectTransform) => _targetTransform.ApplyTo(rectTransform, OverrideParent);
+        public void SetDisableValues(RectTransform rectTransform) => _disableTransform.ApplyTo(rectTransform, OverrideParent);
 
         public IEnumerable<Tween> Enable(RectTransform rectTransform, float addDelay = 0) => Enable(Animation, rectTransform, addDelay);
 
         public IEnumerable<Tween> Enable(EnableDisableTweenAnimationPair animation, RectTransform rectTransform, float addDelay = 0)
         {
-            var parent = rectTransform.parent as RectTransform;
+            var parent = OverrideParent;
+            if (parent == null)
+                parent = rectTransform.parent as RectTransform;
             var parentSize = parent != null ? parent.rect.size : Vector2.one;
-
+            _targetTransform.ApplyPositionAnchors(rectTransform);
+            
             yield return MakeEnableAndAdd(animation, d => rectTransform.DOAnchorPos(_targetTransform.AnchoredPositionNormalized * parentSize, d), addDelay);
             yield return MakeEnableAndAdd(animation, d => rectTransform.DOLocalRotate(_targetTransform.Rotation.eulerAngles, d), addDelay);
             yield return MakeEnableAndAdd(animation, d => rectTransform.DOSizeDelta(_targetTransform.SizeDelta, d), addDelay);
@@ -80,8 +116,11 @@ namespace DingoUnityExtensions.Tweens
 
         public IEnumerable<Tween> Disable(EnableDisableTweenAnimationPair animation, RectTransform rectTransform, float addDelay = 0)
         {
-            var parent = rectTransform.parent as RectTransform;
+            var parent = OverrideParent;
+            if (parent == null)
+                parent = rectTransform.parent as RectTransform;
             var parentSize = parent != null ? parent.rect.size : Vector2.one;
+            _disableTransform.ApplyPositionAnchors(rectTransform);
 
             yield return MakeDisableAndAdd(animation, d => rectTransform.DOAnchorPos(_disableTransform.AnchoredPositionNormalized * parentSize, d), addDelay);
             yield return MakeDisableAndAdd(animation, d => rectTransform.DOLocalRotate(_disableTransform.Rotation.eulerAngles, d), addDelay);
@@ -92,10 +131,10 @@ namespace DingoUnityExtensions.Tweens
                 rectTransform.localScale.z), d), addDelay);
         }
 
-        public void BakeDefaultValues(RectTransform rectTransform) => _defaultTransform = RectTransformData.FromRectTransform(rectTransform);
-        public void BakeTargetValues(RectTransform rectTransform) => _targetTransform = RectTransformData.FromRectTransform(rectTransform);
-        public void BakeDisableValues(RectTransform rectTransform) => _disableTransform = RectTransformData.FromRectTransform(rectTransform);
-
+        public void BakeDefaultValues(RectTransform rectTransform) => _defaultTransform = RectTransformData.FromRectTransform(rectTransform, OverrideParent);
+        public void BakeTargetValues(RectTransform rectTransform) => _targetTransform = RectTransformData.FromRectTransform(rectTransform, OverrideParent);
+        public void BakeDisableValues(RectTransform rectTransform) => _disableTransform = RectTransformData.FromRectTransform(rectTransform, OverrideParent);
+        
         private Tween MakeDisableAndAdd(EnableDisableTweenAnimationPair animation, TweenUtils.Factory tweenFactoryMethod, float addDelay = 0)
         {
             return animation.MakeDisableTween(tweenFactoryMethod, out _, _addictiveDisableDelay + addDelay);

@@ -61,9 +61,15 @@ namespace DingoUnityExtensions.Tweens
             if (_manageInteractable && CanvasGroup != null)
             {
                 if (state is AnimateState.Enabling or AnimateState.Enabled)
+                {
                     CanvasGroup.interactable = true;
+                    CanvasGroup.blocksRaycasts = true;
+                }
                 else
+                {
                     CanvasGroup.interactable = false;
+                    CanvasGroup.blocksRaycasts = false;
+                }
             }
             
             if (state is AnimateState.Enabled)

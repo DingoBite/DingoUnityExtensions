@@ -4,6 +4,17 @@ namespace DingoUnityExtensions.Extensions
 {
     public static class RectTransformExtensions
     {
+        public static void SetPivot(this RectTransform rt, Vector2 pivot)
+        {
+            if (rt == null) return;
+	
+            Vector2 size = rt.rect.size;
+            Vector2 deltaPivot = rt.pivot - pivot;
+            Vector3 deltaPosition = rt.rotation * new Vector3((deltaPivot.x * size.x) * rt.localScale.x, (deltaPivot.y * size.y) * rt.localScale.y);
+            rt.pivot = pivot;
+            rt.localPosition -= deltaPosition;
+        }
+        
         public static bool IsPointInRectTransform(this RectTransform rectTransform, Vector2 point, Camera camera)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, point, camera, out var lp);
