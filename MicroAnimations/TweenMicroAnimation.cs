@@ -8,7 +8,15 @@ using UnityEngine;
 namespace DingoUnityExtensions.MicroAnimations
 {
     [Serializable]
-    public abstract class TweenMicroAnimation
+    public abstract class MicroAnimation
+    {
+        public abstract void ForwardAnimate();
+        public abstract void BackwardAnimate();
+        public abstract void ResetView();
+    }
+    
+    [Serializable]
+    public abstract class TweenMicroAnimation : MicroAnimation
     {
         [SerializeField] private EnableDisableTweenAnimationPair _animation;
         [SerializeField] private float _delay;
@@ -49,10 +57,7 @@ namespace DingoUnityExtensions.MicroAnimations
             return fullDuration;
         }
 
-        public abstract void ForwardAnimate();
-        public abstract void BackwardAnimate();
-
-        public void ResetView()
+        public override void ResetView()
         {
             foreach (var tween in _tweens.Values.Where(t => t != null))
             {

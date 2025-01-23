@@ -9,7 +9,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
     public abstract class PointerEnterHandlersButtonProvider<T> : PointerHandlersButtonProvider<T>
         where T : MonoBehaviour, IPointerDownEventWrapper, IPointerUpEventWrapper, IPointerClickEventWrapper, IPointerEnterEventWrapper, IPointerExitEventWrapper
     {
-        [SerializeReference, SubclassSelector] private List<TweenMicroAnimation> _enterAnimations;
+        [SerializeReference, SubclassSelector] private List<MicroAnimation> _enterAnimations;
 
         protected override void SubscribeOnly()
         {
@@ -29,7 +29,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
         {
             foreach (var microAnimation in _enterAnimations)
             {
-                microAnimation.ForwardAnimate();
+                if (microAnimation != null)
+                    microAnimation.ForwardAnimate();
             }
         }
 
@@ -37,7 +38,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
         {
             foreach (var microAnimation in _enterAnimations)
             {
-                microAnimation.BackwardAnimate();
+                if (microAnimation != null)
+                    microAnimation.BackwardAnimate();
             }
         }
 
@@ -46,7 +48,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
             base.ResetView();
             foreach (var enterAnimation in _enterAnimations)
             {
-                enterAnimation.ResetView();
+                if (enterAnimation != null)
+                    enterAnimation.ResetView();
             }
         }
     }

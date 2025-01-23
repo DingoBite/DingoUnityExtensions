@@ -14,7 +14,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
     {
         [SerializeField] private ToggleSwapInfoBase _interactableToggle;
         
-        [SerializeReference, SubclassSelector] private List<TweenMicroAnimation> _clickAnimations;
+        [SerializeReference, SubclassSelector] private List<MicroAnimation> _clickAnimations;
 
         public T PointerHandler => View;
         
@@ -48,7 +48,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
         {
             foreach (var microAnimation in _clickAnimations)
             {
-                microAnimation.ForwardAnimate();
+                if (microAnimation != null)
+                    microAnimation.ForwardAnimate();
             }
         }
 
@@ -56,7 +57,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
         {
             foreach (var microAnimation in _clickAnimations)
             {
-                microAnimation.BackwardAnimate();
+                if (microAnimation != null)
+                    microAnimation.BackwardAnimate();
             }
         }
 
@@ -64,7 +66,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
         {
             foreach (var clickAnimation in _clickAnimations)
             {
-                clickAnimation.ResetView();
+                if (clickAnimation != null)
+                    clickAnimation.ResetView();
             }
         }
     }
