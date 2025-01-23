@@ -14,6 +14,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
     {
         [SerializeField] private ToggleSwapInfoBase _interactableToggle;
         
+        [SerializeReference, SubclassSelector] private List<MicroAnimation> _downUpOnlyClickAnimations;
         [SerializeReference, SubclassSelector] private List<MicroAnimation> _clickAnimations;
 
         public T PointerHandler => View;
@@ -42,8 +43,16 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
                 _interactableToggle.SetViewActive(value);
         }
 
-        private void OnClick(PointerEventData data, float time) => EventInvoke();
-        
+        private void OnClick(PointerEventData data, float time)
+        {
+            foreach (var microAnimation in _downUpOnlyClickAnimations)
+            {
+                if (microAnimation != null)
+                    microAnimation.ForwardAnimate();
+            }
+            EventInvoke();
+        }
+
         private void OnDown(PointerEventData data, float time)
         {
             foreach (var microAnimation in _clickAnimations)
