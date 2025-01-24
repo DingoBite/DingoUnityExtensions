@@ -12,6 +12,7 @@ namespace DingoUnityExtensions.Tweens
 
         [field: SerializeField] protected bool RestartPlayingTween { get; private set; }
         [SerializeField] private bool _manageActiveness = true;
+        [SerializeField] private bool _firstValueReset = true;
         
         protected abstract bool ValidAnimationParams { get; }
         protected IReadOnlyList<AnimatableBehaviour> Stack => _stack;
@@ -87,8 +88,11 @@ namespace DingoUnityExtensions.Tweens
             }
 
             var prevState = State;
-            if (prevState == AnimateState.None)
+            if (prevState == AnimateState.None && _firstValueReset)
+            {
                 SetFullActive(AnimateState.Disabled, true);
+                State = AnimateState.Disabled;
+            }
             
             SetFullActive(AnimateState.Enabling);
             var isPlaying = IsPlaying(_enableTweens, out var remainingTime, out var elapsedTime);
@@ -124,9 +128,10 @@ namespace DingoUnityExtensions.Tweens
             }
             
             var prevState = State;
-            if (prevState == AnimateState.None)
+            if (prevState == AnimateState.None && _firstValueReset)
             {
                 SetFullActive(AnimateState.Disabled, true);
+                State = AnimateState.Disabled;
                 onComplete?.Invoke();
                 return 0f;
             }
@@ -146,7 +151,7 @@ namespace DingoUnityExtensions.Tweens
                 DisableImmediately();
                 onComplete?.Invoke();
             });
-            return _enableTweens.MaxDuration;
+            return _disableTweens.MaxDuration;
         }
 
         private void EnableImmediatelyPlayHandle()
