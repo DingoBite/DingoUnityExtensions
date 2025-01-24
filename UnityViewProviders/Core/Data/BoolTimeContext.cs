@@ -1,4 +1,4 @@
-namespace DingoUnityExtensions.Generic
+namespace DingoUnityExtensions.UnityViewProviders.Core.Data
 {
     public enum BoolTimeContext
     {
