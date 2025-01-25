@@ -11,6 +11,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         public virtual void SetDefaultView() {}
         protected override void SubscribeOnly() { }
         protected override void UnsubscribeOnly() { }
+        public virtual bool Interactable { get; set; }
     }
 
     public abstract class ValueContainer<TValue> : ContainerBase
@@ -118,7 +119,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         private bool _awaked;
         
-        public bool Interactable
+        public sealed override bool Interactable
         {
             get => gameObject.activeInHierarchy && _isInteractable;
             set
@@ -340,7 +341,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         [SerializeField] private bool _isInteractable = true;
 
-        public bool Interactable
+        public sealed override bool Interactable
         {
             get => gameObject.activeInHierarchy && _isInteractable;
             set
