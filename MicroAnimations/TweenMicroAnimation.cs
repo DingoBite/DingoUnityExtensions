@@ -22,36 +22,19 @@ namespace DingoUnityExtensions.MicroAnimations
         [SerializeField] private float _delay;
 
         private readonly Dictionary<object, Tween> _tweens = new();
-
-        private readonly Dictionary<object, int> _lastForwardFrameAnimatedDict = new();
-        private readonly Dictionary<object, int> _lastBackwardFrameAnimatedDict = new();
-
         protected EnableDisableTweenAnimationPair Animation => _animation;
         
-        protected float PlayTween(object id, TweenUtils.Factory tweenFactory, bool forward, float addDelay = 0, bool useCache = false)
+        protected float PlayTween(object id, TweenUtils.Factory tweenFactory, bool forward, float addDelay = 0)
         {
             id = (id, forward);
             var duration = forward ? _animation.EnableDuration : _animation.DisableDuration;
             var fullDuration = Math.Max(duration + _delay + addDelay, 0);
-            var newFrame = Time.frameCount;
-            var lastForwardFrameAnimated = _lastForwardFrameAnimatedDict.GetValueOrDefault(id, 0);
-            var lastBackwardFrameAnimated = _lastBackwardFrameAnimatedDict.GetValueOrDefault(id, 0);
-            var forwardFrame = newFrame - lastForwardFrameAnimated < 1;
-            var backwardFrame = newFrame - lastBackwardFrameAnimated < 1;
-            if (forward && forwardFrame || !forward && backwardFrame)
-                return fullDuration;
 
-            Tween tween;
-            if (forward)
-            {
-                _lastForwardFrameAnimatedDict[id] = newFrame;
-                tween = _animation.MakeEnableTween(tweenFactory).SetDelay(_delay + addDelay);
-            }
-            else
-            {
-                _lastBackwardFrameAnimatedDict[id] = newFrame;
-                tween = _animation.MakeDisableTween(tweenFactory).SetDelay(_delay + addDelay);
-            }
+            var delay = _delay + addDelay;
+            var tween = forward ? _animation.MakeEnableTween(tweenFactory) : _animation.MakeDisableTween(tweenFactory);
+
+            if (_delay > Vector2.kEpsilon)
+                tween.SetDelay(delay);
             tween.Play();
             _tweens[id] = tween;
             return fullDuration;

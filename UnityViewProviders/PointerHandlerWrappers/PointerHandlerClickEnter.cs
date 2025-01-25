@@ -12,9 +12,23 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         
         protected bool Entered { get; private set; }
         protected bool Exit { get; private set; }
+
+        private bool _blockNextEnter;
         
+        public override void OnPointerClick(PointerEventData eventData)
+        {
+            if (Entered)
+                _blockNextEnter = true;
+            base.OnPointerClick(eventData);
+        }
+
         public void OnPointerEnter(PointerEventData eventData)
         {
+            if (_blockNextEnter)
+            {
+                _blockNextEnter = false;
+                return;
+            }
             _enterTime = Time.time;
             Entered = true;
             PointerEnterEvent?.Invoke(eventData, 0);

@@ -15,7 +15,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         protected bool Down { get; private set; }
         protected bool Up { get; private set; }
 
-        public void OnPointerClick(PointerEventData eventData)
+        public virtual void OnPointerClick(PointerEventData eventData)
         {
             Down = false;
             Up = true;
