@@ -208,7 +208,7 @@ namespace DingoUnityExtensions.Tweens
         protected virtual void SetFullActive(AnimateState state, bool force = false)
         {
             var active = state is AnimateState.Enabled or AnimateState.Enabling or AnimateState.Disabling;
-            if (enabled == active)
+            if (enabled == active && enabled == GameObject.activeSelf)
                 return;
             enabled = active;
             if (_manageActiveness && enabled != GameObject.activeSelf)
