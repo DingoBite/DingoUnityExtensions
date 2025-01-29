@@ -6,8 +6,13 @@ namespace DingoUnityExtensions.Utils
 {
     public static class PathUtils
     {
+        #if UNITY_ANDROID
         private const string HTTP = "http:///";
         private const string HTTPS = "https:///";
+        # else
+        private const string HTTP = "http:/";
+        private const string HTTPS = "https:/";
+        #endif
         
         private const string DP_SLASH_1 = ":/";
         private const string DP_SLASH_2 = "://";
@@ -59,6 +64,8 @@ namespace DingoUnityExtensions.Utils
 #endif
         }
 
+        public static bool IsURL(string path) => path.StartsWith(HTTP) || path.StartsWith(HTTPS);
+
         public static string AbsoluteFilePathToUri(string path)
         {
             if (!path.Contains(DP_SLASH_2))
@@ -76,6 +83,13 @@ namespace DingoUnityExtensions.Utils
         
         public static string MakeImagePath(string folder, string imageName)
         {
+            if (IsURL(folder))
+            {
+                if (imageName.StartsWith('/') || folder.EndsWith('/'))
+                    return (folder + imageName);
+                return folder + '/' + imageName; 
+            }
+            
 #if UNITY_ANDROID
             if (imageName.StartsWith('/') || folder.EndsWith('/'))
                 return (folder + imageName).Replace("//", "/");
@@ -103,7 +117,7 @@ namespace DingoUnityExtensions.Utils
                 fullPath = prefix + path;
             else
                 fullPath = prefix + '/' + path;
-            if (createDirectory)
+            if (pathPrefix is not PathPrefix.HTTP and not PathPrefix.HTTPS && createDirectory)
             {
 #if !UNITY_ANDROID
                 var directoryName = Path.GetDirectoryName(fullPath);
