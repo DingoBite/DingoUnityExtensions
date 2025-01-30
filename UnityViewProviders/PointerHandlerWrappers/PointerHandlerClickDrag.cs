@@ -5,7 +5,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
 {
     public class PointerHandlerClickDrag : PointerHandlerClickEnter, IBeginDragEventWrapper, IEndDragEventWrapper, IDragEventWrapper
     {
-private const string HELD = "____held";
+        private const string HELD = "____held";
         
         [SerializeField] private bool _dragAsHeld;
         [SerializeField] private float _timeToHeldReach = -1;

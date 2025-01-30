@@ -35,10 +35,10 @@ namespace DingoUnityExtensions.UnityViewProviders
             if (value.Count != _pool.PulledElements.Count)
             {
                 _pool.Clear();
-                foreach (var altisJoint in value)
+                foreach (var v in value)
                 {
                     var view = _pool.PullElement();
-                    view.UpdateValueWithoutNotify(altisJoint);
+                    view.UpdateValueWithoutNotify(v);
                     view.OnValueChange -= SomeValueChanged;
                     view.OnValueChange += SomeValueChanged;
                 }
