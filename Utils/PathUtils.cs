@@ -6,13 +6,8 @@ namespace DingoUnityExtensions.Utils
 {
     public static class PathUtils
     {
-        #if UNITY_ANDROID
-        private const string HTTP = "http:///";
-        private const string HTTPS = "https:///";
-        # else
         private const string HTTP = "http:/";
         private const string HTTPS = "https:/";
-        #endif
         
         private const string DP_SLASH_1 = ":/";
         private const string DP_SLASH_2 = "://";
@@ -108,11 +103,13 @@ namespace DingoUnityExtensions.Utils
             return null;
         }
 
-        public static string MakePathWithPrefix(PathPrefix pathPrefix, string path, bool createDirectory = false)
+        public static string MakePathWithPrefix(PathPrefix pathPrefix, string path, bool createDirectory = false, bool addEscape = false)
         {
             path = path.Replace('\\', '/');
             string fullPath;
             var prefix = PrefixDictionary[pathPrefix];
+            if (addEscape)
+                prefix += "//";
             if (path.StartsWith('/') || prefix == "")
                 fullPath = prefix + path;
             else

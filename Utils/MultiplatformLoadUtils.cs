@@ -97,7 +97,6 @@ namespace DingoUnityExtensions.Utils
             return result;
         }
 
-
         private static async Task<string> GetDataFromRequest(string path)
         {
             var unityWebRequest = UnityWebRequest.Get(path);
