@@ -23,5 +23,10 @@ namespace DingoUnityExtensions.MathAndGeometry
                 return 0;
             return a / b;
         }
+        
+        public static Vector3 GetProjectedPoint(this Ray ray, Vector3 point)
+        {
+            return ray.origin + Vector3.Project(point - ray.origin, ray.direction);
+        }
     }
 }
