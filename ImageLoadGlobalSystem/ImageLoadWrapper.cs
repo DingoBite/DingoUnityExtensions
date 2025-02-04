@@ -39,8 +39,15 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             action?.Invoke(_rawImage);
         }
 
+        public void ForceSetImage(Texture2D texture)
+        {
+            _isFirstValue = false;
+            UpdateImage(new TextureLoadData(texture, ImageLoadState.Loaded, ""));
+        }
+        
         public void UpdateValueWithLoad(ImageLoadHandle imageLoadHandle)
         {
+            _isFirstValue = false;
             var isLoad = Value == null || Value != imageLoadHandle;
             if (isLoad && Value != null)
                 Unload();
