@@ -41,7 +41,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
         public void ForceSetImage(Texture2D texture)
         {
-            _isFirstValue = false;
+            _isFirstValue = true;
             UpdateImage(new TextureLoadData(texture, ImageLoadState.Loaded, ""));
         }
         
@@ -116,26 +116,22 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             {
                 case ImageLoadState.None:
                     setActive(_imageParent, false);
-                    if (_preloader != null)
-                        setActive(_preloader, true);
+                    setActive(_preloader, true);
                     setActive(_notFound, false);
                     break;
                 case ImageLoadState.Loading:
                     setActive(_imageParent, false);
-                    if (_preloader != null)
-                        setActive(_preloader, true);
+                    setActive(_preloader, true);
                     setActive(_notFound, false);
                     break;
                 case ImageLoadState.NotFound:
                     setActive(_imageParent, false);
-                    if (_preloader != null)
-                        setActive(_preloader, false);
+                    setActive(_preloader, false);
                     setActive(_notFound, true);
                     break;
                 case ImageLoadState.Loaded:
                     setActive(_imageParent, true);
-                    if (_preloader != null)
-                        setActive(_preloader, false);
+                    setActive(_preloader, false);
                     setActive(_notFound, false);
                     var textureObj = textureLoadData.Texture;
                     var size = new Vector2();
