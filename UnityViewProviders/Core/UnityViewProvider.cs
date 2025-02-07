@@ -155,6 +155,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         protected virtual void OnAwake() {}
 
         public event Action<TValue> OnValueChange;
+        public event Action OnAnyChange;
 
         private bool _disabledValueChanged;
         private bool _updateOnEnable;
@@ -185,9 +186,10 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 Awake();
             
             OnValueChange?.Invoke(value);
+            OnAnyChange?.Invoke();
         }
 
-        protected void ForceSetValueAndInvoke(TValue value)
+        protected void ForceSetValue(TValue value)
         {
             try
             {

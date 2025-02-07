@@ -20,7 +20,8 @@ namespace DingoUnityExtensions.MonoBehaviours
 
         private void OnUpdate()
         {
-            Application.targetFrameRate = _frameRate;
+            if (Application.targetFrameRate != _frameRate)
+                Application.targetFrameRate = _frameRate;
         }
     }
 }
