@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
+using DingoUnityExtensions.Extensions;
 using DingoUnityExtensions.Generic;
-using Unity.XR.CoreUtils;
 using UnityEngine;
 
 namespace DingoUnityExtensions.Pools
@@ -75,7 +75,7 @@ namespace DingoUnityExtensions.Pools
         {
             var component = Instantiate(_prefab, transform);
             if (_layerFromPool)
-                component.gameObject.SetLayerRecursively(gameObject.layer);
+                component.gameObject.SetLayerRecursive(gameObject.layer);
             component.name = $"--{_pulledElements.Count}_{ComponentName}";
             OnInstantiate(component);
             return component;
