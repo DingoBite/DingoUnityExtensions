@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DingoUnityExtensions.Extensions
@@ -28,6 +29,22 @@ namespace DingoUnityExtensions.Extensions
             return value;
         }
 
+        public static TValue GetOrAddAndGet<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> factory)
+        {
+            if (!dictionary.TryGetValue(key, out var value))
+            {
+                value = factory();
+                dictionary.Add(key, value);
+            }
+            else
+            {
+                dictionary[key] = value;
+            }
+
+            return value;
+        }
+
+        
         public static Dictionary<T1, T2> ToDictionary<T1, T2>(this IEnumerable<(T1, T2)> pairs)
         {
             return pairs.ToDictionary(p => p.Item1, p => p.Item2);

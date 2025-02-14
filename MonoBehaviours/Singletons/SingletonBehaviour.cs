@@ -31,13 +31,11 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
                         else if (instances.Length == 1)
                         {
                             _instance = instances[0];
-                            DontDestroyOnLoad(_instance.gameObject);
                         }
                         else
                         {
                             Debug.LogError($"[Singleton] Multiple instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
                             _instance = instances[0];
-                            DontDestroyOnLoad(_instance.gameObject);
                             for (var i = 1; i < instances.Length; i++)
                             {
                                 instances[i].gameObject.SetActive(false);
@@ -93,13 +91,11 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
                         else if (instances.Length == 1)
                         {
                             _instance = instances[0];
-                            DontDestroyOnLoad(_instance.gameObject);
                         }
                         else
                         {
                             Debug.LogError($"[Singleton] Multiple instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
                             _instance = instances[0];
-                            DontDestroyOnLoad(_instance.gameObject);
                             for (var i = 1; i < instances.Length; i++)
                             {
                                 instances[i].gameObject.SetActive(false);
