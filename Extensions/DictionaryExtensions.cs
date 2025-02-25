@@ -29,6 +29,22 @@ namespace DingoUnityExtensions.Extensions
             return value;
         }
 
+        public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEnumerable<KeyValuePair<TKey, TValue>> range)
+        {
+            foreach (var (key, value) in range)
+            {
+                dictionary[key] = value;
+            }
+        }
+        
+        public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEnumerable<(TKey, TValue)> range)
+        {
+            foreach (var (key, value) in range)
+            {
+                dictionary[key] = value;
+            }
+        }
+        
         public static TValue GetOrAddAndGet<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> factory)
         {
             if (!dictionary.TryGetValue(key, out var value))
