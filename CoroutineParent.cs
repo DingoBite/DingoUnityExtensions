@@ -24,17 +24,17 @@ namespace DingoUnityExtensions
     
     public interface IUpdater
     {
-        public void Update(in TimeStamp timeStamp) {}
+        public void UpdateHandle(in TimeStamp timeStamp);
     }
     
     public interface ILateUpdater
     {
-        public void LateUpdate(in TimeStamp timeStamp) {}
+        public void LateUpdateHandle(in TimeStamp timeStamp);
     }
     
     public interface IFixedUpdater
     {
-        public void FixedUpdate(in TimeStamp timeStamp) {}
+        public void FixedUpdateHandle(in TimeStamp timeStamp);
     }
     
     public class CoroutineParent : SingletonProtectedBehaviour<CoroutineParent>
@@ -241,7 +241,7 @@ namespace DingoUnityExtensions
                 {
                     try
                     {
-                        updater.Update(timeStamp);
+                        updater.UpdateHandle(timeStamp);
                     }
                     catch (Exception e)
                     {
@@ -295,7 +295,7 @@ namespace DingoUnityExtensions
                 {
                     try
                     {
-                        updater.LateUpdate(timeStamp);
+                        updater.LateUpdateHandle(timeStamp);
                     }
                     catch (Exception e)
                     {
@@ -349,7 +349,7 @@ namespace DingoUnityExtensions
                 {
                     try
                     {
-                        updater.FixedUpdate(timeStamp);
+                        updater.FixedUpdateHandle(timeStamp);
                     }
                     catch (Exception e)
                     {
