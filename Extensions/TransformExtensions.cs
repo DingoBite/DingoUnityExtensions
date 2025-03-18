@@ -48,6 +48,31 @@ namespace DingoUnityExtensions.Extensions
     {
         private const float ANGLE_DELIMITER = 1f / 180f;
 
+        public static float GetDistance(this Matrix4x4 trs, Matrix4x4 targetTRS, TransformComponent transformComponent)
+        {
+            if (transformComponent == TransformComponent.None)
+                return 0;
+
+            var distance = 0f;
+            var components = 0;
+            if (transformComponent.HasFlag(TransformComponent.Scale))
+            {
+                distance += ScaleDistance(trs.lossyScale, targetTRS.lossyScale);
+                components++;
+            }
+            if (transformComponent.HasFlag(TransformComponent.Rotation))
+            {
+                distance += RotationDistance(trs.rotation, targetTRS.rotation);
+                components++;
+            }
+            if (transformComponent.HasFlag(TransformComponent.Position))
+            {
+                distance += PositionDistance(trs.GetPosition(), targetTRS.GetPosition());
+                components++;
+            }
+            return distance / components;
+        }
+        
         public static float GetDistance(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType, TransformComponent transformComponent)
         {
             if (transformComponent == TransformComponent.None)
@@ -55,7 +80,6 @@ namespace DingoUnityExtensions.Extensions
             
             var distance = 0f;
             var components = 0;
-            var rotationMultiplier = 1f;
             if (transformComponent.HasFlag(TransformComponent.Scale))
             {
                 distance += ScaleDistance(transform, target, spaceType, targetSpaceType);
@@ -63,7 +87,8 @@ namespace DingoUnityExtensions.Extensions
             }
             if (transformComponent.HasFlag(TransformComponent.Rotation))
             {
-                rotationMultiplier = RotationDistanceMultiplier(transform, target, spaceType, targetSpaceType);
+                distance += RotationDistance(transform, target, spaceType, targetSpaceType);
+                components++;
             }
             if (transformComponent.HasFlag(TransformComponent.Position))
             {
@@ -71,8 +96,7 @@ namespace DingoUnityExtensions.Extensions
                 components++;
             }
 
-            components = components == 0 ? 1 : components;
-            return distance * rotationMultiplier / components;
+            return distance / components;
         }
         
         public static void SetComponents(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType, TransformComponent transformComponent, out float distance, float time = 1, bool distanceAfter = true)
@@ -82,7 +106,6 @@ namespace DingoUnityExtensions.Extensions
                 return;
             
             var components = 0;
-            var rotationMultiplier = 1f;
             if (transformComponent.HasFlag(TransformComponent.Scale))
             {
                 if (!distanceAfter)
@@ -95,10 +118,11 @@ namespace DingoUnityExtensions.Extensions
             if (transformComponent.HasFlag(TransformComponent.Rotation))
             {
                 if (!distanceAfter)
-                    rotationMultiplier = RotationDistanceMultiplier(transform, target, spaceType, targetSpaceType);
+                    distance += RotationDistance(transform, target, spaceType, targetSpaceType);
                 transform.SetRotation(spaceType, target.GetRotation(targetSpaceType), time);
                 if (distanceAfter)
-                    rotationMultiplier = RotationDistanceMultiplier(transform, target, spaceType, targetSpaceType);
+                    distance += RotationDistance(transform, target, spaceType, targetSpaceType);
+                components++;
             }
             if (transformComponent.HasFlag(TransformComponent.Position))
             {
@@ -110,8 +134,7 @@ namespace DingoUnityExtensions.Extensions
                 components++;
             }
             
-            components = components == 0 ? 1 : components;
-            distance *= rotationMultiplier / components;
+            distance /= components;
         }
 
         public static void SetComponents(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType, TransformComponent transformComponent, float time = 1)
@@ -215,14 +238,12 @@ namespace DingoUnityExtensions.Extensions
             }
         }
         
-        public static float PositionDistance(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType) => 
-            (transform.GetPosition(spaceType) - target.GetPosition(targetSpaceType)).magnitude;
-
-        public static float RotationDistanceMultiplier(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType) => 
-            1 + Quaternion.Angle(transform.GetRotation(spaceType), target.GetRotation(targetSpaceType)) * ANGLE_DELIMITER;
-
-        public static float ScaleDistance(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType) => 
-            (transform.GetScale(spaceType) - target.GetScale(targetSpaceType)).magnitude;
+        public static float PositionDistance(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType) => PositionDistance(transform.GetPosition(spaceType), target.GetPosition(targetSpaceType));
+        public static float RotationDistance(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType) => RotationDistance(transform.GetRotation(spaceType), target.GetRotation(targetSpaceType));
+        public static float ScaleDistance(this Transform transform, Transform target, SpaceType spaceType, SpaceType targetSpaceType) => ScaleDistance(transform.GetScale(spaceType), target.GetScale(targetSpaceType));
+        public static float PositionDistance(this Vector3 p1, Vector3 p2) => Vector3.Distance(p1, p2);
+        public static float RotationDistance(this Quaternion q1, Quaternion q2) => Quaternion.Angle(q1, q2) * ANGLE_DELIMITER;
+        public static float ScaleDistance(this Vector3 s1, Vector3 s2) => Vector3.Distance(s1, s2);
 
         public static void SetTRS(this Transform transform, SpaceType spaceType, Matrix4x4 trs)
         {
