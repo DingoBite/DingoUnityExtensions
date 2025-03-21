@@ -3,6 +3,26 @@ using Newtonsoft.Json;
 
 namespace DingoUnityExtensions.Serialization.Converters
 {
+    public static class UTDDatesConvert
+    {
+        public static DateTime LongUnixSecondsToUTC(long seconds)
+        {
+            return DateTimeOffset.FromUnixTimeSeconds(seconds).UtcDateTime;
+        }
+
+        public static DateTime LongUnixSecondsToLocalUTC(long seconds)
+        {
+            var utcDateTime = LongUnixSecondsToUTC(seconds);
+            return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.Local);
+        }
+        
+        public static DateTime LongUnixSecondsToUTC(long seconds, TimeZoneInfo timeZoneInfo)
+        {
+            var utcDateTime = LongUnixSecondsToUTC(seconds);
+            return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, timeZoneInfo);
+        }
+    }
+    
     public class UTCDateTimeConverter : JsonConverter
     {
         public override object ReadJson(
@@ -15,7 +35,8 @@ namespace DingoUnityExtensions.Serialization.Converters
                 return null;
             var ts = serializer.Deserialize<long>(reader);
 
-            return DateTimeOffset.FromUnixTimeSeconds(ts).UtcDateTime;
+            var utcDateTime = DateTimeOffset.FromUnixTimeSeconds(ts).UtcDateTime;
+            return utcDateTime;
         }
 
         public override bool CanConvert(Type type)
@@ -28,47 +49,56 @@ namespace DingoUnityExtensions.Serialization.Converters
             object value,
             JsonSerializer serializer)
         {
-            return;
+            if (value is DateTime dt)
+            {
+                var unixTime = new DateTimeOffset(dt).ToUnixTimeSeconds();
+                writer.WriteValue(unixTime);
+            }
+            else
+            {
+                writer.WriteNull();
+            }
         }
 
         public override bool CanRead => true;
     }
     
-    public class BoolOrUtcDateTimeConverter : JsonConverter
+    public class ToLocalUTCDateTimeConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType)
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object existingValue,
+            JsonSerializer serializer)
         {
-            return typeof(DateTime).IsAssignableFrom(objectType) || objectType == typeof(bool?) || objectType == typeof(object);
+            if (reader.Value == null)
+                return null;
+            var ts = serializer.Deserialize<long>(reader);
+            return UTDDatesConvert.LongUnixSecondsToLocalUTC(ts);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override bool CanConvert(Type type)
         {
-            switch (reader.TokenType)
-            {
-                case JsonToken.Boolean:
-                    return reader.Value;
-                case JsonToken.Integer:
-                    var ts = serializer.Deserialize<long>(reader);
-                    return DateTimeOffset.FromUnixTimeSeconds(ts).UtcDateTime;
-            }
-            return null;
+            return typeof(DateTime).IsAssignableFrom(type);
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            object value,
+            JsonSerializer serializer)
         {
-            switch (value)
+            if (value is DateTime dt)
             {
-                case bool b:
-                    writer.WriteValue(b);
-                    break;
-                case DateTime dt:
-                    var unixTime = new DateTimeOffset(dt).ToUnixTimeSeconds();
-                    writer.WriteValue(unixTime);
-                    break;
-                default:
-                    writer.WriteNull();
-                    break;
+                dt = TimeZoneInfo.ConvertTimeToUtc(dt, TimeZoneInfo.Local);
+                var unixTime = new DateTimeOffset(dt).ToUnixTimeSeconds();
+                writer.WriteValue(unixTime);
+            }
+            else
+            {
+                writer.WriteNull();
             }
         }
+
+        public override bool CanRead => true;
     }
 }
