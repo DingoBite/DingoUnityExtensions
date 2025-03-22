@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Build;
 
 namespace DingoUnityExtensions.Editor
 {
@@ -16,12 +17,23 @@ namespace DingoUnityExtensions.Editor
         [MenuItem("Edit/Manual Process Defines")]
         private static void ManualProcessDefines()
         {
+#if UNITY_6000_0_OR_NEWER
+            var buildTargetGroup = NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
+            var definesString = PlayerSettings.GetScriptingDefineSymbols(buildTargetGroup);
+            var allDefines = definesString.Split(';').ToList();
+            allDefines.AddRange(GetSymbols().Except(allDefines));
+            PlayerSettings.SetScriptingDefineSymbols(
+                buildTargetGroup,
+                string.Join(";", allDefines.ToArray()));
+#else 
             var definesString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
             var allDefines = definesString.Split(';').ToList();
             allDefines.AddRange(GetSymbols().Except(allDefines));
             PlayerSettings.SetScriptingDefineSymbolsForGroup(
                 EditorUserBuildSettings.selectedBuildTargetGroup,
                 string.Join(";", allDefines.ToArray()));
+#endif
+            
         }
 
         private static IEnumerable<string> GetSymbols()

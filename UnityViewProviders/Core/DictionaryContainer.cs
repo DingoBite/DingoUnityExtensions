@@ -7,10 +7,10 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 {
     public abstract class DictionaryContainer<TId, TValue> : ValueContainer<IReadOnlyDictionary<TId, TValue>>
     {
-        public event Action<IReadOnlyDictionary<TId, TValue>> OnValueChange
+        public event Action<IReadOnlyDictionary<TId, TValue>> OnDictValueChange
         {
-            add => _dictionaryContainerGroup.OnValueChange += value;
-            remove => _dictionaryContainerGroup.OnValueChange -= value;
+            add => _dictionaryContainerGroup.OnDictValueChange += value;
+            remove => _dictionaryContainerGroup.OnDictValueChange -= value;
         } 
         
         [SerializeField] private SerializedDictionary<TId, ValueContainer<TValue>> _checkboxes;

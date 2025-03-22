@@ -5,7 +5,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 {
     public class DictionaryContainerGroup<TId, TValue> : ValueContainerGroup<TId, TValue>
     {
-        public event Action<IReadOnlyDictionary<TId, TValue>> OnValueChange;
+        public event Action<IReadOnlyDictionary<TId, TValue>> OnDictValueChange;
 
         private readonly Dictionary<TId, TValue> _values = new();
 
@@ -26,7 +26,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         protected override void UpdateContainerValues(TId id, TValue value)
         {
             UpdateContainerValuesWithoutNotify(id, value);
-            OnValueChange?.Invoke(_values);
+            OnDictValueChange?.Invoke(_values);
         }
         
         public void UpdateContainerValuesWithoutNotify(TId id, TValue value)

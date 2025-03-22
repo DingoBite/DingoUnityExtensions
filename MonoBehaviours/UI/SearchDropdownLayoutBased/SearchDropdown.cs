@@ -228,7 +228,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             }
 
             _cachedSearchList.Sort((p1, p2) => p2.searchValue.CompareTo(p1.searchValue));
-            var hoveredButton = false;
             foreach (var (id, searchValue) in _cachedSearchList)
             {
                 var button = _buttons.GetButton(id);
@@ -236,7 +235,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
                 button.gameObject.SetActive(!isZero);
                 if (isZero)
                 {
-                    hoveredButton = true;
                     continue;
                 }
 

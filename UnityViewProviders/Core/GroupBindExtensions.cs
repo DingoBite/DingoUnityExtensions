@@ -29,14 +29,14 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
     {
         public static void SubscribeCheckboxGroupAndUpdate<TId, TValue>(this DictionaryContainer<TId, TValue> dictionaryContainer, IReadonlyBind<IReadOnlyDictionary<TId, TValue>> model, Action<IReadOnlyDictionary<TId, TValue>> viewTabSelect, Action<IReadOnlyDictionary<TId, TValue>> onValueChange)
         {
-            dictionaryContainer.OnValueChange += onValueChange;
+            dictionaryContainer.OnDictValueChange += onValueChange;
             model.SafeSubscribe(viewTabSelect);
             viewTabSelect(model.V);
         }
         
         public static void UnSubscribeCheckboxGroup<TId, TValue>(this DictionaryContainer<TId, TValue> dictionaryContainer, IReadonlyBind<IReadOnlyDictionary<TId, TValue>> model, Action<IReadOnlyDictionary<TId, TValue>> viewTabSelect, Action<IReadOnlyDictionary<TId, TValue>> onValueChange)
         {
-            dictionaryContainer.OnValueChange -= onValueChange;
+            dictionaryContainer.OnDictValueChange -= onValueChange;
             model.UnSubscribe(viewTabSelect);
         }
     }

@@ -68,9 +68,10 @@ namespace DingoUnityExtensions.Tweens
         public void ApplyPositionAnchors(RectTransform rectTransform)
         {
             return;
-            rectTransform.SetPivot(Pivot);
-            rectTransform.anchorMin = MinAnchors;
-            rectTransform.anchorMax = MaxAnchors;
+            // TODO Pivot handling
+            // rectTransform.SetPivot(Pivot);
+            // rectTransform.anchorMin = MinAnchors;
+            // rectTransform.anchorMax = MaxAnchors;
         }
     }
 

@@ -116,7 +116,7 @@ namespace DingoUnityExtensions.Utils
         {
             var activeScene = SceneManager.GetActiveScene();
             if (!activeScene.isLoaded)
-                return Object.FindObjectOfType<T>(true);
+                return Object.FindAnyObjectByType<T>(FindObjectsInactive.Include);
             
             foreach (var rootGameObject in activeScene.GetRootGameObjects())
             {

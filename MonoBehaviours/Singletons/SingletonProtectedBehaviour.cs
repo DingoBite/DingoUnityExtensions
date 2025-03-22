@@ -6,7 +6,6 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
     {
         private static T _instance;
         private static readonly object _lock = new();
-        private static bool _applicationIsQuitting;
 
         protected static T Instance
         {
@@ -41,19 +40,6 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
                     return _instance;
                 }
             }
-        }
-        
-        protected virtual void OnDestroy()
-        {
-            if (_instance == this)
-            {
-                _applicationIsQuitting = true;
-            }
-        }
-
-        protected virtual void OnApplicationQuit()
-        {
-            _applicationIsQuitting = true;
         }
     }
 }

@@ -13,7 +13,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
         
         [SerializeField] private Vector2 _minFilter;
 
-        private bool _started;
         private bool _filteredStarted;
         private Vector2 _startPosition;
 
@@ -21,7 +20,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
 
         public void OnBeginDragEvent(PointerEventData data, float t)
         {
-            _started = true;
             _startPosition = data.position;
         }
 
@@ -43,7 +41,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
 
         public void OnEndDragEvent(PointerEventData data, float t)
         {
-            _started = false;
             _filteredStarted = false;
         }
         
