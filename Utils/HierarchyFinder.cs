@@ -354,16 +354,21 @@ namespace DingoUnityExtensions.Utils
                 DebugErrorSubstringFind(typeof(T), subString, false);
         }
 
-        public static T FindComponentInParent<T>(this Transform transform, bool isSelfCheck = false)
+        public static T FindComponentInParent<T>(this Transform transform, bool isSelfCheck = false, int maxInteractionParentSearchDepth = -1)
         {
+            if (maxInteractionParentSearchDepth == 0)
+                return default;
             if (isSelfCheck && transform.TryGetComponent<T>(out var component))
                 return component;
             var parent = transform.parent;
-            if (parent == null) return default;
+            if (parent == null) 
+                return default;
 
-            if (parent.TryGetComponent<T>(out component)) return component;
+            if (parent.TryGetComponent(out component)) 
+                return component;
 
-            var componentInParent = parent.FindComponentInParent<T>();
+            maxInteractionParentSearchDepth--;
+            var componentInParent = parent.FindComponentInParent<T>(maxInteractionParentSearchDepth: maxInteractionParentSearchDepth);
             return componentInParent;
         }
 
