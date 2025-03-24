@@ -36,6 +36,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
 
         public void OnPointerExit(PointerEventData eventData)
         {
+            _blockNextEnter = false;
             Exit = true;
             Entered = false;
             PointerExitEvent?.Invoke(eventData, Time.time - _enterTime);
