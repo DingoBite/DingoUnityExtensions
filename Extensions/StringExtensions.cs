@@ -50,14 +50,18 @@ namespace DingoUnityExtensions.Extensions
 
         public static float FloatConvertOrDefault(this string str)
         {
-            if (float.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out var i))
+            if (string.IsNullOrWhiteSpace(str))
+                return 0;
+            if (float.TryParse(str.Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out var i))
                 return i;
             return 0;
         }
         
         public static int FloatConvertToIntOrDefault(this string str)
         {
-            if (float.TryParse(str, NumberStyles.Number, CultureInfo.InvariantCulture, out var v))
+            if (string.IsNullOrWhiteSpace(str))
+                return 0;
+            if (float.TryParse(str.Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out var v))
                 return (int)(v + float.Epsilon);
             return 0;
         }
