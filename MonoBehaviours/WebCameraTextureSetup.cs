@@ -6,10 +6,12 @@ namespace MobileExerciseAnalyzerView.DebugElements
     public class WebCameraTextureSetup : MonoBehaviour
     {
         [SerializeField] private Material _material;
+#if UNITY_EDITOR
         private WebCamTexture _webCamTexture;
-
+#endif
         private void Update()
         {
+#if UNITY_EDITOR
             // Check if at least one webcam is available
             try
             {
@@ -32,6 +34,7 @@ namespace MobileExerciseAnalyzerView.DebugElements
                 Debug.LogException(e);
                 enabled = false;
             }
+#endif
         }
     }
 }

@@ -48,22 +48,22 @@ namespace DingoUnityExtensions.Extensions
             return 0;
         }
 
-        public static float FloatConvertOrDefault(this string str)
+        public static float FloatConvertOrDefault(this string str, float @default = 0)
         {
             if (string.IsNullOrWhiteSpace(str))
-                return 0;
+                return @default;
             if (float.TryParse(str.Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out var i))
                 return i;
-            return 0;
+            return @default;
         }
         
-        public static int FloatConvertToIntOrDefault(this string str)
+        public static int FloatConvertToIntOrDefault(this string str, int @default = 0)
         {
             if (string.IsNullOrWhiteSpace(str))
-                return 0;
+                return @default;
             if (float.TryParse(str.Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out var v))
                 return (int)(v + float.Epsilon);
-            return 0;
+            return @default;
         }
     }
 }
