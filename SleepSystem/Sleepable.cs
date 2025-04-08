@@ -16,7 +16,7 @@ namespace DingoUnityExtensions.SleepSystem
         [SerializeField] private List<Sleepable> _stack;
         
         private Sleep _sleep = Sleep.None;
-        private readonly Bind<bool> _sleeping = new (true);
+        private readonly Bind<bool> _sleeping = new (true, false);
         
         public IReadonlyBind<bool> Sleeping => _sleeping;
 
