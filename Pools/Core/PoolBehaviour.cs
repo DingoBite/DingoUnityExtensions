@@ -1,36 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using DingoUnityExtensions.Extensions;
 using DingoUnityExtensions.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
-namespace DingoUnityExtensions.Pools
+namespace DingoUnityExtensions.Pools.Core
 {
-    public class Pool<T> : IPoolGetOnly<T>, IEnumerableContainer<T> where T : MonoBehaviour
+    public class PoolBehaviour<T> : MonoBehaviour, IPoolGetOnly<T>, IEnumerableContainer<T> where T : MonoBehaviour
     {
-        private readonly GameObject _parent;
-        private readonly T _prefab;
-        private readonly bool _manageActiveness;
-        private readonly SortTransformOrderOption _sortTransformOrder;
-        private readonly bool _layerFromPool;
-
+        [SerializeField] private T _prefab;
+        [SerializeField] private bool _manageActiveness = true;
+        [SerializeField] private SortTransformOrderOption _sortTransformOrder;
+        [SerializeField] private bool _layerFromPool = true;
+        
         private readonly List<T> _pulledElements = new();
         private readonly Queue<T> _queue = new();
-
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
         public IEnumerable<T> ComponentElements => _pulledElements;
 
-        public Pool(T prefab, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true)
-        {
-            _manageActiveness = manageActiveness;
-            _prefab = prefab;
-            _sortTransformOrder = sortTransformOrder;
-            _layerFromPool = layerFromPool;
-            _parent = parent;
-        }
-        
         public T PullElement()
         {
             if (_queue.TryDequeue(out var element))
@@ -62,18 +50,15 @@ namespace DingoUnityExtensions.Pools
             for (var i = 0; i < PulledElements.Count; i++)
             {
                 var element = PulledElements[i];
-                if (_manageActiveness)
-                    element.gameObject.SetActive(false);
-                _queue.Enqueue(element);
+                PushElement(element);
             }
-            _pulledElements.Clear();
         }
         
         private T InstantiateComponent()
         {
-            var component = Object.Instantiate(_prefab, _parent.transform);
+            var component = Instantiate(_prefab, transform);
             if (_layerFromPool)
-                component.gameObject.SetLayerRecursive(_parent.layer);
+                component.gameObject.SetLayerRecursive(gameObject.layer);
             component.name = $"--{_pulledElements.Count}_{ComponentName}";
             OnInstantiate(component);
             return component;

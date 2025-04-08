@@ -1,60 +1,64 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using DingoUnityExtensions.Extensions;
 using DingoUnityExtensions.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace DingoUnityExtensions.Pools
+namespace DingoUnityExtensions.Pools.Core
 {
-    public interface IPoolGetOnly<out T> where T : MonoBehaviour
+    public class Pool<T> : IPoolGetOnly<T>, IEnumerableContainer<T> where T : MonoBehaviour
     {
-        public IReadOnlyList<T> PulledElements { get; }
-        public T PullElement();
-        public void Clear();
-    }
+        private readonly GameObject _parent;
+        private readonly T _prefab;
+        private readonly bool _manageActiveness;
+        private readonly SortTransformOrderOption _sortTransformOrder;
+        private readonly bool _layerFromPool;
 
-    public enum SortTransformOrderOption
-    {
-        None,
-        AsLast,
-        AsFirst
-    }
-
-    public class PoolBehaviour<T> : MonoBehaviour, IPoolGetOnly<T>, IEnumerableContainer<T> where T : MonoBehaviour
-    {
-        [SerializeField] private T _prefab;
-        [SerializeField] private bool _manageActiveness = true;
-        [SerializeField] private SortTransformOrderOption _sortTransformOrder;
-        [SerializeField] private bool _layerFromPool = true;
-        
         private readonly List<T> _pulledElements = new();
         private readonly Queue<T> _queue = new();
+        private readonly Action<T, bool> _setActiveOverwrite;
+
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
         public IEnumerable<T> ComponentElements => _pulledElements;
 
+        public Pool(T prefab, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true, Action<T, bool> setActiveOverwrite = null)
+        {
+            _setActiveOverwrite = setActiveOverwrite ?? ((behaviour, b) => behaviour.gameObject.SetActive(b));
+            _manageActiveness = manageActiveness;
+            _prefab = prefab;
+            _sortTransformOrder = sortTransformOrder;
+            _layerFromPool = layerFromPool;
+            _parent = parent;
+        }
+        
         public T PullElement()
         {
             if (_queue.TryDequeue(out var element))
             {
-                if (_manageActiveness)
-                    element.gameObject.SetActive(true);
+                ManageActiveness(element, true);
                 _pulledElements.Add(element);
                 Sort(element);
                 return element;
             }
             element = InstantiateComponent();
-            if (_manageActiveness)
-                element.gameObject.SetActive(true);
+            ManageActiveness(element, true);
             _pulledElements.Add(element);
             Sort(element);
             return element;
         }
 
+        private void ManageActiveness(T component, bool value)
+        {
+            if (!_manageActiveness)
+                return;
+            _setActiveOverwrite(component, value);
+        }
+        
         public void PushElement(T element)
         {
-            if (_manageActiveness)
-                element.gameObject.SetActive(false);
+            ManageActiveness(element, false);
             _queue.Enqueue(element);
             _pulledElements.Remove(element);
         }
@@ -64,8 +68,7 @@ namespace DingoUnityExtensions.Pools
             for (var i = 0; i < PulledElements.Count; i++)
             {
                 var element = PulledElements[i];
-                if (_manageActiveness)
-                    element.gameObject.SetActive(false);
+                ManageActiveness(element, false);
                 _queue.Enqueue(element);
             }
             _pulledElements.Clear();
@@ -73,9 +76,9 @@ namespace DingoUnityExtensions.Pools
         
         private T InstantiateComponent()
         {
-            var component = Instantiate(_prefab, transform);
+            var component = Object.Instantiate(_prefab, _parent.transform);
             if (_layerFromPool)
-                component.gameObject.SetLayerRecursive(gameObject.layer);
+                component.gameObject.SetLayerRecursive(_parent.layer);
             component.name = $"--{_pulledElements.Count}_{ComponentName}";
             OnInstantiate(component);
             return component;

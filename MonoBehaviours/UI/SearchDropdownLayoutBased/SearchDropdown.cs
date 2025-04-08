@@ -232,7 +232,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             {
                 var button = _buttons.GetButton(id);
                 var isZero = searchValue < Vector2.kEpsilon;
-                button.gameObject.SetActive(!isZero);
+                button.SetActiveContainer(!isZero);
                 if (isZero)
                 {
                     continue;
@@ -285,7 +285,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             {
                 _closeDropdownBackground.OnEvent -= CloseSearch;
                 _closeDropdownBackground.OnEvent += CloseSearch;
-                _closeDropdownBackground.gameObject.SetActive(true);
+                _closeDropdownBackground.SetActiveContainer(true);
             }
             _startInput = _inputField.text;
 
@@ -317,7 +317,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             foreach (var dropdownValue in _values)
             {
                 var button = _buttons.GetButton(dropdownValue.Id);
-                button.gameObject.SetActive(true);
+                button.SetActiveContainer(true);
                 if (_invertSearch)
                     button.transform.SetAsFirstSibling();
                 else
@@ -359,7 +359,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             if (_closeDropdownBackground != null)
             {
                 _closeDropdownBackground.OnEvent -= CloseSearch;
-                _closeDropdownBackground.gameObject.SetActive(false);
+                _closeDropdownBackground.SetActiveContainer(false);
             }
 
             _cachedSearchList.Clear();

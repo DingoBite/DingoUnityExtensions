@@ -70,7 +70,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 {
                     if (container.gameObject == gameObject)
                         continue;
-                    container.gameObject.SetActive(true);
+                    container.SetActiveContainer(true);
                 }
             }
 
@@ -85,12 +85,25 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                         continue;
                     try
                     {
-                        container.gameObject.SetActive(false);
+                        container.SetActiveContainer(false);
                     }
                     catch (Exception e)
                     {
                         Debug.LogException(e);
                     }
+                }
+            }
+            
+            public override void SetActiveContainer(bool value)
+            {
+                if (!_manageActiveness)
+                {
+                    base.SetActiveContainer(value);
+                    return;
+                }
+                foreach (var container in _stack)
+                {
+                    container.SetActiveContainer(value);
                 }
             }
         }
@@ -277,6 +290,11 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
             _updateOnEnable = true;
             UpdateValueWithoutNotify(Value);
         }
+        
+        public virtual void SetActiveContainer(bool value)
+        {
+            gameObject.SetActive(value);
+        }
     }
 
     public abstract class EventContainer : ContainerBase
@@ -319,7 +337,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 {
                     if (container.gameObject == gameObject)
                         continue;
-                    container.gameObject.SetActive(true);
+                    container.SetActiveContainer(true);
                 }
             }
 
@@ -332,7 +350,20 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 {
                     if (container.gameObject == gameObject)
                         continue;
-                    container.gameObject.SetActive(false);
+                    container.SetActiveContainer(false);
+                }
+            }
+            
+            public override void SetActiveContainer(bool value)
+            {
+                if (!_manageActiveness)
+                {
+                    base.SetActiveContainer(value);
+                    return;
+                }
+                foreach (var container in _stack)
+                {
+                    container.SetActiveContainer(value);
                 }
             }
         }
@@ -366,6 +397,11 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         {
             Interactable = _isInteractable;
             Validate();
+        }
+        
+        public virtual void SetActiveContainer(bool value)
+        {
+            gameObject.SetActive(value);
         }
     }
 

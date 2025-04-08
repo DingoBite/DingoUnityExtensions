@@ -37,8 +37,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
         {
             _currentIndex = 0;
             SetActiveProgress(0, true);
-            _continue.gameObject.SetActive(true);
-            _start.gameObject.SetActive(false);
+            _continue.SetActiveContainer(true);
+            _start.SetActiveContainer(false);
         }
 
         private void GoBack() 
@@ -70,13 +70,13 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
         {
             if (_currentIndex >= _pages.Count - 1)
             {
-                _continue.gameObject.SetActive(false);
-                _start.gameObject.SetActive(true);
+                _continue.SetActiveContainer(false);
+                _start.SetActiveContainer(true);
             }
             else
             {
-                _continue.gameObject.SetActive(true);
-                _start.gameObject.SetActive(false);
+                _continue.SetActiveContainer(true);
+                _start.SetActiveContainer(false);
             }
 
             for (var i = 0; i < _pages.Count; i++)

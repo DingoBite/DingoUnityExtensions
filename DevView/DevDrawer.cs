@@ -1,5 +1,6 @@
 ﻿using DingoUnityExtensions.MonoBehaviours.Singletons;
 using DingoUnityExtensions.Pools;
+using DingoUnityExtensions.Pools.Core;
 using UnityEngine;
 
 namespace DingoUnityExtensions.DevView
