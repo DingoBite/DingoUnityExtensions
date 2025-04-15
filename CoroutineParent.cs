@@ -37,6 +37,16 @@ namespace DingoUnityExtensions
         public void FixedUpdateHandle(in TimeStamp timeStamp);
     }
     
+    public static class CoroutineOrderLayers
+    {
+        public const int MIN_PRIORITY_SPECIAL = int.MinValue + 1;
+        public const int MIN_PRIORITY = int.MinValue + 10;
+        public const int DEFAULT_PRIORITY = 0;
+        public const int MAX_PRIORITY = int.MaxValue - 10;
+        public const int MAX_PRIORITY_SPECIAL = int.MaxValue - 1;
+    }
+
+    
     public class CoroutineParent : SingletonProtectedBehaviour<CoroutineParent>
     {
         private static readonly Dictionary<float, WaitForSeconds> WaitForSecondsMap = new ();
