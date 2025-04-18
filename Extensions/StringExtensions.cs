@@ -102,5 +102,16 @@ namespace DingoUnityExtensions.Extensions
             var b = split[1].Trim();
             return new Vector2Int(IntConvertOrDefault(a, @default), IntConvertOrDefault(b, @default));
         }
+        
+        public static string FirstToUpper(this string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return string.Empty;
+
+            if (str.Length == 1)
+                return char.ToUpper(str[0]).ToString();
+
+            return $"{char.ToUpper(str[0])}{str[1..]}";
+        }
     }
 }
