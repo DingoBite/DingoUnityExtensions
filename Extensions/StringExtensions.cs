@@ -67,6 +67,20 @@ namespace DingoUnityExtensions.Extensions
             return @default;
         }
 
+        public static Vector2Int FloatRangeOrSingleConvertToIntOrDefault(this string str, string delimiter, int @default = 0)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+                return new Vector2Int(@default, @default);
+            var split = str.Split(delimiter);
+            if (split.Length <= 1)
+            {
+                return new Vector2Int(@FloatConvertToIntOrDefault(str, @default), @FloatConvertToIntOrDefault(str, @default));
+            }
+            var a = split[0].Trim();
+            var b = split[1].Trim();
+            return new Vector2Int(FloatConvertToIntOrDefault(a, @default), FloatConvertToIntOrDefault(b, @default));
+        }
+
         public static Vector2Int FloatRangeConvertToIntOrDefault(this string str, string delimiter, int @default = 0)
         {
             if (string.IsNullOrWhiteSpace(str))
