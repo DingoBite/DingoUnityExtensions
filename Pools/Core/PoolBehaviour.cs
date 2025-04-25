@@ -47,7 +47,7 @@ namespace DingoUnityExtensions.Pools.Core
 
         public void Clear()
         {
-            for (var i = 0; i < PulledElements.Count; i++)
+            for (var i = PulledElements.Count - 1; i >= 0; i--)
             {
                 var element = PulledElements[i];
                 PushElement(element);
