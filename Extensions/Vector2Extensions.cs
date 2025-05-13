@@ -13,6 +13,9 @@ namespace DingoUnityExtensions.Extensions
 
         public static Vector2 ToPercentMercator(this Vector2 point) => new((point.x + 180) / 360, point.y / 90);
         
+        public static Vector3 ForwardTopIndependent(this Transform transform) => transform.forward.XZ().XZ().normalized;
+        public static Vector3 RightTopIndependent(this Transform transform) => transform.right.XZ().XZ().normalized;
+        
         public static Vector3 XZ(this Vector2 vector) => new Vector3(vector.x, 0, vector.y);
 
         public static Vector2 Project(this Vector2 vector, Vector2 onNormal)
