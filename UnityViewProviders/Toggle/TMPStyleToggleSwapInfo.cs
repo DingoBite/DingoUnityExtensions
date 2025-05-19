@@ -1,4 +1,5 @@
-﻿using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
+﻿using DingoUnityExtensions.UnityViewProviders.Core.Data;
+using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using TMPro;
 using UnityEngine;
 
@@ -12,9 +13,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
         [SerializeField] private FontStyles _disableFontStyle;
         [SerializeField] private Color _disableFontColor = Color.white;
 
-        public override void SetViewActive(bool value)
+        public override void SetViewActive(BoolTimeContext value)
         {
-            if (value)
+            if (value.Bool())
             {
                 _text.fontStyle = _enableFontStyle;
                 _text.color = _enableFontColor;

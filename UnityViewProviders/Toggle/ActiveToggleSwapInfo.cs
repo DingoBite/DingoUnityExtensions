@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DingoUnityExtensions.UnityViewProviders.Core.Data;
 using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using UnityEngine;
 
@@ -10,17 +11,18 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
         [SerializeField] private List<GameObject> _reverseObjects;
         [SerializeField] private bool _invert;
         
-        public override void SetViewActive(bool value)
+        public override void SetViewActive(BoolTimeContext value)
         {
-            value = _invert ? !value : value;
+            var bValue = value.Bool();
+            bValue = _invert ? !bValue : bValue;
             foreach (var go in _objects)
             {
-                go.SetActive(value);
+                go.SetActive(bValue);
             }
 
             foreach (var go in _reverseObjects)
             {
-                go.SetActive(!value);
+                go.SetActive(!bValue);
             }
         }
     }

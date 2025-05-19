@@ -1,4 +1,5 @@
-﻿using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
+﻿using DingoUnityExtensions.UnityViewProviders.Core.Data;
+using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,14 +12,15 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
         [SerializeField] private UnityEvent<bool> _toggleEvent;
         [SerializeField] private bool _invert;
 
-        public override void SetViewActive(bool value)
+        public override void SetViewActive(BoolTimeContext value)
         {
-            value = _invert ? !value : value;
-            if (value)
+            var bValue = value.Bool();
+            bValue = _invert ? !bValue : bValue;
+            if (bValue)
                 _enableEvent.Invoke();
             else 
                 _disableEvent.Invoke();
-            _toggleEvent.Invoke(value);
+            _toggleEvent.Invoke(bValue);
         }
     }
 }

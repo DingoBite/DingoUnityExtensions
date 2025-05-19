@@ -1,5 +1,6 @@
 using System;
 using DingoUnityExtensions.UnityViewProviders.Core;
+using DingoUnityExtensions.UnityViewProviders.Core.Data;
 using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using TMPro;
 using UnityEngine;
@@ -12,7 +13,8 @@ namespace DingoUnityExtensions.UnityViewProviders
         [field: SerializeField] public RectTransform RectTransform { get; private set; }
         [SerializeField] private TMP_Text _title;
         [SerializeField] private ToggleSwapInfoBase _toggleSwapInfo;
-
+        [SerializeField] private bool _selectImmediately;
+        
         public event Action OnSelect;
         public event Action OnDeselect;
         
@@ -23,13 +25,13 @@ namespace DingoUnityExtensions.UnityViewProviders
         
         public void Select()
         {
-            _toggleSwapInfo.SetViewActive(true);
+            _toggleSwapInfo.SetViewActive(true.TimeContext(_selectImmediately));
             OnSelect?.Invoke();
         }
 
         public void Deselect()
         {
-            _toggleSwapInfo.SetViewActive(false);
+            _toggleSwapInfo.SetViewActive(false.TimeContext(_selectImmediately));
             OnDeselect?.Invoke();
         }
         

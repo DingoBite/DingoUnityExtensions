@@ -2,6 +2,7 @@
 using DingoUnityExtensions.MicroAnimations;
 using DingoUnityExtensions.Tweens;
 using DingoUnityExtensions.UnityViewProviders.Core;
+using DingoUnityExtensions.UnityViewProviders.Core.Data;
 using DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers;
 using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
         where T : MonoBehaviour, IPointerDownEventWrapper, IPointerUpEventWrapper, IPointerClickEventWrapper
     {
         [SerializeField] private ToggleSwapInfoBase _interactableToggle;
+        [SerializeField] private bool _interactableImmediately;
         
         [SerializeReference, SubclassSelector] private List<MicroAnimation> _downUpOnlyClickAnimations;
         [SerializeReference, SubclassSelector] private List<MicroAnimation> _clickAnimations;
@@ -40,7 +42,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
         {
             View.enabled = value;
             if (_interactableToggle != null)
-                _interactableToggle.SetViewActive(value);
+                _interactableToggle.SetViewActive(value.TimeContext(_interactableImmediately));
         }
 
         private void OnClick(PointerEventData data, float time)

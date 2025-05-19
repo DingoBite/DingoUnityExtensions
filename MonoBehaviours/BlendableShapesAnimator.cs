@@ -45,9 +45,6 @@ namespace DingoUnityExtensions.MonoBehaviours
             _meshRenderer.SetBlendShapeWeight(_index, weight);
         }
 
-        public void Pause() => _tween?.Pause();
-        public void Resume() => _tween?.Play();
-        
         public void StartAnimate(int index, SkinnedMeshRenderer meshRenderer)
         {
             _meshRenderer = meshRenderer;
@@ -126,24 +123,6 @@ namespace DingoUnityExtensions.MonoBehaviours
             }
         }
 
-        public void Pause()
-        {
-            for (var i = 0; i < _blendableShapesParameters.Count; i++)
-            {
-                var parameter = _blendableShapesParameters[i];
-                parameter.Pause();
-            }
-        }
-        
-        public void Resume()
-        {
-            for (var i = 0; i < _blendableShapesParameters.Count; i++)
-            {
-                var parameter = _blendableShapesParameters[i];
-                parameter.Resume();
-            }
-        }
-        
         public void ResetAll()
         {
             for (var i = 0; i < _blendableShapesParameters.Count; i++)

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using DingoUnityExtensions.UnityViewProviders.Core.Data;
 using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,9 +13,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
         [SerializeField] private Color _inactiveColor = Color.white;
         [SerializeField] private Color _activeColor = Color.white;
         
-        public override void SetViewActive(bool value)
+        public override void SetViewActive(BoolTimeContext value)
         {
-            var c = value ? _activeColor : _inactiveColor;
+            var c = value.Bool() ? _activeColor : _inactiveColor;
             foreach (var graphic in _graphics.Where(g => g != null))
             {
                 graphic.color = c;

@@ -1,4 +1,5 @@
-﻿using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
+﻿using DingoUnityExtensions.UnityViewProviders.Core.Data;
+using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Toggle
@@ -9,9 +10,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
         [SerializeField] private Vector2 _offScale;
         [SerializeField] private Vector2 _onScale;
 
-        public override void SetViewActive(bool value)
+        public override void SetViewActive(BoolTimeContext value)
         {
-            var pos = value ? _onScale : _offScale;
+            var pos = value.Bool() ? _onScale : _offScale;
             _rectTransform.localScale = new Vector3(pos.x, pos.y, 1);
         }
     }
