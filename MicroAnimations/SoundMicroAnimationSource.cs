@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.MicroAnimations
 {
-    public class SoundMicroAnimationSource : SingletonProtectedBehaviour<SoundMicroAnimationSource>
+    public class SoundMicroAnimationSource : ProtectedSingletonBehaviour<SoundMicroAnimationSource>
     {
         [SerializeField] private SoundMicroAnimationClips _soundMicroAnimationClips;
         [SerializeField] private SoundMicroAnimationPlayer _prefab;

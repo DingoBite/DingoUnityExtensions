@@ -47,7 +47,7 @@ namespace DingoUnityExtensions
     }
 
     
-    public class CoroutineParent : SingletonProtectedBehaviour<CoroutineParent>
+    public class CoroutineParent : ProtectedSingletonBehaviour<CoroutineParent>
     {
         private static readonly Dictionary<float, WaitForSeconds> WaitForSecondsMap = new ();
 
