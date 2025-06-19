@@ -47,67 +47,67 @@ namespace DingoUnityExtensions.Extensions
             view.UpdateValueWithoutNotify(model.V);
         }
         
-        public static void BindTwoSide<TValue>(this ValueContainer<TValue> view, Action<TValue> modelAction, IReadonlyBind<TValue> model)
+        public static void BindTwoSide<TValue>(this ValueContainer<TValue> view, Action<TValue> onViewChange, IReadonlyBind<TValue> model)
         {
-            view.SafeSubscribe(modelAction);
+            view.SafeSubscribe(onViewChange);
             model.OnValueChange -= view.UpdateValueWithoutNotify;
             model.OnValueChange += view.UpdateValueWithoutNotify;
             
             view.ValueChangeFromExternalSource = true;
         }
         
-        public static void UnBindTwoSide<TValue>(this ValueContainer<TValue> view, Action<TValue> modelAction, IReadonlyBind<TValue> model)
+        public static void UnBindTwoSide<TValue>(this ValueContainer<TValue> view, Action<TValue> onViewChange, IReadonlyBind<TValue> model)
         {
-            view.UnSubscribe(modelAction);
+            view.UnSubscribe(onViewChange);
             model.OnValueChange -= view.UpdateValueWithoutNotify;
             
             view.ValueChangeFromExternalSource = false;
         }
         
-        public static void BindTwoSideAndUpdate<TValue>(this ValueContainer<TValue> view, Action<TValue> modelAction, IReadonlyBind<TValue> model)
+        public static void BindTwoSideAndUpdate<TValue>(this ValueContainer<TValue> view, Action<TValue> onViewChange, IReadonlyBind<TValue> model)
         {
-            view.BindTwoSide(modelAction, model);
+            view.BindTwoSide(onViewChange, model);
             view.UpdateValueWithoutNotify(model.V);
         }
 
-        public static void BindTwoSide<TValue, TViewValue>(this ValueContainer<TViewValue> view, Action<TViewValue> viewChangeAction, Action<TValue> modelChangeAction, IReadonlyBind<TValue> model)
+        public static void BindTwoSide<TValue, TViewValue>(this ValueContainer<TViewValue> view, Action<TViewValue> onViewChange, Action<TValue> onModelChange, IReadonlyBind<TValue> model)
         {
-            view.SafeSubscribe(viewChangeAction);
-            model.OnValueChange -= modelChangeAction;
-            model.OnValueChange += modelChangeAction;
+            view.SafeSubscribe(onViewChange);
+            model.OnValueChange -= onModelChange;
+            model.OnValueChange += onModelChange;
             
             view.ValueChangeFromExternalSource = true;
         }
         
-        public static void UnBindTwoSide<TValue, TViewValue>(this ValueContainer<TViewValue> view, Action<TViewValue> viewChangeAction, Action<TValue> modelChangeAction, IReadonlyBind<TValue> model)
+        public static void UnBindTwoSide<TValue, TViewValue>(this ValueContainer<TViewValue> view, Action<TViewValue> onViewChange, Action<TValue> onModelChange, IReadonlyBind<TValue> model)
         {
-            view.UnSubscribe(viewChangeAction);
-            model.OnValueChange -= modelChangeAction;
+            view.UnSubscribe(onViewChange);
+            model.OnValueChange -= onModelChange;
             
             view.ValueChangeFromExternalSource = false;
         }
 
-        public static void BindTwoSideAndUpdate<TValue>(this ValueContainer<TValue> view, Action<TValue> viewChangeAction, Action<TValue> modelChangeAction, IReadonlyBind<TValue> model)
+        public static void BindTwoSideAndUpdate<TValue>(this ValueContainer<TValue> view, Action<TValue> onViewChange, Action<TValue> onModelChange, IReadonlyBind<TValue> model)
         {
-            view.BindTwoSide(viewChangeAction, modelChangeAction, model);
-            modelChangeAction(model.V);
+            view.BindTwoSide(onViewChange, onModelChange, model);
+            onModelChange(model.V);
         }
         
-        public static void BindTwoSideAndUpdate<TValue, TViewValue>(this ValueContainer<TViewValue> view, Action<TViewValue> viewChangeAction, Action<TValue> modelChangeAction, IReadonlyBind<TValue> model, TViewValue viewValue)
+        public static void BindTwoSideAndUpdate<TValue, TViewValue>(this ValueContainer<TViewValue> view, Action<TViewValue> onViewChange, Action<TValue> onModelChange, IReadonlyBind<TValue> model, TViewValue viewValue)
         {
-            view.BindTwoSide(viewChangeAction, modelChangeAction, model);
-            viewChangeAction(viewValue);
+            view.BindTwoSide(onViewChange, onModelChange, model);
+            onViewChange(viewValue);
         }
 
-        public static void UnSubscribe<TValue>(this ValueContainer<TValue> view, Action<TValue> callback)
+        public static void UnSubscribe<TValue>(this ValueContainer<TValue> view, Action<TValue> onViewChange)
         {
-            view.OnValueChange -= callback;
+            view.OnValueChange -= onViewChange;
         }
         
-        public static void SafeSubscribe<TValue>(this ValueContainer<TValue> view, Action<TValue> callback)
+        public static void SafeSubscribe<TValue>(this ValueContainer<TValue> view, Action<TValue> onViewChange)
         {
-            view.OnValueChange -= callback;
-            view.OnValueChange += callback;
+            view.OnValueChange -= onViewChange;
+            view.OnValueChange += onViewChange;
         }
 
         public static void UnSubscribe(this EventContainer view, Action action)
