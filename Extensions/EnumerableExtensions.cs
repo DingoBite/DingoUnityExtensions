@@ -29,10 +29,14 @@ namespace DingoUnityExtensions.Extensions
         
         public static void AddOrUpdate<T>(this IList<T> list, int index, T value)
         {
-            if (index == list.Count)
+            if (index < 0)
+                throw new IndexOutOfRangeException();
+            
+            while (list.Count <= index)
+            {
                 list.Add(value);
-            else
-                list[index] = value;
+            }
+            list[index] = value;
         }
 
         public static void AddIfNotContains<T>(this IList<T> list, T value)
