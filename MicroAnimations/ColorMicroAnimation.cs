@@ -14,7 +14,8 @@ namespace DingoUnityExtensions.MicroAnimations
         [SerializeField] private Color _color = Color.white;
         [SerializeField] private float _eachDelay;
         [SerializeField] private bool _crossFade = true;
-        
+        [SerializeField] private float _multiply = 1;
+
         private readonly List<Color> _defaultValues = new();
         
         public override void ForwardAnimate()
@@ -24,13 +25,13 @@ namespace DingoUnityExtensions.MicroAnimations
                 var g = _graphics[i];
                 if (_crossFade)
                 {
-                    g.CrossFadeColor(_color, Animation.EnableDuration, true, true);
+                    g.CrossFadeColor(_color * _multiply, Animation.EnableDuration, true, true);
                     continue;
                 }
                 if (_defaultValues.Count <= i)
                     _defaultValues.Add(g.color);
                 var i1 = i;
-                PlayTween((this, g), d => DOBlendableColor(g, _color - _defaultValues[i1], d), true, i * _eachDelay);
+                PlayTween((this, g), d => DOBlendableColor(g, _color * _multiply - _defaultValues[i1], d), true, i * _eachDelay);
             }
         }
 
@@ -47,7 +48,7 @@ namespace DingoUnityExtensions.MicroAnimations
                 if (_defaultValues.Count <= i)
                     _defaultValues.Add(g.color);
                 var i1 = i;
-                PlayTween((this, g), d => DOBlendableColor(g, _defaultValues[i1] - _color, d), false, (_graphics.Count - i - 1) * _eachDelay);
+                PlayTween((this, g), d => DOBlendableColor(g, _defaultValues[i1] - _color * _multiply, d), false, (_graphics.Count - i - 1) * _eachDelay);
             }
         }
 
