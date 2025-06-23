@@ -72,7 +72,12 @@ namespace DingoUnityExtensions.Editor
                 select type).Any();
             if (bindNamespaceFound)
                 yield return "BIND_EXISTS";
-
+            
+            var addressablesNamespaceFound = (from type in types
+                where type.Namespace == "UnityEngine.ResourceManagement.AsyncOperations"
+                select type).Any();
+            if (addressablesNamespaceFound)
+                yield return "ADDRESSABLES_EXISTS";
         }
     }
 }
