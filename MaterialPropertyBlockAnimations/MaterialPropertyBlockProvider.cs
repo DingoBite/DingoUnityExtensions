@@ -26,6 +26,13 @@ namespace DingoUnityExtensions.MaterialPropertyBlockAnimations
             _materialPropertyBlock.SetFloat(PropertyId, value);
             renderer.SetPropertyBlock(_materialPropertyBlock);
         }
+
+        public void SetTexture(Renderer renderer, Texture texture)
+        {
+            Setup(renderer);
+            _materialPropertyBlock.SetTexture(PropertyId, texture);
+            renderer.SetPropertyBlock(_materialPropertyBlock);
+        }
         
         public void SetColor(Renderer renderer, Color color)
         {
