@@ -1,9 +1,56 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Scripting;
 
 namespace DingoUnityExtensions.MaterialPropertyBlockAnimations
 {
+    [Serializable, Preserve]
+    public class ListMaterialPropertyBlockProvider
+    {
+        [SerializeField] private List<MaterialPropertyBlockProvider> _providers;
+        
+        public void SetInt(Renderer renderer, int value)
+        {
+            foreach (var b in _providers)
+            {
+                b.SetInt(renderer, value);
+            }
+        }
+        
+        public void SetFloat(Renderer renderer, float value)
+        {
+            foreach (var b in _providers)
+            {
+                b.SetFloat(renderer, value);
+            }
+        }
+
+        public void SetTexture(Renderer renderer, Texture texture)
+        {
+            foreach (var b in _providers)
+            {
+                b.SetTexture(renderer, texture);
+            }
+        }
+        
+        public void SetColor(Renderer renderer, Color color)
+        {
+            foreach (var b in _providers)
+            {
+                b.SetColor(renderer, color);
+            }
+        }
+        
+        public void SetVector(Renderer renderer, Vector4 vector)
+        {
+            foreach (var b in _providers)
+            {
+                b.SetVector(renderer, vector);
+            }
+        }
+    }
+    
     [Serializable, Preserve]
     public class MaterialPropertyBlockProvider
     {
