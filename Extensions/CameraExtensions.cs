@@ -10,7 +10,14 @@ namespace DingoUnityExtensions.Extensions
             return GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(c), renderer.bounds);
         }
 
-        public static bool IsObjectFullyVisible(this Camera c, Renderer renderer)
+        public static bool IsPointVisible(this Camera c, Vector3 point, Vector2 offset = default)
+        {
+            var vp = c.WorldToViewportPoint(point);
+            var visible = vp.z > 0 && vp.x >= offset.x && vp.x <= 1 - offset.x && vp.y >= offset.y && vp.y <= 1 - offset.y;
+            return visible;
+        }
+        
+        public static bool IsObjectFullyVisible(this Camera c, Renderer renderer, Vector2 offset = default)
         {
             var bounds = renderer.bounds;
             var points = new NativeArray<Vector3>(8, Allocator.Temp);
@@ -29,7 +36,7 @@ namespace DingoUnityExtensions.Extensions
             foreach (var p in points)
             {
                 var vp = c.WorldToViewportPoint(p);
-                var visible = vp is { z: > 0, x: >= 0 and <= 1, y: >= 0 and <= 1 };
+                var visible = vp.z > 0 && vp.x >= offset.x && vp.x <= 1 - offset.x && vp.y >= offset.y && vp.y <= 1 - offset.y;
                 if (!visible)
                     return false;
             }
