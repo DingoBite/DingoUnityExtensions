@@ -159,6 +159,15 @@ namespace DingoUnityExtensions
             return coroutine;
         }
         
+        public static Coroutine InvokeAfterAsyncMethodWithCanceling<T>(object sender, Func<Task<T>> asyncAction, Action<T> action)
+        {
+            if (Instance._actions.TryGetValue(sender, out var coroutine) && coroutine != null)
+                Instance.StopCoroutine(coroutine);
+            coroutine = InvokeAfterAsyncMethod(asyncAction, action);
+            Instance._actions[sender] = coroutine;
+            return coroutine;
+        }
+        
         public static Coroutine InvokeAfterAsyncMethodWithCanceling<T>(object sender, Func<Task<T>> asyncAction, Action<Task<T>> action)
         {
             if (Instance._actions.TryGetValue(sender, out var coroutine) && coroutine != null)
@@ -175,6 +184,12 @@ namespace DingoUnityExtensions
             coroutine = InvokeAfterAsyncMethod(asyncAction, action);
             Instance._actions[sender] = coroutine;
             return coroutine;
+        }
+        
+        public static Coroutine InvokeAfterAsyncMethod<T>(Func<Task<T>> asyncAction, Action<T> action)
+        {
+            var task = asyncAction.Invoke();
+            return Instance.StartCoroutine(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), () => action(task.Result)));
         }
         
         public static Coroutine InvokeAfterAsyncMethod<T>(Func<Task<T>> asyncAction, Action<Task<T>> action)
