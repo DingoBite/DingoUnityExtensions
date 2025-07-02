@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using DingoUnityExtensions.Extensions;
-using DingoUnityExtensions.Generic;
 using UnityEngine;
 
 namespace DingoUnityExtensions.Pools.Core
 {
-    public class PoolBehaviour<T> : MonoBehaviour, IPoolGetOnly<T>, IEnumerableContainer<T> where T : MonoBehaviour
+    public class PoolBehaviour<T> : MonoBehaviour, IPoolGetOnly<T> where T : MonoBehaviour
     {
         [SerializeField] private T _prefab;
         [SerializeField] private bool _manageActiveness = true;
@@ -17,7 +16,6 @@ namespace DingoUnityExtensions.Pools.Core
         private readonly Queue<T> _queue = new();
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
-        public IEnumerable<T> ComponentElements => _pulledElements;
 
         public T PullElement()
         {

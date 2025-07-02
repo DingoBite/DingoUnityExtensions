@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using DingoUnityExtensions.Extensions;
-using DingoUnityExtensions.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace DingoUnityExtensions.Pools.Core
 {
-    public class Pool<T> : IPoolGetOnly<T>, IEnumerableContainer<T> where T : MonoBehaviour
+    public class Pool<T> : IPoolGetOnly<T> where T : MonoBehaviour
     {
         private readonly GameObject _parent;
         private readonly T _prefab;
@@ -21,7 +20,6 @@ namespace DingoUnityExtensions.Pools.Core
 
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
-        public IEnumerable<T> ComponentElements => _pulledElements;
 
         public Pool(T prefab, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true, Action<T, bool> setActiveOverwrite = null)
         {

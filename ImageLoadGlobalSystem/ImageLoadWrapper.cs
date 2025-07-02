@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using Bind;
-using DingoUnityExtensions.Generic;
-using DingoUnityExtensions.SleepSystem;
 using DingoUnityExtensions.Tweens;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using DingoUnityExtensions.UnityViewProviders.Text;
@@ -12,12 +10,10 @@ using UnityEngine.UI;
 
 namespace DingoUnityExtensions.ImageLoadGlobalSystem
 {
-    public class ImageLoadWrapper : ValueContainer<ImageLoadHandle>, IContainer<UISleepable>
+    public class ImageLoadWrapper : ValueContainer<ImageLoadHandle>
     {
-        [SerializeField] private UISleepable _sleepable;
         [SerializeField] private RevealCanvasGroup _imageParent;
         [SerializeField] private RawImage _rawImage;
-        [SerializeField] private bool _autoManageLifetime = true;
 
         [SerializeField] private AspectRatioFitter _aspectRatioFitter;
         
@@ -27,87 +23,57 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         [SerializeField, ShowIf(nameof(IsDefaultLayoutSize))] private Vector2 _defaultLayoutElementSizes;
         [SerializeField] private string _nameTemplate = "{0}";
 
-        private bool _isFirstValue;
+        private RectTransform _rectTransform;
+        private bool? _load;
         
+        public RectTransform RectTransform => _rectTransform ??= GetComponent<RectTransform>(); 
         private bool IsDefaultLayoutSize => _layoutElement != null;
-        public UISleepable ComponentElement => _sleepable;
-
-        public void ApplyRawImageAction(Action<RawImage> action)
-        {
-            if (_rawImage == null)
-                return;
-            action?.Invoke(_rawImage);
-        }
-
+        public Texture CurrentTexture => _rawImage.texture;
+        
         public void ForceSetImage(Texture2D texture)
         {
-            _isFirstValue = true;
+            Unload();
             UpdateImage(new TextureLoadData(texture, ImageLoadState.Loaded, ""));
         }
-        
+
         public void UpdateValueWithLoad(ImageLoadHandle imageLoadHandle)
         {
-            _isFirstValue = false;
-            var isLoad = Value == null || Value != imageLoadHandle;
-            if (isLoad && Value != null)
-                Unload();
             UpdateValueWithoutNotify(imageLoadHandle);
-            if (isLoad || imageLoadHandle.TextureFlow.V.State == ImageLoadState.None)
-                SetupForLoad();
+            Load();
         }
-        
-        public void SetupForLoad()
+
+        public void Load()
         {
-            if (_autoManageLifetime)
-            {
-                Debug.LogError($"Cannot manage autolifetime ImageLoadWrapper");
+            if (_load != null && _load.Value)
                 return;
-            }
-            SetSleepState(false);
+            
+            _load = true;
+            Value?.LoadFor(this);
         }
 
         public void Unload()
         {
-            if (_autoManageLifetime)
-            {
-                Debug.LogError($"Cannot manage autolifetime ImageLoadWrapper");
+            if (_load != null && !_load.Value)
                 return;
-            }
-            SetSleepState(true);
-        }
-
-        protected override void PreviousValueFree(ImageLoadHandle previousData)
-        {
-            if (previousData == null)
+            
+            _load = false;
+            UpdateImage(TextureLoadData.None);
+            if (Value == null)
                 return;
-            previousData.TextureFlow.UnSubscribe(UpdateImage);
+            Value.TextureFlow.UnSubscribe(UpdateImage);
+            Value.UnloadFor(this);
         }
 
-        protected override void OnAwake() => SetDefaultValue();
+        protected override void PreviousValueFree(ImageLoadHandle previousData) => Unload();
 
-        protected void SetDefaultValue()
-        {
-            if (!_isFirstValue)
-            {
-                UpdateImage(new TextureLoadData(null, ImageLoadState.Loading, ""));
-                _isFirstValue = true;
-            }
-        }
-        
         protected override void SetValueWithoutNotify(ImageLoadHandle value)
         {
-            SetDefaultValue();
-            
             name = "not found";
             if (value == null)
                 return;
 
             name = SingleKeyText.ReplaceKeyBy(Path.GetFileNameWithoutExtension(value.Path), _nameTemplate);
-            if (value.TextureFlow.V.State != ImageLoadState.None)
-                UpdateImage(value.TextureFlow.V);
-            value.TextureFlow.SafeSubscribeAndSet(UpdateImage);
-            if (_autoManageLifetime && gameObject.activeInHierarchy && enabled && _sleepable == null)
-                ImageGlobalLoadManager.Instance.Enable(this);
+            Value.TextureFlow.SafeSubscribeAndSet(UpdateImage);
         }
 
         private void UpdateImage(TextureLoadData textureLoadData)
@@ -154,7 +120,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
                             _aspectRatioFitter.aspectRatio = aspectRatio;
                         }
 
-                        if (_layoutElement != null)
+                        if (_layoutElement != null && _defaultLayoutElementSizes.y != 0)
                         {
                             var defaultAspectRatio = _defaultLayoutElementSizes.x / _defaultLayoutElementSizes.y;
                             var scale = aspectRatio / defaultAspectRatio;
@@ -183,42 +149,6 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
                 else 
                     animatableBehaviour.AnimatableSetActive(value);
             }
-        }
-        
-        private void SetSleepState(bool value)
-        {
-            if (ImageGlobalLoadManager.Instance == null)
-                return;
-            
-            if (value)
-                ImageGlobalLoadManager.Instance.Disable(this);
-            else
-                ImageGlobalLoadManager.Instance.Enable(this);
-        }
-
-        protected override void SubscribeOnly()
-        {
-            if (!_autoManageLifetime)
-                return;
-            
-            if (_sleepable != null)
-            {
-                _sleepable.Sleeping.SafeSubscribe(SetSleepState);
-                SetSleepState(_sleepable.Sleeping.V);
-            }
-            else if (ImageGlobalLoadManager.Instance != null)
-            {
-                ImageGlobalLoadManager.Instance.Enable(this);
-            }
-        }
-
-        protected override void UnsubscribeOnly()
-        {
-            if (!_autoManageLifetime)
-                return;
-            
-            if (_sleepable == null && ImageGlobalLoadManager.Instance != null)
-                ImageGlobalLoadManager.Instance.Disable(this);
         }
     }
 }

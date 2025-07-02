@@ -38,17 +38,17 @@ namespace DingoUnityExtensions.Extensions
             };
         }
 
-        public static bool WorldOverlaps(this RectTransform rect1, RectTransform rect2)
+        public static bool WorldOverlaps(this RectTransform overlap, RectTransform subRect)
         {
-            var worldRect1 = GetWorldRect(rect1);
-            var worldRect2 = GetWorldRect(rect2);
+            var worldRect1 = GetWorldRect(overlap);
+            var worldRect2 = GetWorldRect(subRect);
             return worldRect1.Overlaps(worldRect2);
         }
         
-        public static bool WorldOverlaps(this RectTransform rect1, RectTransform rect2, out Rect worldRect1, out Rect worldRect2)
+        public static bool WorldOverlaps(this RectTransform overlap, RectTransform subRect, out Rect worldRect1, out Rect worldRect2)
         {
-            worldRect1 = GetWorldRect(rect1);
-            worldRect2 = GetWorldRect(rect2);
+            worldRect1 = GetWorldRect(overlap);
+            worldRect2 = GetWorldRect(subRect);
             return worldRect1.Overlaps(worldRect2);
         }
         

@@ -1,12 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DingoUnityExtensions.Extensions;
-using DingoUnityExtensions.Generic;
 using DingoUnityExtensions.Utils;
 using UnityEngine;
 
 namespace DingoUnityExtensions.MonoBehaviours
 {
+    public interface IEnumerableContainer<out T>
+    {
+        public IEnumerable<T> ComponentElements { get; }
+    }
+
+    public interface IContainer<out T>
+    {
+        public T ComponentElement { get; }
+    }
+
+    public abstract class PopulateParent<T> : PopulateParent
+    {
+        public IReadOnlyList<T> GetComponents() => RepopulateAndGet<T>();
+    }
+    
     public class PopulateParent : MonoBehaviour
     {
         [SerializeField] private int _searchDepth = 1;
@@ -17,6 +31,12 @@ namespace DingoUnityExtensions.MonoBehaviours
             public static readonly Dictionary<PopulateParent, List<T>> Dict = new();
         }
         
+        public IReadOnlyList<T> RepopulateAndGet<T>()
+        {
+            Repopulate<T>();
+            return ParentCache<T>.Dict.GetValueOrDefault(this);
+        }
+
         public IReadOnlyList<T> Get<T>() => ParentCache<T>.Dict.GetValueOrDefault(this);
 
         public void ForceRepopulate<T>()
@@ -52,16 +72,17 @@ namespace DingoUnityExtensions.MonoBehaviours
             list.AddRange(collection);
             _dirty = false;
         }
-        
+
         public void Repopulate<T>()
         {
             if (!_dirty)
                 return;
             ForceRepopulate<T>();
         }
+        
+        public void SetDirty() => _dirty = true;
 
         private void OnTransformChildrenChanged() => _dirty = true;
         private void OnTransformParentChanged() => _dirty = true;
-        public void SetDirty() => _dirty = true;
     }
 }

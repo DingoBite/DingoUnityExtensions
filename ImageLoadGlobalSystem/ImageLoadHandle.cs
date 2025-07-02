@@ -30,6 +30,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             State = state;
             Path = path;
         }
+
+        public static TextureLoadData None => new(null, ImageLoadState.None, null);
     }
 
     public static class ImageLoadGlobalCache
@@ -51,34 +53,32 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
         public static void Link(string path, object obj)
         {
-            if (!DependObjects.TryGetValue(path, out var hash))
+            if (!DependObjects.TryGetValue(path, out var dependObjects))
             {
-                hash = new HashSet<object>();
-                DependObjects.Add(path, hash);
+                dependObjects = new HashSet<object>();
+                DependObjects.Add(path, dependObjects);
             }
 
             DependPath.TryAdd(obj, path);
-
-            hash.Add(obj);
+            dependObjects.Add(obj);
         }
 
         public static void UnLink(object obj)
         {
-            if (!DependPath.TryGetValue(obj, out var path))
+            if (!DependPath.Remove(obj, out var path))
                 return;
-            var v = TextureFlows[path].V;
-            DependPath.Remove(obj);
+            var textureFlow = TextureFlows[path];
             if (DependObjects.TryGetValue(path, out var dependObjects))
                 dependObjects.Remove(obj);
-            if (dependObjects.Count != 0)
+            if (dependObjects != null && dependObjects.Count != 0)
                 return;
             
-            if (v.State == ImageLoadState.Loaded && v.Texture != null)
-                Object.Destroy(v.Texture);
-            else if (v.State == ImageLoadState.Loading)
+            if (textureFlow.V.State == ImageLoadState.Loaded && textureFlow.V.Texture != null)
+                Object.Destroy(textureFlow.V.Texture);
+            else if (textureFlow.V.State != ImageLoadState.None)
                 CoroutineParent.CancelCoroutine(obj);
-            
-            TextureFlows[path].V = new TextureLoadData(null, ImageLoadState.None, path);
+
+            textureFlow.V = TextureLoadData.None;
         }
     }
     
@@ -86,14 +86,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
     {
         public string Path { get; private set; }
 
-        private readonly Bind<TextureLoadData> _textureFlowWrapper = new();
-        private Bind<TextureLoadData> _textureFlow;
-        
-        public IReadonlyBind<TextureLoadData> TextureFlow => _textureFlowWrapper;
-
-        public ImageLoadHandle()
-        {
-        }
+        private readonly Bind<TextureLoadData> _textureFlow;
+        public IReadonlyBind<TextureLoadData> TextureFlow => _textureFlow;
         
         public ImageLoadHandle(string path)
         {
@@ -102,30 +96,21 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             _textureFlow.SafeSubscribe(ChangeData);
         }
         
-        public void LoadPath(object receiver)
+        public void LoadFor(object receiver)
         {
-            if (Path == null)
+            if (string.IsNullOrWhiteSpace(Path))
             {
                 Debug.LogErrorFormat($"Cannot load image path == null");
                 return;
             }
-            CoroutineParent.StartCoroutineWithCanceling(receiver, () => LoadImageCoroutine(_textureFlow, receiver, Path));
+
+            UnloadFor(receiver);
+            CoroutineParent.StartCoroutineWithCanceling(receiver, LoadImageCoroutine(_textureFlow, receiver, Path));
         }
-        
-        public void ChangePath(object receiver, string path)
+
+        public void UnloadFor(object receiver)
         {
-            if (path == Path)
-                return;
-            
-            Unload(receiver);
-            _textureFlow.UnSubscribe(ChangeData);
-            _textureFlow = ImageLoadGlobalCache.GetOrRegister(path);
-            _textureFlow.SafeSubscribe(ChangeData);
-            Path = path;
-        }
-        
-        public void Unload(object receiver)
-        {
+            CoroutineParent.CancelCoroutine(receiver);
             ImageLoadGlobalCache.UnLink(receiver);
         }
         
@@ -139,10 +124,6 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             }
 
             bind.V = new TextureLoadData(null, ImageLoadState.Loading, path);
-            var prevTexture = bind.V.Texture;
-            if (prevTexture != null)
-                ImageLoadGlobalCache.UnLink(receiver);
-            
             yield return MultiplatformLoadUtils.LoadTexture2DAsync(path)
                 .AsUniTask()
                 .ToCoroutine(t =>
@@ -154,6 +135,6 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
                 });
         }
         
-        private void ChangeData(TextureLoadData textureLoadData) => _textureFlowWrapper.V = textureLoadData;
+        private void ChangeData(TextureLoadData textureLoadData) => _textureFlow.V = textureLoadData;
     }
 }

@@ -129,17 +129,34 @@ namespace DingoUnityExtensions
         }
         
 #if UNITASK_EXISTS
-        public static Coroutine YieldTaskCoroutine<T>(UniTask<T> task, Action<T> resultHandler = null, Action<Exception> exceptionHandler = null) => Instance.StartCoroutine(task.ToCoroutine(resultHandler, exceptionHandler));
-        public static Coroutine YieldTaskCoroutine(UniTask task, Action<Exception> exceptionHandler = null) => Instance.StartCoroutine(task.ToCoroutine(exceptionHandler));
+        public static Coroutine YieldTaskCoroutine<T>(UniTask<T> task, Action<T> resultHandler = null, Action<Exception> exceptionHandler = null) => StartCoroutineOnInstance(task.ToCoroutine(resultHandler, exceptionHandler));
+        public static Coroutine YieldTaskCoroutine(UniTask task, Action<Exception> exceptionHandler = null) => StartCoroutineOnInstance(task.ToCoroutine(exceptionHandler));
         public static Coroutine YieldTaskCoroutine(Task task, Action<Exception> exceptionHandler = null) => YieldTaskCoroutine(task.AsUniTask(), exceptionHandler);
         public static Coroutine YieldTaskCoroutine<T>(Task<T> task, Action<T> resultHandler = null, Action<Exception> exceptionHandler = null) => YieldTaskCoroutine(task.AsUniTask(), resultHandler, exceptionHandler);
 #endif
+
+        public static Coroutine StartCoroutineOnInstance(IEnumerator coroutineEnumerator) => Instance.StartCoroutine(coroutineEnumerator);
+
+        public static void CancelCoroutine(Coroutine coroutine)
+        {
+            if (coroutine != null)  
+                Instance.StopCoroutine(coroutine);
+        }
+
+        public static Coroutine StartCoroutineWithCanceling(object key, IEnumerator coroutineEnumerator)
+        {
+            if (Instance._coroutinesWithCanceling.TryGetValue(key, out var coroutine) && coroutine != null)
+                Instance.StopCoroutine(coroutine);
+            coroutine = StartCoroutineOnInstance(coroutineEnumerator);
+            Instance._coroutinesWithCanceling[key] = coroutine;
+            return coroutine;
+        }
 
         public static Coroutine StartCoroutineWithCanceling(object key, Func<IEnumerator> factory)
         {
             if (Instance._coroutinesWithCanceling.TryGetValue(key, out var coroutine) && coroutine != null)
                 Instance.StopCoroutine(coroutine);
-            coroutine = Instance.StartCoroutine(factory());
+            coroutine = StartCoroutineOnInstance(factory());
             Instance._coroutinesWithCanceling[key] = coroutine;
             return coroutine;
         }
@@ -189,19 +206,19 @@ namespace DingoUnityExtensions
         public static Coroutine InvokeAfterAsyncMethod<T>(Func<Task<T>> asyncAction, Action<T> action)
         {
             var task = asyncAction.Invoke();
-            return Instance.StartCoroutine(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), () => action(task.Result)));
+            return StartCoroutineOnInstance(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), () => action(task.Result)));
         }
         
         public static Coroutine InvokeAfterAsyncMethod<T>(Func<Task<T>> asyncAction, Action<Task<T>> action)
         {
             var task = asyncAction.Invoke();
-            return Instance.StartCoroutine(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), () => action(task)));
+            return StartCoroutineOnInstance(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), () => action(task)));
         }
         
         public static Coroutine InvokeAfterAsyncMethod(Func<Task> asyncAction, Action action)
         {
             var task = asyncAction.Invoke();
-            return Instance.StartCoroutine(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), action));
+            return StartCoroutineOnInstance(WaitAndInvokeC(new WaitUntil(() => task.IsCompleted), action));
         }
 
         public static Coroutine InvokeAfterSeconds(float seconds, Action action)
@@ -213,17 +230,17 @@ namespace DingoUnityExtensions
                 action?.Invoke();
                 return null;
             }
-            return Instance.StartCoroutine(WaitAndInvokeC(CachedWaiter(seconds), action));
+            return StartCoroutineOnInstance(WaitAndInvokeC(CachedWaiter(seconds), action));
         }
 
         public static Coroutine WaitAndInvoke(IEnumerator yieldInstruction, Action action)
         {
-            return Instance.StartCoroutine(WaitAndInvokeC(yieldInstruction, action));
+            return StartCoroutineOnInstance(WaitAndInvokeC(yieldInstruction, action));
         }
         
         public static Coroutine WaitAndInvoke(YieldInstruction yieldInstruction, Action action)
         {
-            return Instance.StartCoroutine(WaitAndInvokeC(yieldInstruction, action));
+            return StartCoroutineOnInstance(WaitAndInvokeC(yieldInstruction, action));
         }       
         
         public static IEnumerator WaitAndInvokeC(YieldInstruction yieldInstruction, Action action)
@@ -234,7 +251,7 @@ namespace DingoUnityExtensions
         
         public static IEnumerator WaitAndInvokeC(IEnumerator yieldInstruction, Action action)
         {
-            yield return Instance.StartCoroutine(yieldInstruction);
+            yield return StartCoroutineOnInstance(yieldInstruction);
             action?.Invoke();
         }
 
