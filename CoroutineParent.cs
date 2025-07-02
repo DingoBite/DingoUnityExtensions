@@ -260,7 +260,7 @@ namespace DingoUnityExtensions
             if (_updatersDelegates.Count != 0)
             {
                 CachedUpdatersDelegates.Clear();
-                CachedUpdatersDelegates.AddRange(_updatersDelegates.Values.OrderBy(e => e.order).Select(e => e.action));
+                CachedUpdatersDelegates.AddRange(_updatersDelegates.Values.OrderByDescending(e => e.order).Select(e => e.action));
                 foreach (var updater in CachedUpdatersDelegates)
                 {
                     try
@@ -277,7 +277,7 @@ namespace DingoUnityExtensions
             if (_updaters.Count != 0)
             {
                 CachedUpdaters.Clear();
-                CachedUpdaters.AddRange(_updaters.Values.OrderBy(e => e.order).Select(e => e.updater));
+                CachedUpdaters.AddRange(_updaters.Values.OrderByDescending(e => e.order).Select(e => e.updater));
                 var timeStamp = new TimeStamp(Time.deltaTime);
                 foreach (var updater in CachedUpdaters)
                 {
@@ -294,7 +294,7 @@ namespace DingoUnityExtensions
 
             if (_singleUpdateActions.Count != 0)
             {
-                foreach (var updateAction in _singleUpdateActions.OrderBy(p => p.order).Select(p => p.action))
+                foreach (var updateAction in _singleUpdateActions.OrderByDescending(p => p.order).Select(p => p.action))
                 {
                     try
                     {
@@ -314,7 +314,7 @@ namespace DingoUnityExtensions
             if (_lateUpdatersDelegates.Count != 0)
             {
                 CachedLateUpdatersDelegates.Clear();
-                CachedLateUpdatersDelegates.AddRange(_lateUpdatersDelegates.Values.OrderBy(e => e.order).Select(e => e.action));
+                CachedLateUpdatersDelegates.AddRange(_lateUpdatersDelegates.Values.OrderByDescending(e => e.order).Select(e => e.action));
                 foreach (var lateUpdater in CachedLateUpdatersDelegates)
                 {
                     try
@@ -331,7 +331,7 @@ namespace DingoUnityExtensions
             if (_lateUpdaters.Count != 0)
             {
                 CachedLateUpdaters.Clear();
-                CachedLateUpdaters.AddRange(_lateUpdaters.Values.OrderBy(e => e.order).Select(e => e.updater));
+                CachedLateUpdaters.AddRange(_lateUpdaters.Values.OrderByDescending(e => e.order).Select(e => e.updater));
                 var timeStamp = new TimeStamp(Time.deltaTime);
                 foreach (var updater in CachedLateUpdaters)
                 {
@@ -348,7 +348,7 @@ namespace DingoUnityExtensions
             
             if (_singleLateUpdateActions.Count != 0)
             {
-                foreach (var updateAction in _singleLateUpdateActions.OrderBy(p => p.order).Select(p => p.action))
+                foreach (var updateAction in _singleLateUpdateActions.OrderByDescending(p => p.order).Select(p => p.action))
                 {
                     try
                     {
@@ -368,7 +368,7 @@ namespace DingoUnityExtensions
             if (_fixedUpdatersDelegates.Count != 0)
             {
                 CachedFixedUpdatersDelegates.Clear();
-                CachedFixedUpdatersDelegates.AddRange(_fixedUpdatersDelegates.Values.OrderBy(e => e.order).Select(e => e.action));
+                CachedFixedUpdatersDelegates.AddRange(_fixedUpdatersDelegates.Values.OrderByDescending(e => e.order).Select(e => e.action));
                 foreach (var fixedUpdater in CachedFixedUpdatersDelegates)
                 {
                     try
@@ -385,7 +385,7 @@ namespace DingoUnityExtensions
             if (_fixedUpdaters.Count != 0)
             {
                 CachedFixedUpdaters.Clear();
-                CachedFixedUpdaters.AddRange(_fixedUpdaters.Values.OrderBy(e => e.order).Select(e => e.updater));
+                CachedFixedUpdaters.AddRange(_fixedUpdaters.Values.OrderByDescending(e => e.order).Select(e => e.updater));
                 var timeStamp = new TimeStamp(Time.deltaTime);
                 foreach (var updater in CachedFixedUpdaters)
                 {
@@ -402,7 +402,7 @@ namespace DingoUnityExtensions
             
             if (_singleFixedUpdateActions.Count != 0)
             {
-                foreach (var updateAction in _singleFixedUpdateActions.OrderBy(p => p.order).Select(p => p.action))
+                foreach (var updateAction in _singleFixedUpdateActions.OrderByDescending(p => p.order).Select(p => p.action))
                 {
                     try
                     {
