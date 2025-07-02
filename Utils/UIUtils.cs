@@ -4,57 +4,32 @@ namespace DingoUnityExtensions.Utils
 {
     public static class UIUtils
     {
-        public static Vector2 WorldToCanvasSpace(Vector3 pointPosition, RectTransform parentCanvas, Camera cam)
+        public static Vector2 WorldToCanvasSpaceClamped(
+            Vector3 worldPoint,
+            RectTransform rectToClampPos,
+            RectTransform parentRect,
+            Camera worldCamera, Camera uiCamera)
         {
-            var canvasPosition = CalculateCanvasPosition(pointPosition, parentCanvas, cam);
-            return canvasPosition;
-        }
+            // World → screen
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(worldCamera, worldPoint);
 
-        public static Vector2 WorldToCanvasSpaceClamped(Rect rect, RectTransform parentCanvas, Camera cam)
-        {
-            var pointPosition = new Vector3(rect.x, rect.y);
-            var canvasPosition = CalculateCanvasPosition(pointPosition, parentCanvas, cam);
-            var clampBounds = CalculateClampBounds(rect, Vector2.one * 0.5f);
-            return ClampCanvasPosition(canvasPosition, clampBounds.min, clampBounds.max);
-        }
+            // Screen → local (anchored) in parent
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parentRect, screenPos, uiCamera, out var localPos);
 
-        public static Vector2 WorldToCanvasSpaceClamped(Rect rect, Vector3 pointPosition, RectTransform parentCanvas, Camera cam)
-        {
-            var canvasPosition = CalculateCanvasPosition(pointPosition, parentCanvas, cam);
-            var clampBounds = CalculateClampBounds(rect, Vector2.one * 0.5f);
-            return ClampCanvasPosition(canvasPosition, clampBounds.min, clampBounds.max);
-        }
+            // Clamp so the rect stays fully inside parent
+            float halfW = rectToClampPos.rect.width  * rectToClampPos.pivot.x;
+            float halfH = rectToClampPos.rect.height * rectToClampPos.pivot.y;
 
-        public static Vector2 WorldToCanvasSpaceClamped(Rect rect, Vector3 pointPosition, Vector2 pivot, RectTransform parentCanvas, Camera cam)
-        {
-            var canvasPosition = CalculateCanvasPosition(pointPosition, parentCanvas, cam);
-            var clampBounds = CalculateClampBounds(rect, pivot);
-            return ClampCanvasPosition(canvasPosition, clampBounds.min, clampBounds.max);
-        }
-        
-        private static Vector2 CalculateCanvasPosition(Vector3 pointPosition, RectTransform parentCanvas, Camera cam)
-        {
-            var screenPoint = cam.WorldToScreenPoint(pointPosition);
-            var sizeDelta = parentCanvas.sizeDelta;
-            if (sizeDelta.magnitude < Vector2.kEpsilon)
-                sizeDelta = parentCanvas.rect.size;
-            return new Vector2(screenPoint.x * sizeDelta.x / Screen.width, screenPoint.y * sizeDelta.y / Screen.height);
-        }
+            float minX = -parentRect.rect.width  * parentRect.pivot.x + halfW;
+            float maxX =  parentRect.rect.width  * (1f - parentRect.pivot.x) - (rectToClampPos.rect.width  - halfW);
+            float minY = -parentRect.rect.height * parentRect.pivot.y + halfH;
+            float maxY =  parentRect.rect.height * (1f - parentRect.pivot.y) - (rectToClampPos.rect.height - halfH);
 
-        private static Vector2 ClampCanvasPosition(Vector2 canvasPosition, Vector2 minBounds, Vector2 maxBounds)
-        {
-            var clampedX = Mathf.Clamp(canvasPosition.x, minBounds.x, maxBounds.x);
-            var clampedY = Mathf.Clamp(canvasPosition.y, minBounds.y, maxBounds.y);
-            return new Vector2(clampedX, clampedY);
-        }
+            localPos.x = Mathf.Clamp(localPos.x, minX, maxX);
+            localPos.y = Mathf.Clamp(localPos.y, minY, maxY);
 
-        private static Rect CalculateClampBounds(Rect rect, Vector2 pivot)
-        {
-            var w = rect.width;
-            var h = rect.height;
-            var minBounds = new Vector2(w * pivot.x, h * pivot.y);
-            var maxBounds = new Vector2(Screen.width - w * (1 - pivot.x), Screen.height - h * (1 - pivot.y));
-            return new Rect(minBounds, maxBounds - minBounds);
+            return localPos; // assign to rectToClampPos.anchoredPosition afterwards
         }
     }
 }
