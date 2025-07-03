@@ -3,7 +3,7 @@ using UnityEngine;
 namespace DingoUnityExtensions.MonoBehaviours.UI
 {
     [RequireComponent(typeof(RectTransform))]
-    public class UIBehaviour : MonoBehaviour
+    public class UIBehaviour : UnityEngine.EventSystems.UIBehaviour
     {
         private RectTransform _rectTransform;
 
