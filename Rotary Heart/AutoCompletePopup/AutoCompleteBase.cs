@@ -45,7 +45,7 @@ namespace RotaryHeart.Lib.AutoComplete
         /// <param name="orderFunc">Order available to draw items by this func</param>
         /// <returns>Selected value from autocomplete window</returns>
         internal static string _AutoCompleteLogic(Rect position, GUIContent label, string text, string[] entries, bool allowCustom, bool allowEmpty, bool fromEditor,
-            IStyle windowStyle, bool returnFullPath = false, Func<string, float> orderFunc = null)
+            IStyle windowStyle, bool returnFullPath = false, Func<string, float?> orderFunc = null)
         {
             //Used to draw the window
             Rect lastRect = position;
@@ -120,7 +120,7 @@ namespace RotaryHeart.Lib.AutoComplete
         }
 
         internal static void _AutoCompleteLogic(Rect position, GUIContent label, string text, string[] entries, bool allowCustom, bool allowEmpty, bool returnFullPath, string separator, bool fromEditor,
-            IStyle windowStyle, Action<string> onItemAdded, Func<string, float> orderFunc)
+            IStyle windowStyle, Action<string> onItemAdded, Func<string, float?> orderFunc)
         {
             Rect lastRect = position;
 

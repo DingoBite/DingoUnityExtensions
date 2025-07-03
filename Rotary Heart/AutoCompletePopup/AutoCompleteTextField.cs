@@ -28,7 +28,7 @@ namespace RotaryHeart.Lib.AutoComplete
             ///     See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(string text, string[] entries, bool allowCustom = false, bool allowEmpty = true, Func<string, float> orderFunc = null, bool returnFullPath = false, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(string text, string[] entries, bool allowCustom = false, bool allowEmpty = true, Func<string, float?> orderFunc = null, bool returnFullPath = false, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField("", text, UnityEngine.GUI.skin.textField, entries, "", allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -47,7 +47,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(string text, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(string text, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField("", text, UnityEngine.GUI.skin.textField, entries, hint, allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -66,7 +66,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(string text, GUIStyle style, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(string text, GUIStyle style, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField("", text, style, entries, "", allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -86,7 +86,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField("", text, style, entries, hint, allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -105,7 +105,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(string label, string text, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(string label, string text, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField(label, text, UnityEngine.GUI.skin.textField, entries, "", allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -125,7 +125,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(string label, string text, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(string label, string text, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField(label, text, UnityEngine.GUI.skin.textField, entries, hint, allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -145,7 +145,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(string label, string text, GUIStyle style, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(string label, string text, GUIStyle style, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField(label, text, style, entries, "", allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -166,7 +166,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(string label, string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(string label, string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField(new GUIContent(label), text, style, entries, hint, allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -186,7 +186,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(GUIContent label, string text, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(GUIContent label, string text, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField(label, text, UnityEngine.GUI.skin.textField, entries, "", allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -206,7 +206,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(GUIContent label, string text, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(GUIContent label, string text, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField(label, text, UnityEngine.GUI.skin.textField, entries, hint, allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -226,7 +226,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(GUIContent label, string text, GUIStyle style, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false,  Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(GUIContent label, string text, GUIStyle style, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false,  Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 return AutoCompleteTextField(label, text, style, entries, "", allowCustom, allowEmpty, returnFullPath, orderFunc, options);
             }
@@ -250,7 +250,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// See Also: GUILayout.Width, GUILayout.Height, GUILayout.MinWidth, GUILayout.MaxWidth, GUILayout.MinHeight, GUILayout.MaxHeight, GUILayout.ExpandWidth, GUILayout.ExpandHeight.
             /// </param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(GUIContent label, string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null, params GUILayoutOption[] options)
+            public static string AutoCompleteTextField(GUIContent label, string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null, params GUILayoutOption[] options)
             {
                 //Get the rect to draw the text field
                 Rect lastRect = UnityEditor.EditorGUILayout.GetControlRect(!string.IsNullOrEmpty(label.text), UnityEditor.EditorGUIUtility.singleLineHeight, style, options);
@@ -276,9 +276,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(Rect position, string text, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false)
+            public static string AutoCompleteTextField(Rect position, string text, string[] entries, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null)
             {
-                return AutoCompleteTextField(position, "", text, UnityEngine.GUI.skin.textField, entries, "", allowCustom, allowEmpty, returnFullPath);
+                return AutoCompleteTextField(position, "", text, UnityEngine.GUI.skin.textField, entries, "", allowCustom, allowEmpty, returnFullPath, orderFunc);
             }
             /// <summary>
             /// Make a TextField that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -290,9 +290,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(Rect position, string text, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true)
+            public static string AutoCompleteTextField(Rect position, string text, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, Func<string, float?> orderFunc = null)
             {
-                return AutoCompleteTextField(position, "", text, UnityEngine.GUI.skin.textField, entries, hint, allowCustom, allowEmpty);
+                return AutoCompleteTextField(position, "", text, UnityEngine.GUI.skin.textField, entries, hint, allowCustom, allowEmpty, orderFunc:orderFunc);
             }
             /// <summary>
             /// Make a TextField that has an <paramref name="AutoCompleteWindow"/> logic for selecting options.
@@ -379,9 +379,9 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowCustom">Should the system allow custom entries</param>
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(Rect position, string label, string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false)
+            public static string AutoCompleteTextField(Rect position, string label, string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null)
             {
-                return AutoCompleteTextField(position, new GUIContent(label), text, style, entries, hint, allowCustom, allowEmpty, returnFullPath);
+                return AutoCompleteTextField(position, new GUIContent(label), text, style, entries, hint, allowCustom, allowEmpty, returnFullPath, orderFunc);
             }
 
             /// <summary>
@@ -444,7 +444,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <param name="orderFunc">Order available to draw items by this func</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(Rect position, GUIContent label, string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float> orderFunc = null)
+            public static string AutoCompleteTextField(Rect position, GUIContent label, string text, GUIStyle style, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, bool returnFullPath = false, Func<string, float?> orderFunc = null)
             {
                 //Check for focus, the system is only shown if the text field is focused
                 UnityEngine.GUI.SetNextControlName("CheckFocus");
@@ -666,7 +666,7 @@ namespace RotaryHeart.Lib.AutoComplete
             /// <param name="allowEmpty">Should the system add a Nothing element and allow returning an empty string</param>
             /// <param name="windowStyle">Contains the style to use for the window (colors, textures, etc)</param>
             /// <returns>Selected value from autocomplete window</returns>
-            public static string AutoCompleteTextField(Rect position, GUIContent label, string text, GUIStyle inputStyle, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, IStyle windowStyle = null, bool returnFullPath = false, Func<string, float> orderFunc = null)
+            public static string AutoCompleteTextField(Rect position, GUIContent label, string text, GUIStyle inputStyle, string[] entries, string hint, bool allowCustom = false, bool allowEmpty = true, IStyle windowStyle = null, bool returnFullPath = false, Func<string, float?> orderFunc = null)
             {
                 //Check for focus, the system is only shown if the text field is focused
                 UnityEngine.GUI.SetNextControlName("CheckFocus");

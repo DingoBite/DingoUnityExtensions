@@ -163,7 +163,7 @@ namespace RotaryHeart.Lib.AutoComplete
         bool m_closed = false;
         int m_selectionIndex = -1;
         Vector2? m_prevMousePos;
-        Func<string, float> m_orderFunc;
+        Func<string, float?> m_orderFunc;
         private bool m_returnFullPath;
 
         public bool Closed { get { return m_closed; } }
@@ -185,12 +185,12 @@ namespace RotaryHeart.Lib.AutoComplete
         /// <param name="allowEmpty">Allows to select an empty element</param>
         /// <param name="orderFunc">Order available to draw items by this func</param>
         public void Show(Rect position, string[] items, string[] usedItems, Action<string> onItemAdded, 
-                                string separator = null, string[] ignore = null, string backText = "Select Item", bool returnFullPath = true, bool allowCustom = false, IStyle style = null, bool allowEmpty = false, Func<string, float> orderFunc = null)
+                                string separator = null, string[] ignore = null, string backText = "Select Item", bool returnFullPath = true, bool allowCustom = false, IStyle style = null, bool allowEmpty = false, Func<string, float?> orderFunc = null)
         {
             Init(position, separator, backText, items, ignore, usedItems, onItemAdded, returnFullPath, allowCustom, allowEmpty, style, orderFunc);
         }
         
-        void Init(Rect rect, string separator, string backText, string[] items, string[] ignore, string[] usedItems, Action<string> onItemAdded, bool returnFullPath, bool allowCustom, bool allowEmpty, IStyle style, Func<string, float> orderFunc = null)
+        void Init(Rect rect, string separator, string backText, string[] items, string[] ignore, string[] usedItems, Action<string> onItemAdded, bool returnFullPath, bool allowCustom, bool allowEmpty, IStyle style, Func<string, float?> orderFunc = null)
         {
             Vector2 v2 = GUIUtility.GUIToScreenPoint(new Vector2(rect.x, rect.y));
             rect.x = v2.x;

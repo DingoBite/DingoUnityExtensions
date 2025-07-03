@@ -98,7 +98,7 @@ namespace RotaryHeart.Lib.AutoComplete
         bool m_firstOpen = true;
         int m_selectionIndex = -1;
         Vector2? m_prevMousePos;
-        private Func<string,float> m_orderFunc;
+        private Func<string, float?> m_orderFunc;
 
         static EditorAddItemWindow Instance
         {
@@ -128,13 +128,13 @@ namespace RotaryHeart.Lib.AutoComplete
         /// <param name="allowCustom">Allow custom items to be added from the search bar</param>
         /// <param name="allowEmpty">Allows to select an empty element</param>
         public static void Show(Rect position, string[] items, string[] usedItems, Action<string> onItemAdded,
-            string separator = null, string[] ignore = null, string backText = "Select Item", bool returnFullPath = true, bool allowCustom = false, bool allowEmpty = false, Func<string, float> orderFunc = null)
+            string separator = null, string[] ignore = null, string backText = "Select Item", bool returnFullPath = true, bool allowCustom = false, bool allowEmpty = false, Func<string, float?> orderFunc = null)
         {
             Instance.Init(position, separator, backText, items, ignore, usedItems, onItemAdded, returnFullPath, allowCustom, allowEmpty, orderFunc);
             Instance.Repaint();
         }
         
-        void Init(Rect rect, string separator, string backText, string[] items, string[] ignore, string[] usedItems, Action<string> onItemAdded, bool returnFullPath, bool allowCustom, bool allowEmpty, Func<string, float> orderFunc = null)
+        void Init(Rect rect, string separator, string backText, string[] items, string[] ignore, string[] usedItems, Action<string> onItemAdded, bool returnFullPath, bool allowCustom, bool allowEmpty, Func<string, float?> orderFunc = null)
         {
             Vector2 v2 = GUIUtility.GUIToScreenPoint(new Vector2(rect.x, rect.y));
             rect.x = v2.x;
@@ -426,7 +426,7 @@ namespace RotaryHeart.Lib.AutoComplete
                 });
             }
             
-            IEnumerable<string> availableItems = m_orderFunc == null ? m_availableItems : m_availableItems.OrderBy(m_orderFunc);
+            IEnumerable<string> availableItems = m_orderFunc == null ? m_availableItems : m_availableItems.Where(i => m_orderFunc(i) != null).OrderBy(m_orderFunc);
 
             foreach (string item in availableItems)
             {

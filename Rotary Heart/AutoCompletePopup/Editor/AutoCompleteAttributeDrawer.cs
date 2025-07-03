@@ -43,12 +43,12 @@ namespace RotaryHeart.Lib.AutoComplete
                 }
             }
 
-            Func<string, float> orderFunc;
+            Func<string, float?> orderFunc;
             switch (m_attributeType)
             {
                 case AttributeType.TextField:
                     AutoCompleteTextFieldAttribute textFieldAttribute = attribute as AutoCompleteTextFieldAttribute;
-                    orderFunc = GetValues(property, textFieldAttribute.OrderFuncMember) as Func<string, float>;
+                    orderFunc = GetValues(property, textFieldAttribute.OrderFuncMember) as Func<string, float?>;
                     AutoCompleteDropDown.EditorGUI.AutoCompleteDropDown(position, label, property.stringValue, m_entries, s =>
                     {
                         property.stringValue = s;
@@ -58,7 +58,7 @@ namespace RotaryHeart.Lib.AutoComplete
                     break;
                 case AttributeType.Dropdown:
                     AutoCompleteDropDownAttribute dropDownAttribute = attribute as AutoCompleteDropDownAttribute;
-                    orderFunc = GetValues(property, dropDownAttribute.OrderFuncMember) as Func<string, float>;
+                    orderFunc = GetValues(property, dropDownAttribute.OrderFuncMember) as Func<string, float?>;
                     AutoCompleteDropDown.EditorGUI.AutoCompleteDropDown(position, label, property.stringValue, m_entries, s =>
                     {
                         property.stringValue = s;
