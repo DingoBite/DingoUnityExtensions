@@ -15,22 +15,9 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
                 {
                     if (_instance != null)
                         return _instance;
-                    var instances = Resources.FindObjectsOfTypeAll<T>();
-
-                    if (instances.Length > 1)
-                    {
-                        Debug.LogError($"[Singleton] Multiple instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
-                        _instance = instances[0];
-                    }
-                    else if (instances.Length == 1)
-                    {
-                        _instance = instances[0];
-                    }
-                    else if (Application.isPlaying)
-                    {
+                    _instance = Resources.Load<T>("S_" + typeof(T).Name);
+                    if (_instance == null)
                         Debug.LogError($"[Singleton] No instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
-                    }
-
                     return _instance;
                 }
             }
@@ -41,7 +28,7 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
     {
         private static T _instance;
         private static readonly object _lock = new();
-
+        
         protected static T Instance
         {
             get
@@ -50,22 +37,9 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
                 {
                     if (_instance != null)
                         return _instance;
-                    var instances = Resources.FindObjectsOfTypeAll<T>();
-
-                    if (instances.Length > 1)
-                    {
-                        Debug.LogError($"[Singleton] Multiple instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
-                        _instance = instances[0];
-                    }
-                    else if (instances.Length == 1)
-                    {
-                        _instance = instances[0];
-                    }
-                    else if (Application.isPlaying)
-                    {
+                    _instance = Resources.Load<T>("S_" + typeof(T).Name);
+                    if (_instance == null)
                         Debug.LogError($"[Singleton] No instances of singleton '{typeof(T)}' found. This can lead to incorrect behavior.");
-                    }
-
                     return _instance;
                 }
             }
