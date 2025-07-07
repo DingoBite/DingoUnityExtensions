@@ -6,6 +6,7 @@ using DingoUnityExtensions.UnityViewProviders.Core;
 using DingoUnityExtensions.UnityViewProviders.Text;
 using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace DingoUnityExtensions.ImageLoadGlobalSystem
@@ -23,6 +24,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         [SerializeField, ShowIf(nameof(IsDefaultLayoutSize))] private Vector2 _defaultLayoutElementSizes;
         [SerializeField] private string _nameTemplate = "{0}";
 
+        [SerializeField] private UnityEvent<bool> _loadUnloadEvent;
+        
         private RectTransform _rectTransform;
         private bool? _load;
         
@@ -46,7 +49,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         {
             if (_load != null && _load.Value)
                 return;
-            
+            _loadUnloadEvent?.Invoke(true);
             _load = true;
             Value?.LoadFor(this);
         }
@@ -56,6 +59,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             if (_load != null && !_load.Value)
                 return;
             
+            _loadUnloadEvent?.Invoke(false);
             _load = false;
             UpdateImage(TextureLoadData.None);
             if (Value == null)
