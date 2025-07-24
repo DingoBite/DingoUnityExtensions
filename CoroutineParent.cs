@@ -238,17 +238,31 @@ namespace DingoUnityExtensions
             return StartCoroutineOnInstance(WaitAndInvokeC(yieldInstruction, action));
         }
         
+        public static Coroutine WaitFramesAndInvoke(int frames, Action action)
+        {
+            return StartCoroutineOnInstance(WaitFramesAndInvokeC(frames, action));
+        }
+
         public static Coroutine WaitAndInvoke(YieldInstruction yieldInstruction, Action action)
         {
             return StartCoroutineOnInstance(WaitAndInvokeC(yieldInstruction, action));
+        }
+
+        public static IEnumerator WaitFramesAndInvokeC(int frames, Action action)
+        {
+            for (var i = 0; i < frames; i++)
+            {
+                yield return null;
+            }
+            action?.Invoke();
         }       
         
         public static IEnumerator WaitAndInvokeC(YieldInstruction yieldInstruction, Action action)
         {
             yield return yieldInstruction;
             action?.Invoke();
-        }       
-        
+        }
+
         public static IEnumerator WaitAndInvokeC(IEnumerator yieldInstruction, Action action)
         {
             yield return StartCoroutineOnInstance(yieldInstruction);

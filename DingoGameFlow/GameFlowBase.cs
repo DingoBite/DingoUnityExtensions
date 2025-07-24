@@ -7,7 +7,7 @@ namespace DingoUnityExtensions.DingoGameFlow
 {
     public abstract class GameFlowBase : MonoBehaviour
     {
-        [field: SerializeField] protected bool DebugLog { get; private set; }
+        [field: SerializeField] protected bool LogSteps { get; private set; }
         
         protected AppModelRoot AppModelRoot { get; private set; }
 
