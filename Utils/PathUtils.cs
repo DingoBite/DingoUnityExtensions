@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -126,6 +127,39 @@ namespace DingoUnityExtensions.Utils
             return fullPath;
         }
 
+        // public static string NormalizePath(this string path) => path?.Replace("\\", "/").Replace("//", "/");
+        public static string NormalizePath(this string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return path;
+
+            var length = path.Length;
+            var buffer = length <= 256 ? stackalloc char[length] : new char[length];
+            var writeIndex = 0;
+            var lastWasSlash = false;
+
+            for (var i = 0; i < length; i++)
+            {
+                var c = path[i];
+                var normalized = c == '\\' ? '/' : c;
+
+                if (normalized == '/')
+                {
+                    if (lastWasSlash)
+                        continue;
+                    lastWasSlash = true;
+                }
+                else
+                {
+                    lastWasSlash = false;
+                }
+
+                buffer[writeIndex++] = normalized;
+            }
+
+            return new string(buffer[..writeIndex]);
+        }
+        
         public static string GetPathWithoutExtensions(string path)
         {
             var dir = Path.GetDirectoryName(path);
