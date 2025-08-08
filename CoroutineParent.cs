@@ -139,12 +139,16 @@ namespace DingoUnityExtensions
 
         public static void CancelCoroutine(Coroutine coroutine)
         {
+            if (Instance == null)
+                return;
             if (coroutine != null)  
                 Instance.StopCoroutine(coroutine);
         }
 
         public static Coroutine StartCoroutineWithCanceling(object key, IEnumerator coroutineEnumerator)
         {
+            if (Instance == null)
+                return default;
             if (Instance._coroutinesWithCanceling.TryGetValue(key, out var coroutine) && coroutine != null)
                 Instance.StopCoroutine(coroutine);
             coroutine = StartCoroutineOnInstance(coroutineEnumerator);
@@ -154,6 +158,8 @@ namespace DingoUnityExtensions
 
         public static Coroutine StartCoroutineWithCanceling(object key, Func<IEnumerator> factory)
         {
+            if (Instance == null)
+                return default;
             if (Instance._coroutinesWithCanceling.TryGetValue(key, out var coroutine) && coroutine != null)
                 Instance.StopCoroutine(coroutine);
             coroutine = StartCoroutineOnInstance(factory());
@@ -163,6 +169,8 @@ namespace DingoUnityExtensions
 
         public static void CancelCoroutine(object key)
         {
+            if (Instance == null)
+                return;
             if (Instance._coroutinesWithCanceling.TryGetValue(key, out var coroutine) && coroutine != null)
                 Instance.StopCoroutine(coroutine);
         }

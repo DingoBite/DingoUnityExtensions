@@ -20,6 +20,7 @@ namespace DingoUnityExtensions.Pools.Core
 
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
+        public GameObject Parent => _parent;
 
         public Pool(T prefab, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true, Action<T, bool> setActiveOverwrite = null)
         {
@@ -56,6 +57,7 @@ namespace DingoUnityExtensions.Pools.Core
         
         public void PushElement(T element)
         {
+            element.transform.SetParent(_parent.transform);
             ManageActiveness(element, false);
             _queue.Enqueue(element);
             _pulledElements.Remove(element);
