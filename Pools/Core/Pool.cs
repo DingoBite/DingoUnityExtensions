@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using DingoUnityExtensions.Extensions;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -17,19 +18,41 @@ namespace DingoUnityExtensions.Pools.Core
         private readonly List<T> _pulledElements = new();
         private readonly Queue<T> _queue = new();
         private readonly Action<T, bool> _setActiveOverwrite;
+        private readonly Func<GameObject, T> _factory;
+        private readonly Func<GameObject, Task<T>> _asyncFactory;
 
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
         public GameObject Parent => _parent;
 
-        public Pool(T prefab, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true, Action<T, bool> setActiveOverwrite = null)
+        private Pool(GameObject parent,
+            SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast,
+            bool layerFromPool = true, 
+            bool manageActiveness = true, 
+            Action<T, bool> setActiveOverwrite = null)
         {
             _setActiveOverwrite = setActiveOverwrite ?? ((behaviour, b) => behaviour.gameObject.SetActive(b));
             _manageActiveness = manageActiveness;
-            _prefab = prefab;
             _sortTransformOrder = sortTransformOrder;
             _layerFromPool = layerFromPool;
             _parent = parent;
+        }
+        
+        public Pool(T prefab, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true, Action<T, bool> setActiveOverwrite = null) 
+            : this(parent, sortTransformOrder, layerFromPool, manageActiveness, setActiveOverwrite)
+        {
+            _prefab = prefab;
+        }
+        public Pool(Func<GameObject, T> factory, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true, Action<T, bool> setActiveOverwrite = null) 
+            : this(parent, sortTransformOrder, layerFromPool, manageActiveness, setActiveOverwrite)
+        {
+            _factory = factory;
+        }
+        
+        public Pool(Func<GameObject, Task<T>> asyncFactory, GameObject parent, SortTransformOrderOption sortTransformOrder = SortTransformOrderOption.AsLast, bool layerFromPool = true, bool manageActiveness = true, Action<T, bool> setActiveOverwrite = null) 
+            : this(parent, sortTransformOrder, layerFromPool, manageActiveness, setActiveOverwrite)
+        {
+            _asyncFactory = asyncFactory;
         }
         
         public T PullElement()
@@ -47,6 +70,24 @@ namespace DingoUnityExtensions.Pools.Core
             Sort(element);
             return element;
         }
+        
+        public async Task<T> PullElementAsync()
+        {
+            if (_asyncFactory == null)
+                return PullElement();
+            if (_queue.TryDequeue(out var element))
+            {
+                ManageActiveness(element, true);
+                _pulledElements.Add(element);
+                Sort(element);
+                return element;
+            }
+            element = await InstantiateComponentAsync();
+            ManageActiveness(element, true);
+            _pulledElements.Add(element);
+            Sort(element);
+            return element;
+        }
 
         private void ManageActiveness(T component, bool value)
         {
@@ -57,7 +98,8 @@ namespace DingoUnityExtensions.Pools.Core
         
         public void PushElement(T element)
         {
-            element.transform.SetParent(_parent.transform);
+            if (_parent != null)
+                element.transform.SetParent(_parent.transform);
             ManageActiveness(element, false);
             _queue.Enqueue(element);
             _pulledElements.Remove(element);
@@ -76,15 +118,27 @@ namespace DingoUnityExtensions.Pools.Core
         
         private T InstantiateComponent()
         {
-            var component = Object.Instantiate(_prefab, _parent.transform);
-            if (_layerFromPool)
+            T component;
+            if (_factory != null)
+                component = _factory(_parent);
+            else if (_parent == null)
+                component = Object.Instantiate(_prefab);
+            else
+                component = Object.Instantiate(_prefab, _parent.transform);
+            if (_layerFromPool && _parent != null)
                 component.gameObject.SetLayerRecursive(_parent.layer);
             component.name = $"--{_pulledElements.Count}_{ComponentName}";
-            OnInstantiate(component);
             return component;
         }
-
-        protected virtual void OnInstantiate(T component){}
+        
+        private async Task<T> InstantiateComponentAsync()
+        {
+            var component = await _asyncFactory(_parent);
+            if (_layerFromPool && _parent != null)
+                component.gameObject.SetLayerRecursive(_parent.layer);
+            component.name = $"--{_pulledElements.Count}_{ComponentName}";
+            return component;
+        }
         
         private void Sort(T element)
         {
