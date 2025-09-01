@@ -131,7 +131,7 @@ namespace DingoUnityExtensions.Utils
         public static string NormalizePath(this string path)
         {
             if (string.IsNullOrEmpty(path))
-                return path;
+                return string.Empty;
 
             var length = path.Length;
             var buffer = length <= 256 ? stackalloc char[length] : new char[length];
