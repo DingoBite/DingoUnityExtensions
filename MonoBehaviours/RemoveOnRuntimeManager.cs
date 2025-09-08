@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Cinemachine;
 using UnityEngine;
 
 namespace DingoUnityExtensions.MonoBehaviours
@@ -16,7 +15,6 @@ namespace DingoUnityExtensions.MonoBehaviours
         [SerializeField] private RemoveBehaviour _removeBehaviour;
         [SerializeField] private bool _handleEditorOnly;
         [SerializeField] private List<GameObject> _scopes;
-        [TagField]
         [SerializeField] private string _tagToHide;
         
         private void Awake()
