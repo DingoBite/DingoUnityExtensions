@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Scripting;
 
-namespace DingoUnityExtensions.MaterialPropertyBlockAnimations
+namespace DingoUnityExtensions.MaterialPropertiesAccess
 {
     [Serializable, Preserve]
-    public class ListMaterialPropertyBlockProvider
+    public class ListMaterialPropertyProvider
     {
-        [SerializeField] private List<MaterialPropertyBlockProvider> _providers;
+        [SerializeField] private List<MaterialPropertyProvider> _providers;
         
         public void SetInt(Renderer renderer, int value)
         {
@@ -52,7 +52,7 @@ namespace DingoUnityExtensions.MaterialPropertyBlockAnimations
     }
     
     [Serializable, Preserve]
-    public class MaterialPropertyBlockProvider
+    public class MaterialPropertyProvider
     {
         protected int PropertyId = -1;
         protected string PropertyNameForId;
