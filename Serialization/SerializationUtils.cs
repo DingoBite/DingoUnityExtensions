@@ -114,11 +114,48 @@ namespace DingoUnityExtensions.Serialization
                 if (Stack.TryPop(out var removeKey) && CachedValues.TryRemove(removeKey, out var valueToDispose))
                     _dispose?.Invoke(valueToDispose);
             }
+            
+            public static void ClearAll() 
+            { 
+                Bag.Clear();
+                Stack.Clear();
+                Queue.Clear();
+                foreach (var (key, value) in CachedValues)
+                {
+                    _dispose?.Invoke(value);
+                }
+                CachedValues.Clear();
+            }
         }
 
         public static void SetupCache<T>(int capacity, CacheType cacheType, Action<T> dispose = null)
         {
             StaticCache<T>.Setup(capacity, cacheType, dispose);
+        }
+
+        public static async Task SaveAsync(string path, string json, bool catchException = true, CancellationTokenSource cancellationTokenSource = null)
+        {
+            if (catchException)
+            {
+                try
+                {
+                    if (cancellationTokenSource != null)
+                        await File.WriteAllTextAsync(path, json, cancellationTokenSource.Token);
+                    else
+                        await File.WriteAllTextAsync(path, json);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+            }
+            else
+            {
+                if (cancellationTokenSource != null)
+                    await File.WriteAllTextAsync(path, json, cancellationTokenSource.Token);
+                else
+                    await File.WriteAllTextAsync(path, json);
+            }
         }
         
         public static async Task SaveSerializeAsync(string path, object obj, bool catchException = true, JsonSerializerSettings settings = null, CancellationTokenSource cancellationTokenSource = null)
@@ -261,6 +298,8 @@ namespace DingoUnityExtensions.Serialization
             
             return value;
         }
+        
+        public static void ClearAll<T>() => StaticCache<T>.ClearAll();
     }
 }
 

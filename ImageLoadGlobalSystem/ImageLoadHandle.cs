@@ -92,6 +92,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         public ImageLoadHandle(string path)
         {
             Path = path;
+            if (Path == null)
+                return;
             _textureFlow = ImageLoadGlobalCache.GetOrRegister(Path);
             _textureFlow.SafeSubscribe(ChangeData);
         }

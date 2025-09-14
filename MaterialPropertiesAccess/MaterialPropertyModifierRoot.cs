@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace DingoUnityExtensions.MaterialPropertyBlockAnimations
+namespace DingoUnityExtensions.MaterialPropertiesAccess
 {
-    public class MaterialPropertyBlockModifierRoot : MonoBehaviour
+    public class MaterialPropertyModifierRoot : MonoBehaviour
     {
-        [SerializeReference, SubclassSelector] private List<MaterialPropertyBlockModifier> _modifiers;
+        [SerializeReference, SubclassSelector] private List<MaterialPropertyByTimeAccess> _modifiers;
         [SerializeField] private bool _affectToSharedMaterial;
         [SerializeField] private Renderer _renderer;
         
         private MaterialPropertyBlock _block;
 
-        public IReadOnlyList<MaterialPropertyBlockModifier> Modifiers => _modifiers;
+        public IReadOnlyList<MaterialPropertyByTimeAccess> Modifiers => _modifiers;
         public float Time { get; private set; }
         
-        public void Setup(IEnumerable<MaterialPropertyBlockModifier> modifiers) => _modifiers = modifiers.ToList();
+        public void Setup(IEnumerable<MaterialPropertyByTimeAccess> modifiers) => _modifiers = modifiers.ToList();
         
         public void SetTime(float time)
         {

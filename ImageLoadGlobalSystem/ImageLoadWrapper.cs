@@ -24,6 +24,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         [SerializeField, ShowIf(nameof(IsDefaultLayoutSize))] private Vector2 _defaultLayoutElementSizes;
         [SerializeField] private string _nameTemplate = "{0}";
 
+        [SerializeField] private bool _autoManageLifetime;
+        
         [SerializeField] private UnityEvent<bool> _loadUnloadEvent;
         
         private RectTransform _rectTransform;
@@ -76,6 +78,9 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             if (value == null)
                 return;
 
+            if (_autoManageLifetime && isActiveAndEnabled)
+                Load();
+            
             name = SingleKeyText.ReplaceKeyBy(Path.GetFileNameWithoutExtension(value.Path), _nameTemplate);
             Value.TextureFlow.SafeSubscribeAndSet(UpdateImage);
         }
@@ -153,6 +158,20 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
                 else 
                     animatableBehaviour.AnimatableSetActive(value);
             }
+        }
+
+        protected override void OnEnable()
+        {
+            if (_autoManageLifetime)
+                Load();
+            base.OnEnable();
+        }
+
+        protected override void OnDisable()
+        {
+            if (_autoManageLifetime)
+                Unload();
+            base.OnDisable();
         }
     }
 }
