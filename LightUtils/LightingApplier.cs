@@ -14,6 +14,10 @@ namespace DingoUnityExtensions.LightUtils
             RenderSettings.ambientIntensity = p.AmbientIntensity;
             RenderSettings.subtractiveShadowColor = p.RealtimeShadowColor;
             
+            RenderSettings.ambientSkyColor = p.SkyColor;
+            RenderSettings.ambientEquatorColor = p.EquatorColor;
+            RenderSettings.ambientGroundColor = p.GroundColor;
+            
             RenderSettings.fog = p.Fog;
             RenderSettings.fogColor = p.FogColor;
             RenderSettings.fogDensity = p.FogDensity;

@@ -13,6 +13,10 @@ namespace DingoUnityExtensions.LightUtils
         public float AmbientIntensity = 1f;
         public Color RealtimeShadowColor = Color.gray;
 
+        public Color SkyColor = Color.gray;
+        public Color EquatorColor = Color.gray;
+        public Color GroundColor = Color.gray;
+        
         public bool Fog;
         public Color FogColor = Color.gray;
         public float FogDensity = 0.01f;
@@ -28,9 +32,16 @@ namespace DingoUnityExtensions.LightUtils
             AmbientIntensity = RenderSettings.ambientIntensity;
             RealtimeShadowColor = RenderSettings.subtractiveShadowColor;
 
+            SkyColor = RenderSettings.ambientSkyColor;
+            EquatorColor = RenderSettings.ambientEquatorColor;
+            GroundColor = RenderSettings.ambientGroundColor;
+
             Fog = RenderSettings.fog;
             FogColor = RenderSettings.fogColor;
             FogDensity = RenderSettings.fogDensity;
         }
+
+        [Button]
+        private void Apply() => LightingApplier.Apply(this);
     }
 }
