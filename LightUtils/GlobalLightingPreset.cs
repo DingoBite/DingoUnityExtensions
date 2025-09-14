@@ -43,5 +43,7 @@ namespace DingoUnityExtensions.LightUtils
 
         [Button]
         private void Apply() => LightingApplier.Apply(this);
+        [Button]
+        private void UpdateEnvironment() => DynamicGI.UpdateEnvironment();
     }
 }
