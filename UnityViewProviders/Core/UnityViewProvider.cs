@@ -12,6 +12,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         protected override void SubscribeOnly() { }
         protected override void UnsubscribeOnly() { }
         public virtual bool Interactable { get; set; }
+        public virtual Type ValueType { get; }
+        public virtual void SetActiveContainer(bool value) { }
+        public virtual void UpdateBoxedValueWithoutNotify(object value) {}
     }
 
     public abstract class ValueContainer<TValue> : ContainerBase
@@ -157,6 +160,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
             }
         }
 
+        public sealed override Type ValueType => typeof(TValue);
+
         private void Awake()
         {
             if (_awaked)
@@ -225,6 +230,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         protected virtual void OnSetInteractable(bool value) { }
 
+        public sealed override void UpdateBoxedValueWithoutNotify(object value)
+        {
+            if (value is TValue obj)
+                UpdateValueWithoutNotify(obj);
+        }
+        
         public void UpdateValueWithoutNotify(TValue value)
         {
             if (!_awaked)
@@ -291,7 +302,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
             UpdateValueWithoutNotify(Value);
         }
         
-        public virtual void SetActiveContainer(bool value)
+        public override void SetActiveContainer(bool value)
         {
             gameObject.SetActive(value);
         }
@@ -385,6 +396,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 OnSetInteractable(value);
             }
         }
+
+        public sealed override Type ValueType => typeof(void);
 
         public event Action OnEvent;
 
