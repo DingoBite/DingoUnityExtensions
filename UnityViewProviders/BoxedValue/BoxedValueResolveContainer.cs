@@ -23,12 +23,7 @@ namespace DingoUnityExtensions.UnityViewProviders.BoxedValue
                 if (_valueUpdateBehaviour is ValueUpdateBehaviour.ActiveManage)
                     solver.SetActiveContainer(found);
                 if (found)
-                {
-                    if (value.Converter != null)
-                        solver.UpdateBoxedValueWithoutNotify(value.Converter(value.BoxedValue));
-                    else 
-                        solver.UpdateBoxedValueWithoutNotify(value.BoxedValue);
-                }
+                    solver.UpdateBoxedValueWithoutNotify(value.BoxedValue);
             }
         }
         

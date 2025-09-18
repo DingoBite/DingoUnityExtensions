@@ -7,15 +7,14 @@ namespace DingoUnityExtensions.UnityViewProviders.BoxedValue
     {
         public readonly object BoxedValue;
         public readonly Type Type;
-        public readonly Func<object, object> Converter;
 
-        public BoxedValueWrapper(object boxedValue, Type type = null, Func<object, object> converter = null)
+        private BoxedValueWrapper(object boxedValue = null, Type type = null)
         {
             BoxedValue = boxedValue;
             Type = type == null && boxedValue != null ? boxedValue.GetType() : type;
-            Converter = converter;
         }
 
+        public static BoxedValueWrapper Create<T>(T value) => new(value, typeof(T));
         public static BoxedValueWrapper None => new (null);
     }
     
