@@ -33,46 +33,6 @@ namespace DingoUnityExtensions.Tweens
         private readonly TweenList _enableTweens = new();
         private readonly TweenList _disableTweens = new();
 
-        public override void SetActive(bool value, bool isImmediately)
-        {
-            if (isImmediately)
-                SetActiveImmediately(value);
-            else 
-                AnimatableSetActive(value);
-        }
-        
-        public override void AnimatableSetActive(bool value)
-        {
-            if (value)
-                EnableNoParams();
-            else 
-                DisableNoParams();
-        }
-        
-        public override void SetActiveImmediately(bool value)
-        {
-            if (value)
-                EnableImmediately();
-            else 
-                DisableImmediately();
-        }
-        
-        public override void EnableNoParams()
-        {
-            if (!Application.isPlaying && Application.isEditor)
-                EnableImmediately();
-            else 
-                Enable();
-        }
-
-        public override void DisableNoParams()
-        {
-            if (!Application.isPlaying && Application.isEditor)
-                DisableImmediately();
-            else 
-                Disable();
-        }
-
         public override float Enable(float addDelay = 0, Action onComplete = null)
         {
             if (!ValidAnimationParams || State == AnimateState.Enabled)

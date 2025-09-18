@@ -73,22 +73,39 @@ namespace DingoUnityExtensions.Tweens
             if (state is AnimateState.Enabled)
             {
                 var rectSize = RectSize;
-                _layoutElement.minWidth = rectSize.x;
-                _layoutElement.minHeight = rectSize.y;
-                _layoutElement.preferredWidth = rectSize.x;
-                _layoutElement.preferredHeight = rectSize.y;
-                _layoutElement.flexibleWidth = _targetFlexible.x;
-                _layoutElement.flexibleHeight = _targetFlexible.y;
+                if (_flags.HasFlag(LayoutElementFlags.Min))
+                {
+                    _layoutElement.minWidth = rectSize.x;
+                    _layoutElement.minHeight = rectSize.y;
+                }
+                if (_flags.HasFlag(LayoutElementFlags.Preferred))
+                {
+                    _layoutElement.preferredWidth = rectSize.x;
+                    _layoutElement.preferredHeight = rectSize.y;
+                }
+                if (_flags.HasFlag(LayoutElementFlags.Flexible))
+                {
+                    _layoutElement.flexibleWidth = _targetFlexible.x;
+                    _layoutElement.flexibleHeight = _targetFlexible.y;
+                }
             }
             else if (state is AnimateState.Disabled)
             {
-                _layoutElement.minWidth = _defaultMin.x;
-                _layoutElement.minHeight = _defaultMin.y;
-                _layoutElement.preferredWidth = _defaultPreferred.x;
-                _layoutElement.preferredHeight = _defaultPreferred.y;
-                _layoutElement.flexibleWidth = _defaultFlexible.x;
-                _layoutElement.flexibleHeight = _defaultFlexible.y;
-
+                if (_flags.HasFlag(LayoutElementFlags.Min))
+                {
+                    _layoutElement.minWidth = _defaultMin.x;
+                    _layoutElement.minHeight = _defaultMin.y;
+                }
+                if (_flags.HasFlag(LayoutElementFlags.Preferred))
+                {
+                    _layoutElement.preferredWidth = _defaultPreferred.x;
+                    _layoutElement.preferredHeight = _defaultPreferred.y;
+                }
+                if (_flags.HasFlag(LayoutElementFlags.Flexible))
+                {
+                    _layoutElement.flexibleWidth = _defaultFlexible.x;
+                    _layoutElement.flexibleHeight = _defaultFlexible.y;
+                }
             }
         }
     }

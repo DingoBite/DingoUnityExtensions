@@ -1,10 +1,9 @@
-using System;
 using DG.Tweening;
 using UnityEngine;
 
 namespace DingoUnityExtensions.Tweens
 {
-    [CreateAssetMenu(menuName = "Tween Animations/ Create TweenAnimation", fileName = "TweenAnimation", order = 0)]
+    [CreateAssetMenu(menuName = "Tween Animations/ Create " + nameof(TweenAnimation), fileName = nameof(TweenAnimation), order = 0)]
     public class TweenAnimation : ScriptableObject
     {
         [SerializeField] private AnimationCurve _animationCurve;
@@ -13,7 +12,7 @@ namespace DingoUnityExtensions.Tweens
 
         public bool IsInstant => _duration < Vector2.kEpsilon && _delay < Vector2.kEpsilon;
         
-        public Tween Do(Func<float, Tween> tweenFactoryMethod)
+        public Tween Do(TweenUtils.Factory tweenFactoryMethod)
         {
             var tween = tweenFactoryMethod(_duration);
             if (_delay > Vector2.kEpsilon)

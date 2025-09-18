@@ -30,14 +30,49 @@ namespace DingoUnityExtensions.Tweens
     {
         public AnimateState State { get; protected set; }
 
-        public abstract void AnimatableSetActive(bool value);
-        public abstract void SetActiveImmediately(bool value);
-        public abstract void EnableNoParams();
+        public virtual void SetActive(bool value, bool isImmediately)
+        {
+            if (isImmediately)
+                SetActiveImmediately(value);
+            else 
+                AnimatableSetActive(value);
+        }
+        
+        public virtual void AnimatableSetActive(bool value)
+        {
+            if (value)
+                EnableNoParams();
+            else 
+                DisableNoParams();
+        }
+        
+        public virtual void SetActiveImmediately(bool value)
+        {
+            if (value)
+                EnableImmediately();
+            else 
+                DisableImmediately();
+        }
+        
+        public virtual void EnableNoParams()
+        {
+            if (!Application.isPlaying && Application.isEditor)
+                EnableImmediately();
+            else 
+                Enable();
+        }
+
+        public virtual void DisableNoParams()
+        {
+            if (!Application.isPlaying && Application.isEditor)
+                DisableImmediately();
+            else 
+                Disable();
+        }
+        
         public abstract float Enable(float addDelay = 0, Action onComplete = null);
-        public abstract void DisableNoParams();
         public abstract float Disable(float addDelay = 0, Action onComplete = null);
         public abstract void EnableImmediately();
         public abstract void DisableImmediately();
-        public abstract void SetActive(bool value, bool isImmediately);
     }
 }

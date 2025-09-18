@@ -32,38 +32,6 @@ namespace DingoUnityExtensions.Tweens
             }
         }
 
-        public override void AnimatableSetActive(bool value)
-        {
-            if (value)
-                EnableNoParams();
-            else 
-                DisableNoParams();
-        }
-
-        public override void SetActive(bool value, bool isImmediately)
-        {
-            if (isImmediately)
-                SetActiveImmediately(value);
-            else 
-                AnimatableSetActive(value);
-        }
-
-        public override void SetActiveImmediately(bool value)
-        {
-            if (value)
-                EnableImmediately();
-            else 
-                DisableImmediately();
-        }
-
-        public override void EnableNoParams()
-        {
-            if (!Application.isPlaying && Application.isEditor)
-                EnableImmediately();
-            else 
-                Enable();
-        }
-
         public override float Enable(float addDelay = 0, Action onComplete = null)
         {
             _onEnableComplete = onComplete;
@@ -122,14 +90,6 @@ namespace DingoUnityExtensions.Tweens
             {
                 graphic.SetAllDirty();
             }
-        }
-
-        public override void DisableNoParams()
-        {
-            if (!Application.isPlaying && Application.isEditor)
-                DisableImmediately();
-            else 
-                Disable();
         }
 
         public override void EnableImmediately()
