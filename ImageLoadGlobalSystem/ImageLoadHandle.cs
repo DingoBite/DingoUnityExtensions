@@ -95,7 +95,6 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             if (Path == null)
                 return;
             _textureFlow = ImageLoadGlobalCache.GetOrRegister(Path);
-            _textureFlow.SafeSubscribe(ChangeData);
         }
         
         public void LoadFor(object receiver)
@@ -136,7 +135,5 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
                         bind.V = new TextureLoadData(t, ImageLoadState.Loaded, path);
                 });
         }
-        
-        private void ChangeData(TextureLoadData textureLoadData) => _textureFlow.V = textureLoadData;
     }
 }
