@@ -12,7 +12,7 @@ namespace DingoUnityExtensions.UnityViewProviders.BoxedValue
         public BoxedValueWrapper(object boxedValue, Type type = null, Func<object, object> converter = null)
         {
             BoxedValue = boxedValue;
-            Type = type;
+            Type = type == null && boxedValue != null ? boxedValue.GetType() : type;
             Converter = converter;
         }
 
