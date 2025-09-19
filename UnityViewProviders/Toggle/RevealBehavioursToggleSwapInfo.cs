@@ -18,12 +18,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle
             bValue = _invert ? !bValue : bValue;
             foreach (var revealBehaviour in _objects)
             {
-                revealBehaviour.SetActive(value.Bool(), value.Immediately());
+                revealBehaviour.SetActive(bValue, value.Immediately());
             }
 
             foreach (var revealBehaviour in _reverseObjects)
             {
-                revealBehaviour.SetActive(!value.Bool(), value.Immediately());
+                revealBehaviour.SetActive(!bValue, value.Immediately());
             }
         }
     }

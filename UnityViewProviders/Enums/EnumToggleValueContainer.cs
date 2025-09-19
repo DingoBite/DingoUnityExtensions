@@ -9,6 +9,15 @@ namespace DingoUnityExtensions.UnityViewProviders.Enums
     {
         [SerializeField] private SerializedDictionary<TEnum, ValueContainer<bool>> _eventsDict;
 
+        public readonly TabsContainerGroup<TEnum> TabsContainer = new();
+
+        protected override void OnAwake()
+        {
+            TabsContainer.Initialize(_eventsDict);
+            TabsContainer.DeselectAll();
+            base.OnAwake();
+        }
+
         protected override void PreviousValueFree(TEnum previousData)
         {
             if (_eventsDict.TryGetValue(previousData, out var e))
