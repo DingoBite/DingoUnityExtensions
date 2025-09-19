@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using TMPro;
+using UnicodeFontIcons;
 using UnityEngine;
 using UnityEngine.Scripting;
 using UnityEngine.UI;
 
-namespace UnicodeFontIcons
+namespace DingoUnityExtensions.UnicodeFontIcons
 {
     [Serializable, Preserve]
     public class UnicodeIcon
     {
         public string IconKey;
         public FontWeight FontWeight;
+        
+        public UnicodeIcon(string iconKey, FontWeight fontWeight)
+        {
+            IconKey = iconKey;
+            FontWeight = fontWeight;
+        }
     }
 
     public class UnicodeTMP_Text : ValueContainer<UnicodeIcon>

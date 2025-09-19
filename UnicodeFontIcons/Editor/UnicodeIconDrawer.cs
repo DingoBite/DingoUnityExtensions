@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using DingoUnityExtensions.UnicodeFontIcons;
 using RotaryHeart.Lib.AutoComplete;
 using UnicodeFontIcons;
 using UnityEditor;
