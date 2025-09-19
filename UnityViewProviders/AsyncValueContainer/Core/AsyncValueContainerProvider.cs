@@ -37,7 +37,7 @@ namespace DingoUnityExtensions.UnityViewProviders.AsyncValueContainer.Core
             _stateContainers.UpdateValueWithoutNotify(AsyncValueState.Loading);
             try
             {
-                _ = HandleTaskState(task);
+                _ = HandleTaskState(task, _cts.Token);
             }
             catch (Exception e)
             {
@@ -46,13 +46,13 @@ namespace DingoUnityExtensions.UnityViewProviders.AsyncValueContainer.Core
             }
         }
 
-        private async Task HandleTaskState(Task<T> task)
+        private async Task HandleTaskState(Task<T> task, CancellationToken ctsToken)
         {
             LoadedValue = await task;
-            if (_cts.IsCancellationRequested)
+            if (ctsToken.IsCancellationRequested)
                 return;
             await UniTask.SwitchToMainThread();
-            if (_cts.IsCancellationRequested)
+            if (ctsToken.IsCancellationRequested)
                 return;
             _stateContainers.UpdateValueWithoutNotify(AsyncValueState.Success);
             _valueContainer.UpdateValueWithoutNotify(LoadedValue);

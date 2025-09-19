@@ -79,7 +79,10 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
                 return;
 
             if (_autoManageLifetime && isActiveAndEnabled)
+            {
+                Unload();
                 Load();
+            }
             
             name = SingleKeyText.ReplaceKeyBy(Path.GetFileNameWithoutExtension(value.Path), _nameTemplate);
             Value.TextureFlow.SafeSubscribeAndSet(UpdateImage);
