@@ -17,12 +17,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
         public string TemplateString
         {
             get => Template;
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value) || !value.Contains('{') && !value.Contains('}'))
-                    return;
-                Template = value;
-            }
+            set => Template = value;
+        }
+
+        public void RefreshValue()
+        {
+            SetValueWithoutNotify(Value);
         }
 
         protected override void SetValueWithoutNotify(string value) => ReplaceKeyBy(value);

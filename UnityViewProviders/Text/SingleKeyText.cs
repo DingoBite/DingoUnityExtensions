@@ -25,6 +25,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Text
                 return text;
             }
 
+            text ??= "";
+
             var resultText = Pattern.Replace(template, text);
             return resultText;
         }
