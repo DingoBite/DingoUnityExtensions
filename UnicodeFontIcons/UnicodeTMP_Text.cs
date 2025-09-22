@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using TMPro;
-using UnicodeFontIcons;
 using UnityEngine;
 using UnityEngine.Scripting;
 using UnityEngine.UI;
@@ -23,7 +22,14 @@ namespace DingoUnityExtensions.UnicodeFontIcons
         }
     }
 
-    public class UnicodeTMP_Text : ValueContainer<UnicodeIcon>
+    public interface IUnicodeIconContainer
+    {
+        public bool CaseSensitive { get; }
+        public TMP_FontAsset GetTMPFontAsset();
+        public IReadOnlyDictionary<string, string> GetUnicodeMapping();
+    }
+
+    public class UnicodeTMP_Text : ValueContainer<UnicodeIcon>, IUnicodeIconContainer
     {
         [SerializeField] private TMP_Text _tmpText;
         [SerializeField] private UnicodeIcon _icon;

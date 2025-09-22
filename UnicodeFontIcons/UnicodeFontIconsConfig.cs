@@ -8,7 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Scripting;
 
-namespace UnicodeFontIcons
+namespace DingoUnityExtensions.UnicodeFontIcons
 {
     [CreateAssetMenu(menuName = nameof(UnicodeFontIconsConfig), fileName = "S_" + nameof(UnicodeFontIconsConfig), order = 0)]
     public class UnicodeFontIconsConfig : ProtectedSingletonScriptableObject<UnicodeFontIconsConfig>

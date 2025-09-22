@@ -1,20 +1,19 @@
 ﻿using System.Linq;
-using DingoUnityExtensions.UnicodeFontIcons;
-using RotaryHeart.Lib.AutoComplete;
-using UnicodeFontIcons;
 using UnityEditor;
 using UnityEngine;
 
-namespace RealEstateMap.Demo.UnicodeFontIcons.Editor
+namespace DingoUnityExtensions.UnicodeFontIcons.Editor
 {
     [CustomPropertyDrawer(typeof(UnicodeIcon))]
     public class UnicodeIconDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            var unicodeTMP = Selection.activeGameObject?.GetComponent<UnicodeTMP_Text>();
-            if (unicodeTMP == null)
-                return;
+            if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<IUnicodeIconContainer>(out var unicodeTMP))
+            {
+                if (Selection.activeObject is not IUnicodeIconContainer unicodeTMPObj)
+                    return;
+            }
 
             EditorGUI.BeginProperty(position, label, property);
 
@@ -36,20 +35,6 @@ namespace RealEstateMap.Demo.UnicodeFontIcons.Editor
 
             iconKeyProp.stringValue = EditorGUI.TextField(rectKey, iconKeyProp.stringValue);
             DrawIconPreview(rectIconPreview, iconKeyProp.stringValue);
-
-            // var strings = unicodeTMP.GetAllKeys();
-            // AutoCompleteDropDown.EditorGUI.AutoCompleteDropDown(
-            //     rectKey,
-            //     iconKeyProp.stringValue,
-            //     strings,
-            //     s =>
-            //     {
-            //         if (s.EndsWith("-"))
-            //             s = s.Remove(s.Length - 1);
-            //         iconKeyProp.stringValue = s;
-            //         property.serializedObject.ApplyModifiedProperties();
-            //     },
-            //     true, true, true, "-");
             
             EditorGUI.PropertyField(rectWeight, fontWeightProp, GUIContent.none);
             EditorGUI.EndProperty();
@@ -67,10 +52,13 @@ namespace RealEstateMap.Demo.UnicodeFontIcons.Editor
         
         private void DrawIconPreview(Rect rect, string iconKey)
         {
-            var unicodeTMP = Selection.activeGameObject?.GetComponent<UnicodeTMP_Text>();
-            if (unicodeTMP == null)
-                return;
-
+            if (Selection.activeGameObject == null || !Selection.activeGameObject.TryGetComponent<IUnicodeIconContainer>(out var unicodeTMP))
+            {
+                if (Selection.activeObject is not IUnicodeIconContainer unicodeTMPObj)
+                    return;
+                unicodeTMP = unicodeTMPObj;
+            }
+            
             var mapping = unicodeTMP.GetUnicodeMapping();
             if (!unicodeTMP.CaseSensitive)
                 iconKey = iconKey.ToLower();
