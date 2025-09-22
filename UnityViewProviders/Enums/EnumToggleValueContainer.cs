@@ -29,5 +29,17 @@ namespace DingoUnityExtensions.UnityViewProviders.Enums
             if (_eventsDict.TryGetValue(value, out var e))
                 e.UpdateValueWithoutNotify(true);
         }
+
+        protected override void SubscribeOnly()
+        {
+            TabsContainer.OnTabSelect += SetValueWithNotify;
+            base.SubscribeOnly();
+        }
+
+        protected override void UnsubscribeOnly()
+        {
+            TabsContainer.OnTabSelect -= SetValueWithNotify;
+            base.UnsubscribeOnly();
+        }
     }
 }
