@@ -64,7 +64,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             _loadUnloadEvent?.Invoke(false);
             _load = false;
             UpdateImage(TextureLoadData.None);
-            if (Value == null)
+            if (Value?.Path == null)
                 return;
             Value.TextureFlow.UnSubscribe(UpdateImage);
             Value.UnloadFor(this);
@@ -75,8 +75,11 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         protected override void SetValueWithoutNotify(ImageLoadHandle value)
         {
             name = "not found";
-            if (value == null)
+            if (value?.Path == null)
+            {
+                UpdateImage(TextureLoadData.NotFound);
                 return;
+            }
 
             if (_autoManageLifetime && isActiveAndEnabled)
             {

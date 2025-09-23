@@ -32,6 +32,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         }
 
         public static TextureLoadData None => new(null, ImageLoadState.None, null);
+        public static TextureLoadData NotFound => new(null, ImageLoadState.NotFound, null);
     }
 
     public static class ImageLoadGlobalCache
