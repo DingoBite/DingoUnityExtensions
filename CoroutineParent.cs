@@ -183,6 +183,15 @@ namespace DingoUnityExtensions
             Instance._actions[sender] = coroutine;
             return coroutine;
         }
+
+        public static Coroutine InvokeAfterFrameWithCancelling(object sender, int frames, Action action)
+        {
+            if (Instance._actions.TryGetValue(sender, out var coroutine) && coroutine != null)
+                Instance.StopCoroutine(coroutine);
+            coroutine = WaitFramesAndInvoke(frames, action);
+            Instance._actions[sender] = coroutine;
+            return coroutine;
+        }
         
         public static Coroutine InvokeAfterAsyncMethodWithCanceling<T>(object sender, Func<Task<T>> asyncAction, Action<T> action)
         {
