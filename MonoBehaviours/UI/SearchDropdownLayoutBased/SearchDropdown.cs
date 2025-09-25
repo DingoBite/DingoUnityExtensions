@@ -31,6 +31,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
         [SerializeField] private int _overrideSortingOrder;
         [SerializeField] private string _nonePlaceholder = "None";
         [SerializeField] private bool _customValueSupport;
+        [SerializeField] private ValueContainer<bool> _opened;
         
         private float? _templateDefaultHeight;
         private string _startInput;
@@ -290,6 +291,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
             _startInput = _inputField.text;
 
             Opened = true;
+            if (_opened != null)
+                _opened.UpdateValueWithoutNotify(true);
             var anchoredPosition = _layoutContent.RectTransform.anchoredPosition;
             _layoutContent.RectTransform.anchoredPosition = new Vector2(anchoredPosition.x, 0);
             _layoutContent.gameObject.SetActive(true);
@@ -353,6 +356,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.SearchDropdownLayoutBased
 
         private void CloseSearchActive()
         {
+            if (_opened != null)
+                _opened.UpdateValueWithoutNotify(false);
             Opened = false;
             UnselectInputField();
 
