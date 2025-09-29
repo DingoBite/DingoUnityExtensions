@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace DingoUnityExtensions.MonoBehaviours.Singletons
@@ -45,6 +46,13 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
     {
         private static T _instance;
         private static readonly object _lock = new();
+
+        public static T GetNoCheck()
+        {
+            if (_instance == null)
+                _instance = FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None)?.FirstOrDefault();
+            return _instance;
+        }
 
         protected static T Instance
         {
