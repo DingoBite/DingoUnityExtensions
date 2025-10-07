@@ -7,6 +7,7 @@ using DingoUnityExtensions.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace DingoUnityExtensions.ImageLoadGlobalSystem
 {
@@ -126,6 +127,9 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             }
 
             bind.V = new TextureLoadData(null, ImageLoadState.Loading, path);
+#if UNITY_EDITOR && EMULATE_DELAYS
+            yield return CoroutineParent.CachedWaiter((int)(Random.value * 3f));
+#endif
             yield return MultiplatformLoadUtils.LoadTexture2DAsync(path)
                 .AsUniTask()
                 .ToCoroutine(t =>
