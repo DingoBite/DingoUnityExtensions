@@ -77,8 +77,6 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             
             if (textureFlow.V.State == ImageLoadState.Loaded && textureFlow.V.Texture != null)
                 Object.Destroy(textureFlow.V.Texture);
-            else if (textureFlow.V.State != ImageLoadState.None)
-                CoroutineParent.CancelCoroutine(obj);
 
             textureFlow.V = TextureLoadData.None;
         }
@@ -86,13 +84,16 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
     
     public class ImageLoadHandle
     {
+        public const string IMAGE_LOAD_HANDLE = "IMAGE_LOAD_HANDLE";
         public string Path { get; private set; }
 
         private readonly Bind<TextureLoadData> _textureFlow;
+        private readonly bool _disableLogException;
         public IReadonlyBind<TextureLoadData> TextureFlow => _textureFlow;
         
-        public ImageLoadHandle(string path)
+        public ImageLoadHandle(string path, bool disableLogException = false)
         {
+            _disableLogException = disableLogException;
             Path = path;
             if (Path == null)
                 return;
@@ -108,12 +109,12 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             }
 
             UnloadFor(receiver);
-            CoroutineParent.StartCoroutineWithCanceling(receiver, LoadImageCoroutine(_textureFlow, receiver, Path));
+            CoroutineParent.StartCoroutineWithCanceling((receiver, IMAGE_LOAD_HANDLE), LoadImageCoroutine(_textureFlow, receiver, Path));
         }
 
         public void UnloadFor(object receiver)
         {
-            CoroutineParent.CancelCoroutine(receiver);
+            CoroutineParent.CancelCoroutine((receiver, IMAGE_LOAD_HANDLE));
             ImageLoadGlobalCache.UnLink(receiver);
         }
         
@@ -130,7 +131,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 #if UNITY_EDITOR && EMULATE_DELAYS
             yield return CoroutineParent.CachedWaiter((int)(Random.value * 3f));
 #endif
-            yield return MultiplatformLoadUtils.LoadTexture2DAsync(path)
+            yield return MultiplatformLoadUtils.LoadTexture2DAsync(path, _disableLogException)
                 .AsUniTask()
                 .ToCoroutine(t =>
                 {

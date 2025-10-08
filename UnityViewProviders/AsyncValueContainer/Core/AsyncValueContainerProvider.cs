@@ -28,6 +28,8 @@ namespace DingoUnityExtensions.UnityViewProviders.AsyncValueContainer.Core
         
         public T LoadedValue { get; private set; }
 
+        protected ValueContainer<T> ValueContainer => _valueContainer;
+
         protected override void SetValueWithoutNotify(Func<CancellationTokenSource, Task<T>> value)
         {
             CancelLoading(false);
@@ -55,10 +57,13 @@ namespace DingoUnityExtensions.UnityViewProviders.AsyncValueContainer.Core
             if (ctsToken.IsCancellationRequested)
                 return;
             _stateContainers.UpdateValueWithoutNotify(AsyncValueState.Success);
-            _valueContainer.UpdateValueWithoutNotify(LoadedValue);
+            SetValueWithoutNotify(LoadedValue);
             _stateContainers.UpdateValueWithoutNotify(AsyncValueState.ValueUpdated);
         }
 
+        protected virtual void SetValueWithoutNotify(T value) => _valueContainer.UpdateValueWithoutNotify(value);
+        protected virtual void ValueCancelLoading(bool abort) { }
+        
         public void CancelLoading(bool abort)
         {
             if (_cts != null && !_cts.IsCancellationRequested)
@@ -73,6 +78,7 @@ namespace DingoUnityExtensions.UnityViewProviders.AsyncValueContainer.Core
                 }
                 _stateContainers.UpdateValueWithoutNotify(abort ? AsyncValueState.Aborted : AsyncValueState.Cancelled);
             }
+            ValueCancelLoading(abort);
         }
 
         public void ResetContainer()

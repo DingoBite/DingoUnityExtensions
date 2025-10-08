@@ -11,6 +11,9 @@ using UnityEngine.UI;
 
 namespace DingoUnityExtensions.ImageLoadGlobalSystem
 {
+    /// <summary>
+    /// Do not use UpdateValueWithoutNotify on this class
+    /// </summary>
     public class ImageLoadWrapper : ValueContainer<ImageLoadHandle>
     {
         [SerializeField] private RevealCanvasGroup _imageParent;
@@ -30,7 +33,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         
         private RectTransform _rectTransform;
         private bool? _load;
-        
+        private TextureLoadData? _lastTextureLoadData;
+
         public RectTransform RectTransform => _rectTransform ??= GetComponent<RectTransform>(); 
         private bool IsDefaultLayoutSize => _layoutElement != null;
         public Texture CurrentTexture => _rawImage.texture;
@@ -43,11 +47,13 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
         public void UpdateValueWithLoad(ImageLoadHandle imageLoadHandle)
         {
-            UpdateValueWithoutNotify(imageLoadHandle);
-            Load();
+            Unload();
+            SetValue(imageLoadHandle);
+            if (Value.Path != null)
+                LoadOnly();
         }
 
-        public void Load()
+        public void LoadOnly()
         {
             if (_load != null && _load.Value)
                 return;
@@ -60,39 +66,41 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         {
             if (_load != null && !_load.Value)
                 return;
-            
             _loadUnloadEvent?.Invoke(false);
             _load = false;
             UpdateImage(TextureLoadData.None);
-            if (Value?.Path == null)
-                return;
-            Value.TextureFlow.UnSubscribe(UpdateImage);
-            Value.UnloadFor(this);
+            if (Value?.Path != null)
+            {
+                Value.TextureFlow.UnSubscribe(UpdateImage);
+                Value.UnloadFor(this);
+            }
         }
-
-        protected override void PreviousValueFree(ImageLoadHandle previousData) => Unload();
-
-        protected override void SetValueWithoutNotify(ImageLoadHandle value)
+        
+        public void SetValue(ImageLoadHandle value)
         {
+            if (Value == value)
+                return;
+            
+            Value = value;
             name = "not found";
             if (value?.Path == null)
             {
                 UpdateImage(TextureLoadData.NotFound);
                 return;
             }
-
-            if (_autoManageLifetime && isActiveAndEnabled)
-            {
-                Unload();
-                Load();
-            }
             
             name = SingleKeyText.ReplaceKeyBy(Path.GetFileNameWithoutExtension(value.Path), _nameTemplate);
-            Value.TextureFlow.SafeSubscribeAndSet(UpdateImage);
+            Value.TextureFlow.SafeSubscribe(UpdateImage);
+            if (isActiveAndEnabled && _autoManageLifetime)
+                LoadOnly();
         }
 
         private void UpdateImage(TextureLoadData textureLoadData)
         {
+            if (_lastTextureLoadData != null && _lastTextureLoadData.Value.Texture == textureLoadData.Texture)
+                return;
+            
+            _lastTextureLoadData = textureLoadData;
             switch (textureLoadData.State)
             {
                 case ImageLoadState.None:
@@ -155,21 +163,23 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
             return;
 
-            void setActive(AnimatableBehaviour animatableBehaviour, bool value)
+            void setActive(AnimatableBehaviour animatableBehaviour, bool value, bool isImmediately = false)
             {
                 if (animatableBehaviour == null)
                     return;
                 if (!gameObject.activeInHierarchy)
                     animatableBehaviour.SetActiveImmediately(value);
                 else 
-                    animatableBehaviour.AnimatableSetActive(value);
+                    animatableBehaviour.SetActive(value, isImmediately);
             }
         }
+
+        protected override void SetValueWithoutNotify(ImageLoadHandle value) => SetValue(value);
 
         protected override void OnEnable()
         {
             if (_autoManageLifetime)
-                Load();
+                LoadOnly();
             base.OnEnable();
         }
 

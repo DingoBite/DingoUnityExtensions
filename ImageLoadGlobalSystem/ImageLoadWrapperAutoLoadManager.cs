@@ -26,7 +26,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             foreach (var imageLoadWrapper in GetComponents())
             {
                 if (_viewPort.WorldOverlaps(imageLoadWrapper.RectTransform))
-                    imageLoadWrapper.Load();
+                    imageLoadWrapper.LoadOnly();
                 else 
                     imageLoadWrapper.Unload();
             }

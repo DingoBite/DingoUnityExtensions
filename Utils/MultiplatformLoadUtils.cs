@@ -59,7 +59,7 @@ namespace DingoUnityExtensions.Utils
             }
         }
 
-        public static async Task<Texture2D> LoadTexture2DAsync(string path)
+        public static async Task<Texture2D> LoadTexture2DAsync(string path, bool disableLogException = false)
         {
             try
             {
@@ -78,8 +78,11 @@ namespace DingoUnityExtensions.Utils
             }
             catch (Exception e)
             {
-                Debug.LogError(path);
-                Debug.LogException(e);
+                if (!disableLogException)
+                {
+                    Debug.LogError(path);
+                    Debug.LogException(e);
+                }
                 return null;
             }
         }
