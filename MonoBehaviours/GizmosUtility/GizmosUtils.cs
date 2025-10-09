@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using DingoUnityExtensions.MathAndGeometry;
-using Unity.VisualScripting;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
@@ -270,12 +271,17 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
 
         public static bool TryGetSelectedObjectPosition(out Vector3 position)
         {
+#if UNITY_EDITOR
             position = Selection.activeTransform != null ? Selection.activeTransform.position : Vector3.zero;
             return Selection.activeTransform != null;
+#endif
+            position = Vector3.zero;
+            return false;
         }
         
         public static bool TryViewportToWorldPointOnPlane(Vector2 viewportPoint, Plane plane, out Vector3 position)
         {
+#if UNITY_EDITOR
             var sceneView = SceneView.lastActiveSceneView;
             if (sceneView == null || sceneView.camera == null)
             {
@@ -290,6 +296,7 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
                 position = ray.GetPoint(enter);
                 return true;
             }
+#endif
 
             position = Vector3.zero;
             return false;
@@ -297,12 +304,14 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
 
         public static void DrawText(Vector3 position, string text, Color color)
         {
+#if UNITY_EDITOR
             if (color.a < Vector2.kEpsilon)
                 return;
             var prev = Handles.color;
             GUI.color = color;
             Handles.Label(position, text);
             GUI.color = prev;
+#endif
         }
     }
 }
