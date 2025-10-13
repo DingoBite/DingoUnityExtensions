@@ -34,6 +34,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         private RectTransform _rectTransform;
         private bool? _load;
         private TextureLoadData? _lastTextureLoadData;
+        private bool _destroyed;
 
         public RectTransform RectTransform => _rectTransform ??= GetComponent<RectTransform>(); 
         private bool IsDefaultLayoutSize => _layoutElement != null;
@@ -41,12 +42,16 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         
         public void ForceSetImage(Texture2D texture)
         {
+            if (_destroyed)
+                return;
             Unload();
             UpdateImage(new TextureLoadData(texture, ImageLoadState.Loaded, ""));
         }
 
         public void UpdateValueWithLoad(ImageLoadHandle imageLoadHandle)
         {
+            if (_destroyed)
+                return;
             Unload();
             SetValue(imageLoadHandle);
             if (Value.Path != null)
@@ -55,6 +60,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
         public void LoadOnly()
         {
+            if (_destroyed)
+                return;
             if (_load != null && _load.Value)
                 return;
             _loadUnloadEvent?.Invoke(true);
@@ -64,6 +71,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
         public void Unload()
         {
+            if (_destroyed)
+                return;
             if (_load != null && !_load.Value)
                 return;
             _loadUnloadEvent?.Invoke(false);
@@ -78,6 +87,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         
         public void SetValue(ImageLoadHandle value)
         {
+            if (_destroyed)
+                return;
             if (Value == value)
                 return;
             
@@ -188,6 +199,12 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             if (_autoManageLifetime)
                 Unload();
             base.OnDisable();
+        }
+
+        private void OnDestroy()
+        {
+            _destroyed = true;
+            Unload();
         }
     }
 }

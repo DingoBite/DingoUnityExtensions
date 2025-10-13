@@ -32,14 +32,15 @@ namespace DingoUnityExtensions.UnityViewProviders.BoxedValue
                     {
                         _lastInstance.UpdateBoxedValueWithoutNotify(null);
                         Destroy(_lastInstance.gameObject);
+                        _lastInstance = null;
                     }
                     
-                    _lastInstance = Instantiate(solver, transform);
-                    _lastInstance.gameObject.layer = gameObject.layer;
                     if (found)
                     {
+                        _lastInstance = Instantiate(solver, transform);
+                        _lastInstance.gameObject.layer = gameObject.layer;
                         _lastInstance.UpdateBoxedValueWithoutNotify(value.BoxedValue);
-                        continue;
+                        break;
                     }
                 }
                 
@@ -59,6 +60,7 @@ namespace DingoUnityExtensions.UnityViewProviders.BoxedValue
                 {
                     _lastInstance.UpdateBoxedValueWithoutNotify(null);
                     Destroy(_lastInstance.gameObject);
+                    _lastInstance = null;
                 }
                 return;
             }
