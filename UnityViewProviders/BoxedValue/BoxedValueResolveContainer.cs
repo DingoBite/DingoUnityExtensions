@@ -8,7 +8,9 @@ namespace DingoUnityExtensions.UnityViewProviders.BoxedValue
     {
         [SerializeField] private List<ContainerBase> _solvers;
         [SerializeField] private ValueUpdateBehaviour _valueUpdateBehaviour;
-        
+
+        private ContainerBase _lastInstance;
+
         protected override void SetValueWithoutNotify(BoxedValueWrapper value)
         {
             if (value.Type == null)
@@ -21,7 +23,26 @@ namespace DingoUnityExtensions.UnityViewProviders.BoxedValue
             {
                 var found = solver.ValueType == value.Type;
                 if (_valueUpdateBehaviour is ValueUpdateBehaviour.ActiveManage)
+                {
                     solver.SetActiveContainer(found);
+                }
+                else if (_valueUpdateBehaviour is ValueUpdateBehaviour.CreateChild)
+                {
+                    if (_lastInstance != null)
+                    {
+                        _lastInstance.UpdateBoxedValueWithoutNotify(null);
+                        Destroy(_lastInstance.gameObject);
+                    }
+                    
+                    _lastInstance = Instantiate(solver, transform);
+                    _lastInstance.gameObject.layer = gameObject.layer;
+                    if (found)
+                    {
+                        _lastInstance.UpdateBoxedValueWithoutNotify(value.BoxedValue);
+                        continue;
+                    }
+                }
+                
                 if (found)
                     solver.UpdateBoxedValueWithoutNotify(value.BoxedValue);
             }
@@ -31,8 +52,20 @@ namespace DingoUnityExtensions.UnityViewProviders.BoxedValue
         {
             if (_valueUpdateBehaviour is ValueUpdateBehaviour.None)
                 return;
+            
+            if (_valueUpdateBehaviour is ValueUpdateBehaviour.CreateChild)
+            {
+                if (_lastInstance != null)
+                {
+                    _lastInstance.UpdateBoxedValueWithoutNotify(null);
+                    Destroy(_lastInstance.gameObject);
+                }
+                return;
+            }
+            
             foreach (var solver in _solvers)
             {
+                solver.UpdateBoxedValueWithoutNotify(default);
                 solver.SetActiveContainer(false);
             }
         }

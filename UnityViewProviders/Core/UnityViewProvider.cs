@@ -234,6 +234,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         {
             if (value is TValue obj)
                 UpdateValueWithoutNotify(obj);
+            else if (value is null)
+                UpdateValueWithoutNotify(default);
         }
         
         public void UpdateValueWithoutNotify(TValue value)
