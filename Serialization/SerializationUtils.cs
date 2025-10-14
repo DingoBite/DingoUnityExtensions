@@ -246,7 +246,30 @@ namespace DingoUnityExtensions.Serialization
 
             return value;
         }
-        
+
+        public static void Replace(string path1, string path2, string bak)
+        {
+            if (File.Exists(path1))
+            {
+                try
+                {
+                    File.Replace(path2, path1, bak, true);
+                }
+                catch
+                {
+                    if (File.Exists(path2))
+                    {
+                        if (File.Exists(path1)) File.Delete(path1);
+                        File.Move(path2, path1);
+                    }
+                }
+            }
+            else
+            {
+                File.Move(path2, path1);
+            }
+        }
+
         public static T DeserializeOrDefault<T>(string key, string json, CacheOption cacheOption = CacheOption.None, bool catchException = true, T defaultValue = default, JsonSerializerSettings settings = null)
         {
             if (cacheOption == CacheOption.TryGetCachedValue && StaticCache<T>.TryGetCache(key, out var cachedValue))

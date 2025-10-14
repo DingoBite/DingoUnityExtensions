@@ -11,8 +11,8 @@ namespace DingoUnityExtensions.Serialization
     public interface ISerializer
     {
         public Task<T> LoadDeserializeAsync<T>(string uri, bool catchExceptions = true, bool cache = false, bool forceReload = false, CancellationTokenSource cancellationTokenSource = null, JsonSerializerSettings jsonSerializerSettings = null);
-        public Task SaveSerializeAsync(string uri, object obj, bool catchExceptions = true, CancellationTokenSource cancellationTokenSource = null, JsonSerializerSettings jsonSerializerSettings = null);
-        public Task SaveAsync(string uri, string json, bool catchExceptions = true, CancellationTokenSource cancellationTokenSource = null);
+        public Task SaveSerializeAsync(string uri, object obj, bool catchExceptions = true, CancellationTokenSource cancellationTokenSource = null, JsonSerializerSettings jsonSerializerSettings = null, bool bakFile = false);
+        public Task SaveAsync(string uri, string json, bool catchExceptions = true, CancellationTokenSource cancellationTokenSource = null, bool bakFile = false);
         public void ClearAll<T>();
     }
 
@@ -42,7 +42,7 @@ namespace DingoUnityExtensions.Serialization
             return await SerializationUtils.DeserializeFromFileAsync<T>(uri, cacheOption, catchExceptions, settings: jsonSerializerSettings ?? _fallbackSettings, cancellationTokenSource: cancellationTokenSource);
         }
 
-        public async Task SaveSerializeAsync(string uri, object obj, bool catchExceptions = true, CancellationTokenSource cancellationTokenSource = null, JsonSerializerSettings jsonSerializerSettings = null)
+        public async Task SaveSerializeAsync(string uri, object obj, bool catchExceptions = true, CancellationTokenSource cancellationTokenSource = null, JsonSerializerSettings jsonSerializerSettings = null, bool bakFile = false)
         {
             var token = cancellationTokenSource?.Token ?? CancellationToken.None;
 
@@ -50,7 +50,17 @@ namespace DingoUnityExtensions.Serialization
             await gate.WaitAsync(token);
             try
             {
-                await SerializationUtils.SaveSerializeAsync(uri, obj, catchExceptions, jsonSerializerSettings ?? _fallbackSettings, cancellationTokenSource: cancellationTokenSource);
+                if (bakFile)
+                {
+                    var tmp = uri + ".tmp";
+                    var bak = uri + ".bak";
+                    await SerializationUtils.SaveSerializeAsync(tmp, obj, catchExceptions, jsonSerializerSettings ?? _fallbackSettings, cancellationTokenSource: cancellationTokenSource);
+                    SerializationUtils.Replace(tmp, uri, bak);
+                }
+                else
+                {
+                    await SerializationUtils.SaveSerializeAsync(uri, obj, catchExceptions, jsonSerializerSettings ?? _fallbackSettings, cancellationTokenSource: cancellationTokenSource);
+                }
             }
             catch (Exception e)
             {
@@ -62,7 +72,7 @@ namespace DingoUnityExtensions.Serialization
             }
         }
 
-        public async Task SaveAsync(string uri, string json, bool catchExceptions = true, CancellationTokenSource cancellationTokenSource = null)
+        public async Task SaveAsync(string uri, string json, bool catchExceptions = true, CancellationTokenSource cancellationTokenSource = null, bool bakFile = false)
         {
             var token = cancellationTokenSource?.Token ?? CancellationToken.None;
 
@@ -70,6 +80,17 @@ namespace DingoUnityExtensions.Serialization
             await gate.WaitAsync(token);
             try
             {
+                if (bakFile)
+                {
+                    var tmp = uri + ".tmp";
+                    var bak = uri + ".bak";
+                    await SerializationUtils.SaveAsync(tmp, json, catchExceptions, cancellationTokenSource: cancellationTokenSource);
+                    SerializationUtils.Replace(tmp, uri, bak);
+                }
+                else
+                {
+                    await SerializationUtils.SaveAsync(uri, json, catchExceptions, cancellationTokenSource: cancellationTokenSource);
+                }
                 await SerializationUtils.SaveAsync(uri, json, catchExceptions, cancellationTokenSource: cancellationTokenSource);
             }
             catch (Exception e)
