@@ -1,3 +1,4 @@
+using System.Buffers;
 using Unity.Collections;
 using UnityEngine;
 
@@ -5,9 +6,28 @@ namespace DingoUnityExtensions.Extensions
 {
     public static class CameraExtensions
     {
+        private static readonly Plane[] Planes = new Plane[6];
+        
+        public static bool IsObjectVisible(this Camera c, Renderer renderer, float offset)
+        {
+            GeometryUtility.CalculateFrustumPlanes(c, Planes);
+
+            for (var i = 0; i < 6; i++)
+            {
+                Planes[i].distance += offset;
+            }
+
+            var visible = GeometryUtility.TestPlanesAABB(Planes, renderer.bounds);
+            return visible;
+        }
+        
         public static bool IsObjectVisible(this Camera c, Renderer renderer)
         {
-            return GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(c), renderer.bounds);
+            var planes = ArrayPool<Plane>.Shared.Rent(6);
+            GeometryUtility.CalculateFrustumPlanes(c, planes);
+            var testPlanes = GeometryUtility.TestPlanesAABB(planes, renderer.bounds);
+            ArrayPool<Plane>.Shared.Return(planes);
+            return testPlanes;
         }
 
         public static bool IsPointVisible(this Camera c, Vector3 point, Vector2 offset = default)
