@@ -16,7 +16,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
         [SerializeField] private TweenAnimation _tweenAnimation;
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private List<ScrollRect> _stack;
-
+        [SerializeField] private Vector2 _offset;
+        
         private Tween _tween;
         private bool _initialized;
         private float _elasticity;
@@ -50,11 +51,18 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
             CenterOnItem(target, isImmediately, overrideAnimation, onComplete);
         }
 
-        public void CenterOnItem(RectTransform target, bool isImmediately = false, TweenAnimation overrideAnimation = null, Action onComplete = null)
+        public void CenterOnItem(RectTransform target, bool isImmediately = false, TweenAnimation overrideAnimation = null, Action onComplete = null, bool preserveOnVisible = false)
         {
+            if (preserveOnVisible && IsFullyVisible(target))
+            {
+                _tween?.Kill();
+                onComplete?.Invoke();
+                return;
+            }
+
             var viewport = _scrollRect.viewport;
             var content = _scrollRect.content;
-    
+
             var contentSize = content.rect.size;
             var viewportSize = viewport.rect.size;
             var normalizedPosition = _scrollRect.normalizedPosition;
@@ -63,7 +71,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
             {
                 var viewportWidth = viewportSize.x;
                 var contentWidth = contentSize.x;
-                var viewportCenter = viewportWidth * viewport.pivot.x;
+                var viewportCenter = viewportWidth * viewport.pivot.x + _offset.x;
                 var targetPositionInContent = target.anchoredPosition.x;
                 var viewportConventDiff = contentWidth - viewportWidth;
                 var desiredX = (targetPositionInContent - viewportCenter) / viewportConventDiff;
@@ -74,12 +82,13 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
             {
                 var viewportHeight = viewportSize.y;
                 var contentHeight = contentSize.y;
-                var viewportCenter = viewportHeight * viewport.pivot.y;
-                var targetPositionInContent = target.anchoredPosition.y;
+                var viewportCenter = viewportHeight * (1 - viewport.pivot.y) + _offset.y;
+                var targetPositionInContent = target.anchoredPosition.y + target.pivot.y * target.rect.height;
                 var viewportConventDiff = contentHeight - viewportHeight;
-                var desiredY = (targetPositionInContent - viewportCenter) / viewportConventDiff;
+                var desiredY = 1 - (viewportCenter - targetPositionInContent) / viewportConventDiff;
                 normalizedPosition.y = Mathf.Clamp01(desiredY);
             }
+
             _tween?.Kill();
             if (isImmediately)
             {
@@ -96,12 +105,21 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
                     BlockMovement(false);
                     onComplete?.Invoke();
                 });
-                _tween.OnKill(() =>
-                {
-                    BlockMovement(false);
-                });
+                _tween.OnKill(() => { BlockMovement(false); });
                 _tween.Play();
             }
+        }
+
+        private bool IsFullyVisible(Transform target)
+        {
+            var viewport = _scrollRect.viewport;
+            var bounds = RectTransformUtility.CalculateRelativeRectTransformBounds(viewport, target);
+            var r = viewport.rect;
+
+            var hOk = !_scrollRect.horizontal || (bounds.min.x >= r.xMin && bounds.max.x <= r.xMax);
+            var vOk = !_scrollRect.vertical || (bounds.min.y >= r.yMin && bounds.max.y <= r.yMax);
+
+            return hOk && vOk;
         }
         
         public void BlockMovement(bool value, bool stackOnly = false)
