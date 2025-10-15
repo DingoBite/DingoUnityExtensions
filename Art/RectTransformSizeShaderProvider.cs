@@ -5,65 +5,85 @@ using UIBehaviour = DingoUnityExtensions.MonoBehaviours.UI.UIBehaviour;
 namespace DingoUnityExtensions.Art
 {
     [ExecuteAlways]
-    public class RectTransformSizeShaderProvider : UIBehaviour
+    [RequireComponent(typeof(RectTransform))]
+    public class RectTransformSizeShaderProvider : UIBehaviour, IMaterialModifier
     {
         private static readonly int RectSizeID = Shader.PropertyToID("_RectSize");
-        private static readonly int PivotId = Shader.PropertyToID("_Pivot");
+        private static readonly int PivotID = Shader.PropertyToID("_Pivot");
 
-        [SerializeField] private Image _image;
-        [SerializeField] private Canvas _canvas;
+        [SerializeField] private Graphic _graphic;
         
-        private Vector2 _lastPxSize = new(-1f, -1f);
-        private Vector2 _lastPivot = new(-1f, -1f);
-        private float _lastScaleFactor = -1f;
+        private Material _runtimeMat;
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            _canvas = GetComponentInParent<Canvas>();
-            Canvas.willRenderCanvases += OnWillRenderCanvases;
-            UpdateNow(true);
+            if (!_graphic)
+                _graphic = GetComponent<Graphic>();
+            MarkDirty();
         }
 
         protected override void OnDisable()
         {
-            Canvas.willRenderCanvases -= OnWillRenderCanvases;
+            ReleaseRuntimeMaterial();
+            MarkDirty();
             base.OnDisable();
         }
 
-        protected override void OnCanvasHierarchyChanged()
+        protected override void OnCanvasHierarchyChanged() => MarkDirty();
+        protected override void OnRectTransformDimensionsChange() => MarkDirty();
+#if UNITY_EDITOR
+        protected override void OnValidate()
         {
-            base.OnCanvasHierarchyChanged();
-            _canvas = GetComponentInParent<Canvas>();
+            if (isActiveAndEnabled)
+                MarkDirty();
+        }
+#endif
+
+        public void MarkDirty()
+        {
+            if (_graphic)
+                _graphic.SetMaterialDirty();
         }
 
-        private void OnWillRenderCanvases()
+        private void ReleaseRuntimeMaterial()
         {
-            UpdateNow(false);
+            if (_runtimeMat)
+            {
+#if UNITY_EDITOR
+                DestroyImmediate(_runtimeMat);
+#else
+                Destroy(_runtimeMat);
+#endif
+                _runtimeMat = null;
+            }
         }
 
-        private void UpdateNow(bool force)
+        public Material GetModifiedMaterial(Material baseMat)
         {
-            if (_image == null)
-                return;
+            if (!isActiveAndEnabled || baseMat == null)
+                return baseMat;
 
-            if (_canvas == null)
-                _canvas = GetComponentInParent<Canvas>();
+            if (_runtimeMat == null || _runtimeMat.shader != baseMat.shader)
+            {
+                ReleaseRuntimeMaterial();
+                _runtimeMat = new Material(baseMat) { hideFlags = HideFlags.DontSave };
+            }
+            else
+            {
+                _runtimeMat.CopyPropertiesFromMaterial(baseMat);
+            }
 
-            var scaleFactor = _canvas == null ? 1f : _canvas.scaleFactor;
-            var pxSize = RectTransform.rect.size * scaleFactor;
-            var pivot = RectTransform.pivot;
+            var rt = (RectTransform)transform;
+            var canvas = _graphic ? _graphic.canvas : null;
+            var scale = canvas ? canvas.scaleFactor : 1f;
 
-            if (!force && _lastPxSize == pxSize && _lastPivot == pivot && Mathf.Approximately(_lastScaleFactor, scaleFactor))
-                return;
+            var px = rt.rect.size * scale;
+            var pivot = rt.pivot;
 
-            _lastPxSize = pxSize;
-            _lastPivot = pivot;
-            _lastScaleFactor = scaleFactor;
-
-            var mat = _image.materialForRendering;
-            mat.SetVector(RectSizeID, new Vector4(pxSize.x, pxSize.y, 0f, 0f));
-            mat.SetVector(PivotId, new Vector4(pivot.x, pivot.y, 0f, 0f));
+            _runtimeMat.SetVector(RectSizeID, new Vector4(px.x, px.y, 0, 0));
+            _runtimeMat.SetVector(PivotID, new Vector4(pivot.x, pivot.y, 0, 0));
+            return _runtimeMat;
         }
     }
 }
