@@ -22,6 +22,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
         private bool _initialized;
         private float _elasticity;
         private List<float> _elasticityStack;
+
+        public ScrollRect ScrollRect => _scrollRect;
         
         private void Reset()
         {
