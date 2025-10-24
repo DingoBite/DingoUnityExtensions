@@ -103,6 +103,8 @@ namespace DingoUnityExtensions.Utils
             return null;
         }
 
+        public static string GetRootPathFromPrefix(PathPrefix pathPrefix) => PrefixDictionary[pathPrefix];
+        
         public static string MakePathWithPrefix(PathPrefix pathPrefix, string path, bool createDirectory = false, bool addEscape = false)
         {
             path = path.Replace('\\', '/');
