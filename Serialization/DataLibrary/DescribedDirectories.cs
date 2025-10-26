@@ -45,10 +45,12 @@ namespace DingoUnityExtensions.Serialization.DataLibrary
         }
 
         public string GetRootFolder() => _rootDirectory.FullName;
+
+        public string GetId(TDescriptor descriptor) => _descriptorToId(descriptor);
         
         public string GetDirectoryFullPath(TDescriptor descriptor)
         {
-            var subDirectory = _descriptorToId(descriptor);
+            var subDirectory = GetId(descriptor);
             var directory = $"{_rootDirectory.FullName}/{subDirectory}";
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
@@ -105,7 +107,7 @@ namespace DingoUnityExtensions.Serialization.DataLibrary
         {
             if (!_descriptors.V.Contains(descriptor))
             {
-                Debug.LogError($"Descriptor: {_descriptorToId(descriptor)} is not registered");
+                Debug.LogError($"Descriptor: {GetId(descriptor)} is not registered");
                 return;
             }
             
@@ -152,7 +154,7 @@ namespace DingoUnityExtensions.Serialization.DataLibrary
                     var directory = GetDirectoryFullPath(descriptor);
                     if (Directory.Exists(directory))
                         await Task.Run(() => Directory.Delete(directory, true));
-                    var index = list.FindIndex(d => _descriptorToId(d) == _descriptorToId(descriptor));
+                    var index = list.FindIndex(d => _descriptorToId(d) == GetId(descriptor));
                     if (index < 0)
                         return;
                     list.RemoveAt(index);

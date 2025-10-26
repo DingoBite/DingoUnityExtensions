@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.Serialization.DataLibrary
 {
+    public interface ISavableToLibrary
+    {
+        public Task SaveAsync(DataByPathLibrary dataByPathLibrary);
+    }
+    
     public class DataByPathLibrary
     {
         private readonly DirectoryInfo _rootDirectory;
