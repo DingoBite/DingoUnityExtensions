@@ -9,6 +9,9 @@ namespace DingoUnityExtensions.Serialization.DataLibrary
     {
         private readonly DirectoryInfo _rootDirectory;
         private readonly ISerializer _serializer;
+
+        public string FullPath => _rootDirectory.FullName;
+        public string Name => _rootDirectory.Name;
         
         public DataByPathLibrary(string rooFolderPath, ISerializer serializer)
         {
