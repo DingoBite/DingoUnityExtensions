@@ -8,10 +8,4 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
     {
         public string Id;
     }
-    
-    [Serializable, Preserve]
-    public abstract class StructureRootData
-    {
-        public string Id;
-    }
 }

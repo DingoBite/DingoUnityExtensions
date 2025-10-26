@@ -17,7 +17,6 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
         private readonly DescribedDirectories<TDescriptor> _describedDirectories;
 
         public IReadonlyBind<IReadOnlyList<TDescriptor>> Descriptors => _describedDirectories?.Descriptors;
-        public IReadonlyBind<IReadOnlyDictionary<string, DataByPathLibrary>> Managers => _managers;
         public IReadonlyBind<DataByPathLibrary> Opened => _opened;
         public IReadonlyBind<DataByPathLibrary> Closed => _closed;
 
@@ -29,7 +28,7 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
 
         public async Task RefreshDescriptorsAsync() => await _describedDirectories.RefreshDescriptorsAsync();
 
-        public async Task<StructureRootDataDescriptor> CreateAsync(Func<string, TDescriptor> guidFactory)
+        public async Task<TDescriptor> CreateAsync(Func<string, TDescriptor> guidFactory)
         {
             var id = Guid.NewGuid().ToString();
             var descriptor = guidFactory(id);
@@ -51,6 +50,11 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
             await _describedDirectories.DeleteAsync(descriptor);
         }
 
+        public async Task SaveAsync(TDescriptor descriptor)
+        {
+            await _describedDirectories.SaveAsync(descriptor);
+        }
+        
         public DataByPathLibrary OpenAccess(TDescriptor descriptor)
         {
             if (_managers.V.TryGetValue(descriptor.Id, out var manager))
