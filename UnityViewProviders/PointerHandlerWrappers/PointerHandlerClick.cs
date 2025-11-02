@@ -3,15 +3,18 @@ using UnityEngine.EventSystems;
 
 namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
 {
-    public class PointerHandlerClick : MonoBehaviour, IPointerClickEventWrapper, IPointerDownEventWrapper, IPointerUpEventWrapper
+    public class PointerHandlerClick : MonoBehaviour, IPointerClickEventWrapper, IPointerDownEventWrapper, IPointerUpEventWrapper, ISelectWrapper, IDeselectWrapper
     {
         public event PointerWrapperDelegates.Event PointerClickEvent;
         public event PointerWrapperDelegates.Event PointerDownEvent;
         public event PointerWrapperDelegates.Event PointerUpEvent;
+        public event PointerWrapperDelegates.BaseEvent SelectEvent;
+        public event PointerWrapperDelegates.BaseEvent DeselectEvent;
         
         private float _downTime;
         
         public float LastDownTime { get; private set; }
+        public float LastSelectTime { get; private set; }
         protected bool Down { get; private set; }
         protected bool Up { get; private set; }
 
@@ -37,6 +40,17 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
             Down = false;
             LastDownTime = Time.time - _downTime;
             PointerUpEvent?.Invoke(eventData, LastDownTime);
+        }
+
+        public void OnSelect(BaseEventData eventData)
+        {
+            LastSelectTime = Time.time;
+            SelectEvent?.Invoke(eventData, 0);
+        }
+        
+        public void OnDeselect(BaseEventData eventData)
+        {
+            DeselectEvent?.Invoke(eventData, Time.time - LastSelectTime);
         }
     }
 }

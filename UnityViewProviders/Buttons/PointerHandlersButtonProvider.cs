@@ -11,10 +11,13 @@ using UnityEngine.EventSystems;
 namespace DingoUnityExtensions.UnityViewProviders.Buttons
 {
     public abstract class PointerHandlersButtonProvider<T> : UnityViewProvider<T>
-        where T : MonoBehaviour, IPointerDownEventWrapper, IPointerUpEventWrapper, IPointerClickEventWrapper
+        where T : MonoBehaviour, IPointerDownEventWrapper, IPointerUpEventWrapper, IPointerClickEventWrapper, ISelectWrapper, IDeselectWrapper
     {
         [SerializeField] private ToggleSwapInfoBase _interactableToggle;
         [SerializeField] private bool _interactableImmediately;
+        
+        [SerializeField] private ToggleSwapInfoBase _selectToggle;
+        [SerializeField] private bool _selectImmediately;
         
         [SerializeReference, SubclassSelector] private List<MicroAnimation> _downUpOnlyClickAnimations;
         [SerializeReference, SubclassSelector] private List<MicroAnimation> _clickAnimations;
@@ -28,6 +31,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
             View.PointerClickEvent += OnClick;
             View.PointerDownEvent += OnDown;
             View.PointerUpEvent += OnUp;
+            View.SelectEvent += OnSelect;
+            View.DeselectEvent += OnDeselect;
         }
 
         protected override void UnsubscribeOnly()
@@ -36,6 +41,33 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
             View.PointerClickEvent -= OnClick;
             View.PointerDownEvent -= OnDown;
             View.PointerUpEvent -= OnUp;
+            View.SelectEvent -= OnSelect;
+            View.DeselectEvent -= OnDeselect;
+        }
+
+        private void OnDeselect(BaseEventData data, float time)
+        {
+            if (!Interactable)
+                return;
+            
+            Selected = false;
+            EventSystem.current.SetSelectedGameObject(gameObject, data);
+        }
+
+        private void OnSelect(BaseEventData data, float time)
+        {
+            if (!Interactable)
+                return;
+            
+            Selected = true;
+            EventSystem.current.SetSelectedGameObject(gameObject, data);
+        }
+
+        protected override void OnSelected(bool value)
+        {
+            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != gameObject)
+                EventSystem.current.SetSelectedGameObject(gameObject);
+            _selectToggle.SetViewActive(value.TimeContext(_selectImmediately));
         }
 
         protected override void OnSetInteractable(bool value)

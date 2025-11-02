@@ -3,7 +3,7 @@ using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using TMPro;
 using UnityEngine;
 
-namespace DingoUnityExtensions.UnityViewProviders.Toggle
+namespace DingoUnityExtensions.UnityViewProviders.Toggle.SwapInfo
 {
     public class TMPStyleToggleSwapInfo : ToggleSwapInfoBase
     {

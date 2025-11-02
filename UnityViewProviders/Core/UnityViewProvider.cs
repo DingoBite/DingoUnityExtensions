@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DingoUnityExtensions.MonoBehaviours;
 using NaughtyAttributes;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         protected override void SubscribeOnly() { }
         protected override void UnsubscribeOnly() { }
         public virtual bool Interactable { get; set; }
+        public virtual bool Selectable { get; }
+        public virtual bool Selected { get; set; }
         public virtual Type ValueType { get; }
         public virtual void SetActiveContainer(bool value) { }
         public virtual void UpdateBoxedValueWithoutNotify(object value) {}
@@ -48,6 +51,14 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 }
             }
 
+            protected override void OnSelected(bool value)
+            {
+                foreach (var container in _stack)
+                {
+                    container.Selected = value;
+                }
+            }
+            
             protected override void SubscribeOnly()
             {
                 foreach (var container in _stack)
@@ -118,22 +129,23 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         private Transform _blocker;
 
         [SerializeField] private bool _isInteractable = true;
-        // [Tooltip("Is view value managed from scripts or from input in place")]
-        // [SerializeField] private bool _isExternalValueManager;
-        [Foldout(FINALIZING_VIEW), Tooltip("Update view OnValidate from _debugDefaultValue")]
+        [SerializeField] private bool _isSelectable;
+        
+        [Foldout(FINALIZING_VIEW)]
         [SerializeField] private bool _debugDefaultValueUpdate;
         [Foldout(FINALIZING_VIEW), ShowIf(nameof(_debugDefaultValueUpdate))]
         [SerializeField] private TValue _debugDefaultValue;
-        [Foldout(FINALIZING_VIEW), Tooltip("Change view by value, that default on Not Interactable")]
+        [Foldout(FINALIZING_VIEW)]
         [SerializeField] private bool _placeholderAtNonInteractable;
         
         [HideInInspector]
         [SerializeField] private TValue _previousNotInteractablePlaceholder;
-
+        
+        private bool _selected;
+        private bool _awaked;
+        
         protected virtual TValue NonInteractablePlaceholder => default;
         public bool ValueChangeFromExternalSource { get; set; }
-
-        private bool _awaked;
         
         public sealed override bool Interactable
         {
@@ -155,11 +167,31 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                         SetValueWithoutNotify(_previousNotInteractablePlaceholder);
                     }
                 }
+                
+                if (!_isInteractable)
+                {
+                    _selected = false;
+                    OnSelected(false);
+                }
 
                 OnSetInteractable(value);
             }
         }
 
+        public sealed override bool Selectable => _isSelectable;
+        
+        public sealed override bool Selected
+        {
+            get => _selected && _isSelectable;
+            set
+            {
+                if (!_isSelectable || _selected == value || !_isInteractable)
+                    return;
+                _selected = value;
+                OnSelected(_selected);
+            }
+        }
+        
         public sealed override Type ValueType => typeof(TValue);
 
         private void Awake()
@@ -229,6 +261,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         }
 
         protected virtual void OnSetInteractable(bool value) { }
+        protected virtual void OnSelected(bool value) { }
 
         public sealed override void UpdateBoxedValueWithoutNotify(object value)
         {
@@ -325,6 +358,14 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 }
             }
 
+            protected override void OnSelected(bool value)
+            {
+                foreach (var container in _stack)
+                {
+                    container.Selected = value;
+                }
+            }
+
             protected override void SubscribeOnly()
             {
                 foreach (var container in _stack)
@@ -386,7 +427,10 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         private Transform _blocker;
 
         [SerializeField] private bool _isInteractable = true;
+        [SerializeField] private bool _isSelectable;
 
+        private bool _selected;
+        
         public sealed override bool Interactable
         {
             get => gameObject.activeInHierarchy && _isInteractable;
@@ -395,7 +439,27 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
                 _isInteractable = value;
                 if (_blocker != null)
                     _blocker.gameObject.SetActive(!value);
+                if (!_isInteractable)
+                {
+                    _selected = false;
+                    OnSelected(false);
+                }
+
                 OnSetInteractable(value);
+            }
+        }
+
+        public sealed override bool Selectable => _isSelectable;
+
+        public sealed override bool Selected
+        {
+            get => _selected && _isSelectable;
+            set
+            {
+                if (!_isSelectable || _selected == value || !_isInteractable)
+                    return;
+                _selected = value;
+                OnSelected(_selected);
             }
         }
 
@@ -405,6 +469,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         protected virtual void EventInvoke() => OnEvent?.Invoke();
         protected abstract void OnSetInteractable(bool value);
+        protected virtual void OnSelected(bool value) { }
 
         protected virtual void Validate() {}
         

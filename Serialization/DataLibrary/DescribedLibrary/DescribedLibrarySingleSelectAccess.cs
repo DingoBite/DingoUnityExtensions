@@ -46,6 +46,9 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
         
         public TAccessModel OpenAccess(TDescriptor descriptor)
         {
+            if (descriptor == null)
+                return null;
+            
             if (Descriptors.V.All(d => d.Id != descriptor.Id))
             {
                 Debug.LogError($"[OPEN ERROR]. There is no access with id: {descriptor.Id}");
@@ -64,10 +67,19 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
             return _selectedAccess.V;
         }
 
-        public async Task SaveAsync(TDescriptor descriptor) => await _libraryAccess.SaveAsync(descriptor);
+        public async Task SaveAsync(TDescriptor descriptor)
+        {
+            if (descriptor == null)
+                return;
+            
+            await _libraryAccess.SaveAsync(descriptor);
+        }
 
         public void CloseAccess(TDescriptor descriptor)
         {
+            if (descriptor == null)
+                return;
+            
             if (_selectedAccess.V == null || _selectedAccess.V.Id != descriptor.Id)
                 return;
 
@@ -78,6 +90,9 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
 
         public async Task DeleteStructureAsync(TDescriptor descriptor)
         {
+            if (descriptor == null)
+                return;
+            
             await _libraryAccess.DeleteAsync(descriptor);
             CloseAccess(descriptor);
         }

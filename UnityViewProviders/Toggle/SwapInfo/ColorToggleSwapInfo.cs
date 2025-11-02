@@ -5,7 +5,7 @@ using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DingoUnityExtensions.UnityViewProviders.Toggle
+namespace DingoUnityExtensions.UnityViewProviders.Toggle.SwapInfo
 {
     public class ColorToggleSwapInfo : ToggleSwapInfoBase
     {

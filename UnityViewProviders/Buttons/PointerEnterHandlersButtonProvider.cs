@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 namespace DingoUnityExtensions.UnityViewProviders.Buttons
 {
     public abstract class PointerEnterHandlersButtonProvider<T> : PointerHandlersButtonProvider<T>
-        where T : MonoBehaviour, IPointerDownEventWrapper, IPointerUpEventWrapper, IPointerClickEventWrapper, IPointerEnterEventWrapper, IPointerExitEventWrapper
+        where T : MonoBehaviour, IPointerDownEventWrapper, IPointerUpEventWrapper, IPointerClickEventWrapper, IPointerEnterEventWrapper, IPointerExitEventWrapper, ISelectWrapper, IDeselectWrapper 
     {
         [SerializeReference, SubclassSelector] private List<MicroAnimation> _enterAnimations;
 

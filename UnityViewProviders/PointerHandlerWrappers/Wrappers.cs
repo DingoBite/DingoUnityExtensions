@@ -5,6 +5,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
     public static class PointerWrapperDelegates
     {
         public delegate void Event(PointerEventData data, float time);
+        public delegate void BaseEvent(BaseEventData data, float time);
     }
     
     public interface IPointerClickEventWrapper : IPointerClickHandler
@@ -50,5 +51,15 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
     public interface IPointerMoveEventWrapper : IPointerMoveHandler
     {
         public event PointerWrapperDelegates.Event PointerMoveEvent;
+    }
+    
+    public interface ISelectWrapper : ISelectHandler
+    {
+        public event PointerWrapperDelegates.BaseEvent SelectEvent;
+    }
+    
+    public interface IDeselectWrapper : IDeselectHandler
+    {
+        public event PointerWrapperDelegates.BaseEvent DeselectEvent;
     }
 }
