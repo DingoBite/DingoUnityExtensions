@@ -120,6 +120,16 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
             Gizmos.DrawMesh(mesh, center, rotation, scale);
             Gizmos.color = prevColor;
         }
+        
+        public static void DrawMesh(Mesh mesh, Matrix4x4 trs, Color color)
+        {
+            if (color.a < Vector2.kEpsilon)
+                return;
+            var prevColor = Gizmos.color;
+            Gizmos.color = color;
+            Gizmos.DrawMesh(mesh, trs.GetPosition(), trs.rotation, trs.lossyScale);
+            Gizmos.color = prevColor;
+        }
 
         public static void DrawSegmentsLine(Vector3[] points, Color color, bool looped = false)
         {
