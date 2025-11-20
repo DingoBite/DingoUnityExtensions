@@ -10,6 +10,7 @@ namespace uPalette.Runtime.Core.Synchronizer
         public abstract void EnableStyle(int index);
         public abstract void DisableStyle(int index);
         public abstract void ChangeStyle<T>(int index, T entryId) where T : EntryId;
+        public abstract void SetDefaultStyle(int index);
     }
     
     public abstract class UPaletteSynchronizerStyles<TEntryId, TValue> : UPaletteStyleSelector where TEntryId : EntryId
@@ -48,6 +49,13 @@ namespace uPalette.Runtime.Core.Synchronizer
             Refresh();
         }
 
+        public override void SetDefaultStyle(int index)
+        {
+            _defaultStyle = index;
+            _selectedStyles.Clear();
+            Refresh();
+        }
+
         private void SetStyle(int index)
         {
             _activeStyle = index;
@@ -56,7 +64,7 @@ namespace uPalette.Runtime.Core.Synchronizer
                 colorSynchronizer.SetEntryId(_styles[index].Value);
             }
         }
-        
+
         private void Refresh()
         {
             if (_selectedStyles.Count == 0)
