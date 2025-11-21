@@ -62,7 +62,7 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
                 Debug.LogError($"Profile {descriptor.Id} is already opened");
                 return manager;
             }
-            manager = new DataByPathLibrary(_describedDirectories.GetRootFolder(), _semaphoreSerializer);
+            manager = new DataByPathLibrary(_describedDirectories.GetDirectoryFullPath(descriptor), _semaphoreSerializer);
             _managers.V[descriptor.Id] = manager;
             _managers.V = _managers.V;
             _opened.V = manager;
