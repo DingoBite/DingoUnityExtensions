@@ -8,7 +8,7 @@ namespace uPalette.Runtime.Core.Synchronizer.CharacterStyle
     [CharacterStyleSynchronizer(typeof(Text), "Character Style")]
     public sealed class TextCharacterStyleSynchronizer : CharacterStyleSynchronizer<Text>
     {
-        protected internal override Foundation.CharacterStyles.CharacterStyle GetValue()
+        public override Foundation.CharacterStyles.CharacterStyle GetValue()
         {
             return new Foundation.CharacterStyles.CharacterStyle
             {
@@ -18,8 +18,8 @@ namespace uPalette.Runtime.Core.Synchronizer.CharacterStyle
                 lineSpacing = Component.lineSpacing
             };
         }
-        
-        protected internal override void SetValue(Foundation.CharacterStyles.CharacterStyle value)
+
+        public override void SetValue(Foundation.CharacterStyles.CharacterStyle value)
         {
             Component.font = value.font;
             Component.fontStyle = value.fontStyle;

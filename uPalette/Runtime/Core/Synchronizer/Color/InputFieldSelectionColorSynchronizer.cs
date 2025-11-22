@@ -7,12 +7,12 @@ namespace uPalette.Runtime.Core.Synchronizer.Color
     [ColorSynchronizer(typeof(InputField), "Selection Color")]
     public sealed class InputFieldSelectionColorSynchronizer : ColorSynchronizer<InputField>
     {
-        protected internal override UnityEngine.Color GetValue()
+        public override UnityEngine.Color GetValue()
         {
             return Component.selectionColor;
         }
 
-        protected internal override void SetValue(UnityEngine.Color value)
+        public override void SetValue(UnityEngine.Color value)
         {
             Component.selectionColor = value;
         }

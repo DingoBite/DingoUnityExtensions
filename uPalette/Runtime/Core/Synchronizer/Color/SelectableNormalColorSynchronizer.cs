@@ -7,12 +7,12 @@ namespace uPalette.Runtime.Core.Synchronizer.Color
     [ColorSynchronizer(typeof(Selectable), "Transition Normal Color")]
     public sealed class SelectableNormalColorSynchronizer : ColorSynchronizer<Selectable>
     {
-        protected internal override UnityEngine.Color GetValue()
+        public override UnityEngine.Color GetValue()
         {
             return Component.colors.normalColor;
         }
 
-        protected internal override void SetValue(UnityEngine.Color value)
+        public override void SetValue(UnityEngine.Color value)
         {
             var colors = Component.colors;
             colors.normalColor = value;

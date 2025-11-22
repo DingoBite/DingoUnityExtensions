@@ -7,12 +7,12 @@ namespace uPalette.Runtime.Core.Synchronizer.Color
     [ColorSynchronizer(typeof(TMP_InputField), "Caret Color")]
     public sealed class TMPInputFieldCaretColorSynchronizer : ColorSynchronizer<TMP_InputField>
     {
-        protected internal override UnityEngine.Color GetValue()
+        public override UnityEngine.Color GetValue()
         {
             return Component.caretColor;
         }
 
-        protected internal override void SetValue(UnityEngine.Color value)
+        public override void SetValue(UnityEngine.Color value)
         {
             Component.customCaretColor = true;
             Component.caretColor = value;

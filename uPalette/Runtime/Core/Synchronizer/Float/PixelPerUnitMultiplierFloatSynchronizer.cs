@@ -1,17 +1,18 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace uPalette.Runtime.Core.Synchronizer.PixelPerUnit
+namespace uPalette.Runtime.Core.Synchronizer.Float
 {
     [RequireComponent(typeof(Image))]
-    [FloatSynchronizer(typeof(Image), "Float")]
+    [FloatSynchronizer(typeof(Image), "Pixel Per Unit Multiplier")]
     public class PixelPerUnitMultiplierFloatSynchronizer : FloatSynchronizer<Image>
     {
-        protected internal override float GetValue()
+        public override float GetValue()
         {
             return Component.pixelsPerUnitMultiplier;
         }
-        protected internal override void SetValue(float value)
+
+        public override void SetValue(float value)
         {
             Component.pixelsPerUnitMultiplier = value;
         }

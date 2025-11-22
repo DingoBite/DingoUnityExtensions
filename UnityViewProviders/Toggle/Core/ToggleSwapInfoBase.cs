@@ -9,9 +9,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
         public abstract void SetViewActive(BoolTimeContext value);
 
         [Button]
-        private void TestEnabled() => SetViewActive(true.TimeContext());
-        
+        private void TestEnabled() => SetViewActive(true.TimeContext(!Application.isPlaying));
+
         [Button]
-        private void TestDisabled() => SetViewActive(false.TimeContext());
+        private void TestDisabled() => SetViewActive(false.TimeContext(!Application.isPlaying));
     }
 }

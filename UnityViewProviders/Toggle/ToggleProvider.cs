@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Toggle
 {
-    [RequireComponent(typeof(UnityEngine.UI.Toggle))]
     public class ToggleProvider : ToggleBehaviourProvider<UnityEngine.UI.Toggle>
     {
         protected override void OnSetInteractable(bool value) => View.interactable = value;

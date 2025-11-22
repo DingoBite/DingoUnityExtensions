@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Text
 {
-    [RequireComponent(typeof(TMP_InputField))]
     public class TextFieldProvider : UnityViewProvider<TMP_InputField, string>
     {
         [Flags]

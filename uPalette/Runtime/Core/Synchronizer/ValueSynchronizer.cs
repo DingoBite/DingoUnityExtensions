@@ -5,9 +5,9 @@ namespace uPalette.Runtime.Core.Synchronizer
     [ExecuteAlways]
     public abstract class ValueSynchronizer<T> : ValueSynchronizerBase<T>
     {
-        protected internal abstract T GetValue();
+        public abstract T GetValue();
 
-        protected internal abstract void SetValue(T value);
+        public abstract void SetValue(T value);
 
         protected override void OnValueChanged(T value)
         {

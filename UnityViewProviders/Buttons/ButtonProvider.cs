@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 namespace DingoUnityExtensions.UnityViewProviders.Buttons
 {
-    [RequireComponent(typeof(Button))]
     public class ButtonProvider : UnityViewProvider<Button>
     {
         protected override void SubscribeOnly() => View.onClick.AddListener(EventInvoke);

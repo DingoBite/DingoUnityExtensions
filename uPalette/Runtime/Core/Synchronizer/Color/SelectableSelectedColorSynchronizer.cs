@@ -7,12 +7,12 @@ namespace uPalette.Runtime.Core.Synchronizer.Color
     [ColorSynchronizer(typeof(Selectable), "Transition Selected Color")]
     public sealed class SelectableSelectedColorSynchronizer : ColorSynchronizer<Selectable>
     {
-        protected internal override UnityEngine.Color GetValue()
+        public override UnityEngine.Color GetValue()
         {
             return Component.colors.selectedColor;
         }
 
-        protected internal override void SetValue(UnityEngine.Color value)
+        public override void SetValue(UnityEngine.Color value)
         {
             var colors = Component.colors;
             colors.selectedColor = value;

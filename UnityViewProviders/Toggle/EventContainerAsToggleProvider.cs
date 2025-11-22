@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Toggle
 {
-    [RequireComponent(typeof(EventContainer))]
     public class EventContainerAsToggleProvider : ToggleBehaviourProvider<EventContainer>
     {
         [SerializeField] private bool _lockInputDisable;

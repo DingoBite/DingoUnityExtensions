@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DingoUnityExtensions.MicroAnimations;
-using DingoUnityExtensions.Tweens;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using DingoUnityExtensions.UnityViewProviders.Core.Data;
 using DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers;
@@ -24,8 +23,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
 
         public T PointerHandler => View;
         
-        private readonly TweenList _tweens = new();
-        
         protected override void SubscribeOnly()
         {
             View.PointerClickEvent += OnClick;
@@ -37,7 +34,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
 
         protected override void UnsubscribeOnly()
         {
-            ResetView();
             View.PointerClickEvent -= OnClick;
             View.PointerDownEvent -= OnDown;
             View.PointerUpEvent -= OnUp;
@@ -102,15 +98,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
             {
                 if (microAnimation != null)
                     microAnimation.BackwardAnimate();
-            }
-        }
-
-        protected virtual void ResetView()
-        {
-            foreach (var clickAnimation in _clickAnimations)
-            {
-                if (clickAnimation != null)
-                    clickAnimation.ResetView();
             }
         }
     }

@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using uPalette.Runtime.Core.Model;
-using uPalette.Runtime.Core.Synchronizer.Gradient;
 
-namespace uPalette.Runtime.Core.Synchronizer.PixelPerUnit
+namespace uPalette.Runtime.Core.Synchronizer.Float
 {
     public abstract class FloatSynchronizer : ValueSynchronizer<float>
     {

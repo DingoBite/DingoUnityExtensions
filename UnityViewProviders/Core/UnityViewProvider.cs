@@ -487,7 +487,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
     public abstract class UnityViewProvider<TView, TValue> : ValueContainer<TValue> where TView : Component
     {
-        private TView _view;
+        [SerializeField] private TView _view;
 
         protected TView View
         {
@@ -501,11 +501,13 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         protected abstract override void SubscribeOnly();
         protected abstract override void UnsubscribeOnly();
+
+        protected virtual void Reset() => _view = GetComponentInChildren<TView>();
     }
 
     public abstract class UnityViewProvider<TView> : EventContainer where TView : MonoBehaviour
     {
-        private TView _view;
+        [SerializeField] private TView _view;
 
         protected TView View
         {
@@ -519,5 +521,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
 
         protected abstract override void SubscribeOnly();
         protected abstract override void UnsubscribeOnly();
+        
+        protected virtual void Reset() => _view = GetComponentInChildren<TView>();
     }
 }

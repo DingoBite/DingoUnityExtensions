@@ -1,5 +1,5 @@
 ﻿using UnityEditor;
-using uPalette.Runtime.Core.Synchronizer.PixelPerUnit;
+using uPalette.Runtime.Core.Synchronizer.Float;
 
 namespace uPalette.Editor.Core.Synchronizer
 {

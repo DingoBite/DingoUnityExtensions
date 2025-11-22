@@ -15,7 +15,6 @@ namespace DingoUnityExtensions.MicroAnimations
         public float PitchRandomize;
         public float VolumeRandomize;
     }
-
     
     [CreateAssetMenu(menuName = "MicroAnimations/" + nameof(SoundMicroAnimationClips), fileName = nameof(SoundMicroAnimationClips), order = 0)]
     public class SoundMicroAnimationClips : ScriptableObject

@@ -7,7 +7,7 @@ namespace uPalette.Runtime.Core.Synchronizer.CharacterStyleTMP
     [CharacterStyleTMPSynchronizer(typeof(TextMeshProUGUI), "Character Style")]
     public sealed class TextMeshProUGUICharacterStyleTMPSynchronizer : CharacterStyleTMPSynchronizer<TextMeshProUGUI>
     {
-        protected internal override Foundation.CharacterStyles.CharacterStyleTMP GetValue()
+        public override Foundation.CharacterStyles.CharacterStyleTMP GetValue()
         {
             return new Foundation.CharacterStyles.CharacterStyleTMP
             {
@@ -27,7 +27,7 @@ namespace uPalette.Runtime.Core.Synchronizer.CharacterStyleTMP
             };
         }
 
-        protected internal override void SetValue(Foundation.CharacterStyles.CharacterStyleTMP value)
+        public override void SetValue(Foundation.CharacterStyles.CharacterStyleTMP value)
         {
             Component.font = value.font;
             Component.fontStyle = value.fontStyle;

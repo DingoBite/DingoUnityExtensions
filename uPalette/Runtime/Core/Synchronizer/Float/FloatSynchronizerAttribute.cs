@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace uPalette.Runtime.Core.Synchronizer.PixelPerUnit
+namespace uPalette.Runtime.Core.Synchronizer.Float
 {
     public sealed class FloatSynchronizerAttribute : ValueSynchronizerAttribute
     {

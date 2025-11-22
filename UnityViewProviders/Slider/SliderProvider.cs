@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Slider
 {
-    [RequireComponent(typeof(UnityEngine.UI.Slider))]
     public class SliderProvider : UnityViewProvider<UnityEngine.UI.Slider, float>, IAnimationContainer<UnityEngine.UI.Slider, float>
     {
         [SerializeField] private bool _convertToSliderLerpValue;
