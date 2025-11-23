@@ -3,8 +3,15 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Navigation
 {
+    public enum NavigationRuleType
+    {
+        Auto,
+        PriorNode,
+        ById
+    }
+    
     [Serializable]
-    public class NavigationNodeSelectRule
+    public record NavigationNodeSelectRule
     {
         public UnityEngine.UI.Navigation NavigationType;
         public string RoutePath;
@@ -13,7 +20,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         public float DeltaThreshold = 100f;
         
         [Space]
-        public bool OverrideAuto;
+        public NavigationRuleType NavigationRuleType;
+        public string FindNearestId;
+        public bool FilterIdByNavigationType = true;
 
         public ContainerNavigationNode PriorNode;
 
@@ -25,7 +34,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         public NavigationNodeSelectRule(ContainerNavigationNode priorNode)
         {
             PriorNode = priorNode;
-            OverrideAuto = true;
+            NavigationRuleType = NavigationRuleType.Auto;
             NavigationType = UnityEngine.UI.Navigation.defaultNavigation;
         }
     }

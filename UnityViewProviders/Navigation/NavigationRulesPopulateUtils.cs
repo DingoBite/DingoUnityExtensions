@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Navigation
@@ -45,40 +46,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
                 return null;
             return ResolveDirection(node, node.Right, node.Right.YAsDirection ? Vector2.right : Vector3.right);
         }
-        
-        public static void PopulateRoute(ContainerNavigationRoute route)
-        {
-            if (route == null)
-                return;
-
-            route.RebuildNodes();
-            var nodes = route.Nodes;
-            foreach (var node in nodes)
-            {
-                if (node != null)
-                    node.FindNavigationNodes();
-            }
-        }
-
-        private static ContainerNavigationNode ResolveDirection(ContainerNavigationNode origin, NavigationNodeSelectRule rule, Vector2 direction)
-        {
-            if (rule != null)
-            {
-                var mode = rule.NavigationType.mode;
-
-                if (rule.OverrideAuto && rule.PriorNode != null)
-                    return rule.PriorNode;
-
-                if (mode == UnityEngine.UI.Navigation.Mode.None)
-                    return null;
-
-                if (mode == UnityEngine.UI.Navigation.Mode.Explicit && rule.PriorNode != null)
-                    return rule.PriorNode;
-            }
-
-            var candidates = GetCandidates(origin, rule);
-            return FindBest(origin, rule, candidates, direction);
-        }
 
         private static IEnumerable<ContainerNavigationNode> GetCandidates(ContainerNavigationNode origin, NavigationNodeSelectRule rule)
         {
@@ -121,7 +88,35 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
 
             return currentRoute;
         }
-        
+
+        private static ContainerNavigationNode ResolveDirection(ContainerNavigationNode origin, NavigationNodeSelectRule rule, Vector2 direction)
+        {
+            if (rule.NavigationRuleType is NavigationRuleType.PriorNode)
+                return rule.PriorNode;
+            
+            var mode = rule.NavigationType.mode;
+            if (rule.NavigationRuleType is NavigationRuleType.Auto && mode is UnityEngine.UI.Navigation.Mode.None or UnityEngine.UI.Navigation.Mode.Explicit)
+                return null;
+
+            var candidates = GetCandidates(origin, rule);
+            
+            if (rule.NavigationRuleType is NavigationRuleType.ById)
+            {
+                if (string.IsNullOrWhiteSpace(rule.FindNearestId))
+                    return null;
+
+                if (!rule.FilterIdByNavigationType)
+                {
+                    var nearestById = FindNearestWithId(origin, rule, candidates);
+                    return nearestById;
+                }
+
+                candidates = candidates.Where(c => !string.IsNullOrWhiteSpace(c.Id) && c.Id == rule.FindNearestId);
+            }
+
+            return FindBest(origin, rule, candidates, direction);
+        }
+
         private static ContainerNavigationNode FindBest(ContainerNavigationNode origin, NavigationNodeSelectRule rule, IEnumerable<ContainerNavigationNode> candidates, Vector2 direction)
         {
             if (candidates == null)
@@ -162,9 +157,42 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             return best;
         }
 
-        private static Vector2 Project(Vector3 worldPosition)
+        private static Vector2 Project(Vector3 worldPosition) => new(worldPosition.x, worldPosition.y);
+
+        private static ContainerNavigationNode FindNearestWithId(ContainerNavigationNode origin, NavigationNodeSelectRule rule, IEnumerable<ContainerNavigationNode> candidates)
         {
-            return new Vector2(worldPosition.x, worldPosition.y);
+            if (rule == null || string.IsNullOrEmpty(rule.FindNearestId) || candidates == null)
+                return null;
+
+            var originPos = Project(origin.transform.position);
+            var bestDistSqr = float.PositiveInfinity;
+            ContainerNavigationNode best = null;
+
+            foreach (var other in candidates)
+            {
+                if (other == null || other == origin)
+                    continue;
+
+                if (string.IsNullOrWhiteSpace(other.Id) || other.Id != rule.FindNearestId)
+                    continue;
+
+                var otherPos = Project(other.transform.position);
+                var delta = otherPos - originPos;
+                var dist = delta.magnitude;
+
+                if (dist > rule.DeltaThreshold)
+                    continue;
+
+                var distSqr = delta.sqrMagnitude;
+                if (distSqr < bestDistSqr)
+                {
+                    bestDistSqr = distSqr;
+                    best = other;
+                }
+            }
+
+            return best;
         }
+
     }
 }

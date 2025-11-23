@@ -11,10 +11,6 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
 {
     public static class GizmosUtils
     {
-        // Make something like this:
-        //      GizmosUtils.EachSegmentCallback += OnEachSegmentCallback;
-        //      GizmosUtils.DrawGrid2D(-100 * Vector2.one, 100 * Vector2.one, Vector2.one * Config.GridStep, 0, _gridColor);
-        //      GizmosUtils.EachSegmentCallback -= OnEachSegmentCallback;
         public static event Func<object, Color, Color> EachSegmentCallback;
 
         public static Color WrapEachSegmentCallback(object obj, Color color, Func<Tuple<Vector3, Vector3>, Color> func) => WrapEachSegmentCallback<Tuple<Vector3, Vector3>>(obj, color, func);
@@ -312,32 +308,39 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
             return false;
         }
 
-        public static Vector2 DrawNavigationCurveArrow(Vector3 from, Vector3 to, Color color)
+        public static Vector2 DrawNavigationCurveArrowHandles(Vector3 from, Vector3 to, Color color)
         {
             if (color.a < Vector2.kEpsilon)
                 return Vector2.zero;
 
-            return DrawCurveArrowInternal(from, to, color, 0.22f, 0.12f);
+            return DrawCurveArrowHandlesInternal(from, to, color, 0.22f, 0.12f);
         }
 
-        public static Vector2 DrawCurveArrowInternal(Vector3 from, Vector3 to, Color color, float headSize, float curvature)
+        public static Vector2 DrawCurveArrowHandlesInternal(Vector3 from, Vector3 to, Color color, float headSize, float curvature)
         {
             var delta = to - from;
             var sqrMag = delta.sqrMagnitude;
             if (sqrMag <= Mathf.Epsilon)
                 return Vector2.zero;
 
-            var prev = Gizmos.color;
-            Gizmos.color = color;
+#if UNITY_EDITOR
+            var prevColor = Handles.color;
+            Handles.color = color;
 
             var dir = delta / Mathf.Sqrt(sqrMag);
-            var camForward = Camera.current != null ? Camera.current.transform.forward : Vector3.forward;
+            var camForward = SceneView.currentDrawingSceneView != null ? SceneView.currentDrawingSceneView.camera.transform.forward : Vector3.forward;
+
             var side = Vector3.Cross(camForward, dir).normalized;
             var distance = Mathf.Sqrt(sqrMag);
             var controlOffset = side * (distance * curvature);
             var p0 = from;
             var p1 = (from + to) * 0.5f + controlOffset;
             var p2 = to;
+            
+            var startScreenSize = HandleUtility.GetHandleSize(p0) * headSize;
+            var endScreenSize = HandleUtility.GetHandleSize(p2) * headSize;
+
+            Handles.SphereHandleCap(controlID: 0, position: p0, rotation: Quaternion.identity, size: startScreenSize, EventType.Repaint);
 
             const int segments = 16;
             var prevPoint = p0;
@@ -345,7 +348,7 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
             {
                 var t = i / (float)segments;
                 var point = GetQuadraticPoint(p0, p1, p2, t);
-                Gizmos.DrawLine(prevPoint, point);
+                Handles.DrawLine(prevPoint, point);
                 prevPoint = point;
             }
 
@@ -353,20 +356,17 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
             if (tangent.sqrMagnitude > Mathf.Epsilon)
             {
                 var dirT = tangent.normalized;
-                var tip = p2;
-                var baseCenter = tip - dirT * headSize;
-                var headSide = Vector3.Cross(camForward, dirT).normalized;
-                var halfWidth = headSize * 0.5f;
+                var tip = p2 - dirT * endScreenSize * 2f;
 
-                var pLeft = baseCenter + headSide * halfWidth;
-                var pRight = baseCenter - headSide * halfWidth;
+                var rotation = Quaternion.LookRotation(dirT, camForward);
 
-                Gizmos.DrawLine(tip, pLeft);
-                Gizmos.DrawLine(tip, pRight);
+                Handles.ConeHandleCap(controlID: 0, position: tip, rotation: rotation, size: endScreenSize, EventType.Repaint);
             }
 
-            Gizmos.color = prev;
+            Handles.color = prevColor;
             return p1;
+#endif
+            return Vector2.zero;
         }
 
         private static Vector3 GetQuadraticPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
@@ -379,7 +379,6 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
         {
             return 2f * (1f - t) * (p1 - p0) + 2f * t * (p2 - p1);
         }
-        
         public static void DrawText(Vector3 position, string text, Color color)
         {
 #if UNITY_EDITOR

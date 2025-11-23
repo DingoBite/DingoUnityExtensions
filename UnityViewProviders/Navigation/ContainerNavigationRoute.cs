@@ -60,7 +60,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
 
         private void FindRoute()
         {
-            if (transform.parent == null)
+            if (transform == null)
                 return;
             _route = transform.parent.GetComponentInParent<ContainerNavigationRoute>();
         }
@@ -70,6 +70,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         {
             if (!_alwaysRebuildNodes && !_isDirty && Application.isPlaying)
                 return;
+            FindRoute();
             _nodes.Clear();
             _routes.Clear();
 

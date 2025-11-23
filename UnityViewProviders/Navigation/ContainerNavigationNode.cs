@@ -20,6 +20,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         [SerializeField] private bool _alwaysRebuildNodes;
         [SerializeField] private bool _isDirty = true;
 
+        [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public NavigationNodeSelectRule Up { get; private set; }
         [field: SerializeField] public NavigationNodeSelectRule Down { get; private set; }
         [field: SerializeField] public NavigationNodeSelectRule Left { get; private set; }
@@ -141,7 +142,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
                 return;
             var from = transform.position;
             var to = target.transform.position;
-            var center = GizmosUtils.DrawNavigationCurveArrow(from, to, color);
+            var center = GizmosUtils.DrawNavigationCurveArrowHandles(from, to, color);
             GizmosUtils.DrawTextOutline(center, title, Color.white);
         }
     }
