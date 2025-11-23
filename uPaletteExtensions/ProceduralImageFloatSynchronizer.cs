@@ -27,9 +27,20 @@ namespace DingoUnityExtensions.uPaletteExtensions
                 Component.BorderWidth = value;
                 return;
             }
-            _targetValue = value;
+
             _tween?.Kill();
-            _animation.Do(d => DOTween.To(() => Component.BorderWidth, v => Component.BorderWidth = v, value, d));
+            if (value < 0)
+            {
+                _targetValue = 0;
+                var rectSize = Component.rectTransform.rect.size.magnitude * 0.5f;
+                _tween = _animation.Do(d => DOTween.To(() => Component.BorderWidth, v => Component.BorderWidth = v, rectSize, d));
+                _tween.OnComplete(() => Component.BorderWidth = _targetValue.Value);
+            }
+            else
+            {
+                _targetValue = value;
+                _tween = _animation.Do(d => DOTween.To(() => Component.BorderWidth, v => Component.BorderWidth = v, value, d));
+            }
         }
     }
 }

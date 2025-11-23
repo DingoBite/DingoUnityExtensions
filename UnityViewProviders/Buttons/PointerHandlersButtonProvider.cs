@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 
 namespace DingoUnityExtensions.UnityViewProviders.Buttons
 {
-    public abstract class PointerHandlersButtonProvider<T> : UnityViewProvider<T>
+    public abstract class PointerHandlersButtonProvider<T> : UnityViewProvider<T>, ISubmitHandler
         where T : MonoBehaviour, IPointerDownEventWrapper, IPointerUpEventWrapper, IPointerClickEventWrapper, ISelectWrapper, IDeselectWrapper
     {
         [SerializeField] private ToggleSwapInfoBase _interactableToggle;
@@ -47,7 +47,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
                 return;
             
             Selected = false;
-            EventSystem.current.SetSelectedGameObject(gameObject, data);
         }
 
         private void OnSelect(BaseEventData data, float time)
@@ -56,7 +55,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
                 return;
             
             Selected = true;
-            EventSystem.current.SetSelectedGameObject(gameObject, data);
         }
 
         protected override void OnSelected(bool value)
@@ -90,6 +88,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
                 if (microAnimation != null)
                     microAnimation.ForwardAnimate();
             }
+            this.SelectViaUnity(data);
         }
 
         private void OnUp(PointerEventData data, float time)
@@ -99,6 +98,14 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
                 if (microAnimation != null)
                     microAnimation.BackwardAnimate();
             }
+        }
+        
+        public void OnSubmit(BaseEventData eventData)
+        {
+            if (!Interactable)
+                return;
+            EventInvoke();
+            eventData.Use();
         }
     }
 }

@@ -312,6 +312,74 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
             return false;
         }
 
+        public static Vector2 DrawNavigationCurveArrow(Vector3 from, Vector3 to, Color color)
+        {
+            if (color.a < Vector2.kEpsilon)
+                return Vector2.zero;
+
+            return DrawCurveArrowInternal(from, to, color, 0.22f, 0.12f);
+        }
+
+        public static Vector2 DrawCurveArrowInternal(Vector3 from, Vector3 to, Color color, float headSize, float curvature)
+        {
+            var delta = to - from;
+            var sqrMag = delta.sqrMagnitude;
+            if (sqrMag <= Mathf.Epsilon)
+                return Vector2.zero;
+
+            var prev = Gizmos.color;
+            Gizmos.color = color;
+
+            var dir = delta / Mathf.Sqrt(sqrMag);
+            var camForward = Camera.current != null ? Camera.current.transform.forward : Vector3.forward;
+            var side = Vector3.Cross(camForward, dir).normalized;
+            var distance = Mathf.Sqrt(sqrMag);
+            var controlOffset = side * (distance * curvature);
+            var p0 = from;
+            var p1 = (from + to) * 0.5f + controlOffset;
+            var p2 = to;
+
+            const int segments = 16;
+            var prevPoint = p0;
+            for (var i = 1; i <= segments; i++)
+            {
+                var t = i / (float)segments;
+                var point = GetQuadraticPoint(p0, p1, p2, t);
+                Gizmos.DrawLine(prevPoint, point);
+                prevPoint = point;
+            }
+
+            var tangent = GetQuadraticTangent(p0, p1, p2, 1f);
+            if (tangent.sqrMagnitude > Mathf.Epsilon)
+            {
+                var dirT = tangent.normalized;
+                var tip = p2;
+                var baseCenter = tip - dirT * headSize;
+                var headSide = Vector3.Cross(camForward, dirT).normalized;
+                var halfWidth = headSize * 0.5f;
+
+                var pLeft = baseCenter + headSide * halfWidth;
+                var pRight = baseCenter - headSide * halfWidth;
+
+                Gizmos.DrawLine(tip, pLeft);
+                Gizmos.DrawLine(tip, pRight);
+            }
+
+            Gizmos.color = prev;
+            return p1;
+        }
+
+        private static Vector3 GetQuadraticPoint(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+        {
+            var oneMinusT = 1f - t;
+            return oneMinusT * oneMinusT * p0 + 2f * oneMinusT * t * p1 + t * t * p2;
+        }
+
+        private static Vector3 GetQuadraticTangent(Vector3 p0, Vector3 p1, Vector3 p2, float t)
+        {
+            return 2f * (1f - t) * (p1 - p0) + 2f * t * (p2 - p1);
+        }
+        
         public static void DrawText(Vector3 position, string text, Color color)
         {
 #if UNITY_EDITOR
@@ -321,6 +389,39 @@ namespace DingoUnityExtensions.MonoBehaviours.GizmosUtility
             GUI.color = color;
             Handles.Label(position, text);
             GUI.color = prev;
+#endif
+        }
+
+        public static void DrawTextOutline(Vector3 position, string text, Color color)
+        {
+#if UNITY_EDITOR
+            if (string.IsNullOrEmpty(text) || color.a < Vector2.kEpsilon)
+                return;
+
+            var cam = SceneView.currentDrawingSceneView != null ? SceneView.currentDrawingSceneView.camera : Camera.current;
+
+            var size = HandleUtility.GetHandleSize(position) * 0.02f;
+            if (size <= 0f)
+                size = 0.01f;
+
+            var right = cam != null ? cam.transform.right : Vector3.right;
+            var up = cam != null ? cam.transform.up : Vector3.up;
+
+            var offset = (right + up) * size;
+
+            var outlineColor = new Color(0f, 0f, 0f, color.a);
+
+            var prevGuiColor = GUI.color;
+            var prevHandlesColor = Handles.color;
+
+            GUI.color = outlineColor;
+            Handles.Label(position + offset, text);
+
+            GUI.color = color;
+            Handles.Label(position, text);
+
+            GUI.color = prevGuiColor;
+            Handles.color = prevHandlesColor;
 #endif
         }
     }

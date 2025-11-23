@@ -479,7 +479,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
             Validate();
         }
         
-        public virtual void SetActiveContainer(bool value)
+        public override void SetActiveContainer(bool value)
         {
             gameObject.SetActive(value);
         }

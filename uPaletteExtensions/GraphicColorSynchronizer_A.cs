@@ -29,7 +29,7 @@ namespace DingoUnityExtensions.uPaletteExtensions
             }
             _targetValue = value;
             _tween?.Kill();
-            _animation.Do(d => DOTween.To(() => Component.color, v => Component.color = v, value, d));
+            _tween = _animation.Do(d => DOTween.To(() => Component.color, v => Component.color = v, value, d));
         }
     }
 }
