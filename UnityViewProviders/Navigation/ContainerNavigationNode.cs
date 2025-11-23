@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DingoUnityExtensions.MonoBehaviours.GizmosUtility;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using NaughtyAttributes;
@@ -20,7 +21,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         [SerializeField] private bool _alwaysRebuildNodes;
         [SerializeField] private bool _isDirty = true;
 
-        [field: SerializeField] public string Id { get; private set; }
+        [field: SerializeField] public List<string> Tags { get; private set; }
         [field: SerializeField] public NavigationNodeSelectRule Up { get; private set; }
         [field: SerializeField] public NavigationNodeSelectRule Down { get; private set; }
         [field: SerializeField] public NavigationNodeSelectRule Left { get; private set; }

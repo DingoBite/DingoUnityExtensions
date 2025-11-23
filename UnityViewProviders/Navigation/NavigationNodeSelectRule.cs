@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Navigation
@@ -7,7 +8,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
     {
         Auto,
         PriorNode,
-        ById
+        ByTag
     }
     
     [Serializable]
@@ -21,7 +22,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         
         [Space]
         public NavigationRuleType NavigationRuleType;
-        public string FindNearestId;
+        public List<string> FindByTags;
         public bool FilterIdByNavigationType = true;
 
         public ContainerNavigationNode PriorNode;

@@ -100,18 +100,18 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
 
             var candidates = GetCandidates(origin, rule);
             
-            if (rule.NavigationRuleType is NavigationRuleType.ById)
+            if (rule.NavigationRuleType is NavigationRuleType.ByTag)
             {
-                if (string.IsNullOrWhiteSpace(rule.FindNearestId))
+                if (rule.FindByTags.Count == 0)
                     return null;
 
                 if (!rule.FilterIdByNavigationType)
                 {
-                    var nearestById = FindNearestWithId(origin, rule, candidates);
+                    var nearestById = FindNearestByTags(origin, rule, candidates);
                     return nearestById;
                 }
 
-                candidates = candidates.Where(c => !string.IsNullOrWhiteSpace(c.Id) && c.Id == rule.FindNearestId);
+                candidates = candidates.Where(c => c.Tags.Any(t => rule.FindByTags.Contains(t)));
             }
 
             return FindBest(origin, rule, candidates, direction);
@@ -159,9 +159,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
 
         private static Vector2 Project(Vector3 worldPosition) => new(worldPosition.x, worldPosition.y);
 
-        private static ContainerNavigationNode FindNearestWithId(ContainerNavigationNode origin, NavigationNodeSelectRule rule, IEnumerable<ContainerNavigationNode> candidates)
+        private static ContainerNavigationNode FindNearestByTags(ContainerNavigationNode origin, NavigationNodeSelectRule rule, IEnumerable<ContainerNavigationNode> candidates)
         {
-            if (rule == null || string.IsNullOrEmpty(rule.FindNearestId) || candidates == null)
+            if (rule == null || candidates == null)
                 return null;
 
             var originPos = Project(origin.transform.position);
@@ -172,16 +172,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             {
                 if (other == null || other == origin)
                     continue;
-
-                if (string.IsNullOrWhiteSpace(other.Id) || other.Id != rule.FindNearestId)
+                
+                if (other.Tags.All(t => !rule.FindByTags.Contains(t)))
                     continue;
 
                 var otherPos = Project(other.transform.position);
                 var delta = otherPos - originPos;
-                var dist = delta.magnitude;
-
-                if (dist > rule.DeltaThreshold)
-                    continue;
 
                 var distSqr = delta.sqrMagnitude;
                 if (distSqr < bestDistSqr)
