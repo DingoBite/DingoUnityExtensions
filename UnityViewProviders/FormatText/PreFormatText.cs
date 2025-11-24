@@ -20,5 +20,11 @@ namespace DingoUnityExtensions.UnityViewProviders.FormatText
             Fallback = fallback;
             ArgsArray = new[] { value };
         }
+       
+        public PreFormatText(string fallback = null, params object[] values)
+        {
+            Fallback = fallback;
+            ArgsArray = values;
+        }
     }
 }
