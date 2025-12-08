@@ -8,10 +8,18 @@ namespace DingoUnityExtensions.UnityViewProviders.Toggle.Core
     {
         public abstract void SetViewActive(BoolTimeContext value);
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void TestEnabled() => SetViewActive(true.TimeContext(!Application.isPlaying));
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void TestDisabled() => SetViewActive(false.TimeContext(!Application.isPlaying));
     }
 }

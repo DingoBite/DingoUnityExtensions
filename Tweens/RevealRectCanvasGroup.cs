@@ -89,7 +89,11 @@ namespace DingoUnityExtensions.Tweens
             }
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void SetDefaultValues()
         {
             _bakeAnimationEndpoints.SetDefaultValues(RectTransform);
@@ -100,7 +104,11 @@ namespace DingoUnityExtensions.Tweens
             }
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void SetTargetValues()
         {
             _bakeAnimationEndpoints.SetTargetValues(RectTransform);
@@ -111,7 +119,11 @@ namespace DingoUnityExtensions.Tweens
             }
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void SetDisableValues()
         {
             _bakeAnimationEndpoints.SetDisableValues(RectTransform);

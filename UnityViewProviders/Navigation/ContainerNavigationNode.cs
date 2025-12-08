@@ -118,7 +118,11 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             _rightNode = right;
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         public void PopulateNavigationNodes() => this.FindNavigationNodes();
         
         public void SelectSelf()

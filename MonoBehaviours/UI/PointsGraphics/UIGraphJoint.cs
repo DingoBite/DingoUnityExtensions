@@ -31,9 +31,12 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
                 _graph.color = value;
             }
         }
-
-
-        [Button]
+        
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         public override void Redraw()
         {
             base.Redraw();

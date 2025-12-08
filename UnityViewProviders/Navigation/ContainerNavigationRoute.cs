@@ -65,7 +65,11 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             _route = transform.parent.GetComponentInParent<ContainerNavigationRoute>();
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         public void RebuildNodes()
         {
             if (!_alwaysRebuildNodes && !_isDirty && Application.isPlaying)
@@ -77,7 +81,11 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             CollectNodesAndRoutes(transform);
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         public void BuildFullStructure()
         {
             RebuildNodes();

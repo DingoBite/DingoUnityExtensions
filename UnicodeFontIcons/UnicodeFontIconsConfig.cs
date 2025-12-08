@@ -48,7 +48,11 @@ namespace DingoUnityExtensions.UnicodeFontIcons
             return mapping;
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void ResetCache() => _mappingByFont.Clear();
     }
 }

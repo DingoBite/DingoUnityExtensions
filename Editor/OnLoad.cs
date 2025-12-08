@@ -78,6 +78,12 @@ namespace DingoUnityExtensions.Editor
                 select type).Any();
             if (addressablesNamespaceFound)
                 yield return "ADDRESSABLES_EXISTS";
+            
+            var vInspectorFound = (from type in types
+                    where type.Namespace == "VInspector"
+                    select type).Any();
+            if (vInspectorFound)
+                yield return "VINSPECTOR_EXISTS";
         }
     }
 }

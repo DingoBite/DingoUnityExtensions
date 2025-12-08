@@ -23,7 +23,11 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
             }
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         public override void Redraw()
         {
             var parent = RectTransform;

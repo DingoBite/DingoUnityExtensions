@@ -23,7 +23,11 @@ namespace DingoUnityExtensions.LightUtils
 
         public VolumeProfile GlobalVolumeProfile;
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void CollectFromCurrentSettings()
         {
             Skybox = RenderSettings.skybox;
@@ -41,9 +45,17 @@ namespace DingoUnityExtensions.LightUtils
             FogDensity = RenderSettings.fogDensity;
         }
 
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void Apply() => LightingApplier.Apply(this);
-        [Button]
+#if VINSPECTOR_EXISTS
+        [VInspector.Button]
+#else
+        [NaughtyAttributes.Button]
+#endif
         private void UpdateEnvironment() => DynamicGI.UpdateEnvironment();
     }
 }
