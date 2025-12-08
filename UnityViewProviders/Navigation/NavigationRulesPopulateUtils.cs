@@ -105,13 +105,16 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
                 if (rule.FindByTags.Count == 0)
                     return null;
 
-                if (!rule.FilterIdByNavigationType)
+                if (!rule.FilterTagsByNavigationType)
                 {
                     var nearestById = FindNearestByTags(origin, rule, candidates);
                     return nearestById;
                 }
 
-                candidates = candidates.Where(c => c.Tags.Any(t => rule.FindByTags.Contains(t)));
+                if (rule.TagFindType is TagFindType.Any)
+                    candidates = candidates.Where(c => c.Tags.Any(t => rule.FindByTags.Contains(t)));
+                else if (rule.TagFindType is TagFindType.All)
+                    candidates = candidates.Where(c => rule.FindByTags.All(t => c.Tags.Contains(t)));
             }
 
             return FindBest(origin, rule, candidates, direction);
@@ -135,7 +138,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
 
                 var otherPos = Project(other.transform.position);
                 var delta = otherPos - originPos;
-                if (Mathf.Abs(delta.magnitude) > rule.DeltaThreshold)
+                if (rule.DeltaThreshold > 0 && Mathf.Abs(delta.magnitude) > rule.DeltaThreshold)
                     continue;
                 var distSqr = delta.sqrMagnitude;
                 if (distSqr < Mathf.Epsilon)
@@ -173,7 +176,9 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
                 if (other == null || other == origin)
                     continue;
                 
-                if (other.Tags.All(t => !rule.FindByTags.Contains(t)))
+                if (rule.TagFindType is TagFindType.Any && !other.Tags.Any(t => rule.FindByTags.Contains(t)))
+                    continue;
+                if (rule.TagFindType is TagFindType.All && !rule.FindByTags.All(t => other.Tags.Contains(t)))
                     continue;
 
                 var otherPos = Project(other.transform.position);

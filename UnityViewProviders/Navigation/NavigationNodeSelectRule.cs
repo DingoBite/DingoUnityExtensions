@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DingoUnityExtensions.UnityViewProviders.Navigation
 {
@@ -9,6 +10,13 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         Auto,
         PriorNode,
         ByTag
+    }
+
+    public enum TagFindType
+    {
+        Any,
+        All,
+        Order // TODO
     }
     
     [Serializable]
@@ -23,7 +31,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         [Space]
         public NavigationRuleType NavigationRuleType;
         public List<string> FindByTags;
-        public bool FilterIdByNavigationType = true;
+        public TagFindType TagFindType = TagFindType.Any;
+        public bool FilterTagsByNavigationType = true;
 
         public ContainerNavigationNode PriorNode;
 

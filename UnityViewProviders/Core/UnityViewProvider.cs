@@ -18,6 +18,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         public virtual Type ValueType { get; }
         public virtual void SetActiveContainer(bool value) { }
         public virtual void UpdateBoxedValueWithoutNotify(object value) {}
+
+        protected override void OnDisable()
+        {
+            Selected = false;
+            base.OnDisable();
+        }
     }
 
     public abstract class ValueContainer<TValue> : ContainerBase

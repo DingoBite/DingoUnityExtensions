@@ -7,7 +7,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
     {
         public event PointerWrapperDelegates.Event PointerEnterEvent;
         public event PointerWrapperDelegates.Event PointerExitEvent;
-
+        
         private float _enterTime;
         
         protected bool Entered { get; private set; }

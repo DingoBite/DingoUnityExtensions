@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DingoUnityExtensions.MonoBehaviours.GizmosUtility;
 using DingoUnityExtensions.UnityViewProviders.Core;
@@ -7,10 +8,28 @@ using UnityEngine.EventSystems;
 
 namespace DingoUnityExtensions.UnityViewProviders.Navigation
 {
+    [Flags]
+    public enum EdgeNavigationCase
+    {
+        None,
+        First,
+        Last,
+        Top,
+        Bottom
+    }
+    
     [DisallowMultipleComponent]
     [RequireComponent(typeof(ContainerBase))]
     public class ContainerNavigationNode : MonoBehaviour, IMoveHandler
     {
+        public const string FIRST = "__First"; 
+        public const string LAST = "__Last"; 
+        public const string TOP = "__Top"; 
+        public const string BOTTOM = "__Bottom";
+
+        private static readonly Dictionary<object, bool> DefaultFilterTagsByNavigationType = new();
+        private static readonly Dictionary<object, TagFindType> DefaultTagFindType = new();
+        
         [SerializeField] private ContainerBase _container;
 
         [SerializeField] private ContainerNavigationRoute _route;
@@ -21,6 +40,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         [SerializeField] private bool _alwaysRebuildNodes;
         [SerializeField] private bool _isDirty = true;
 
+        [Tooltip("Use \"" + FIRST + "\", \"" + LAST + "\", , \"" + TOP + "\", \"" + BOTTOM + "\" as predefined tags")]
         [field: SerializeField] public List<string> Tags { get; private set; }
         [field: SerializeField] public NavigationNodeSelectRule Up { get; private set; }
         [field: SerializeField] public NavigationNodeSelectRule Down { get; private set; }
@@ -57,6 +77,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             if (transform.parent == null)
                 return;
             _route = transform.parent.GetComponentInParent<ContainerNavigationRoute>();
+            _isDirty = false;
         }
 
         private void Awake()
@@ -65,7 +86,53 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             if (_container == null)
                 _container = GetComponent<ContainerBase>();
         }
+
+        public void TagEdgeNavigationCase(EdgeNavigationCase edgeNavigationCase)
+        {
+            ResolveEdgeCaseTag(edgeNavigationCase, EdgeNavigationCase.First, FIRST);
+            ResolveEdgeCaseTag(edgeNavigationCase, EdgeNavigationCase.Last, LAST);
+            ResolveEdgeCaseTag(edgeNavigationCase, EdgeNavigationCase.Bottom, BOTTOM);
+            ResolveEdgeCaseTag(edgeNavigationCase, EdgeNavigationCase.Top, TOP);
+        }
+
+        public void LoopFindEdgeNavigationCase(EdgeNavigationCase edgeNavigationCase, bool manageNavigationType = false, bool manageNavigationRule = false)
+        {
+            ResolveEdgeCaseFind(Left, edgeNavigationCase, EdgeNavigationCase.First, LAST, manageNavigationType, manageNavigationRule);
+            ResolveEdgeCaseFind(Right, edgeNavigationCase, EdgeNavigationCase.Last, FIRST, manageNavigationType, manageNavigationRule);
+            ResolveEdgeCaseFind(Up, edgeNavigationCase, EdgeNavigationCase.Bottom, TOP, manageNavigationType, manageNavigationRule);
+            ResolveEdgeCaseFind(Down, edgeNavigationCase, EdgeNavigationCase.Top, BOTTOM, manageNavigationType, manageNavigationRule);
+        }
+
+        private void ResolveEdgeCaseTag(EdgeNavigationCase edgeNavigationCase, EdgeNavigationCase checkEdgeCase, string edgeCaseTag)
+        {
+            if (edgeNavigationCase.HasFlag(checkEdgeCase))
+                Tags.Add(edgeCaseTag);
+            else
+                Tags.Remove(edgeCaseTag);
+        }
         
+        private void ResolveEdgeCaseFind(NavigationNodeSelectRule rule, EdgeNavigationCase newCase, EdgeNavigationCase check, string tags, bool manageNavigationType, bool manageNavigationRule)
+        {
+            if (newCase.HasFlag(check))
+            {
+                rule.FindByTags.Add(tags);
+                DefaultFilterTagsByNavigationType[rule] = rule.FilterTagsByNavigationType;
+                if (manageNavigationType)
+                    rule.FilterTagsByNavigationType = false;
+                DefaultTagFindType[rule] = rule.TagFindType;
+                if (manageNavigationRule)
+                    rule.TagFindType = TagFindType.All;
+            }
+            else
+            {
+                rule.FindByTags.Remove(tags);
+                if (DefaultFilterTagsByNavigationType.Remove(rule, out var filter))
+                    rule.FilterTagsByNavigationType = filter;
+                if (DefaultTagFindType.Remove(rule, out var tagFindType))
+                    rule.TagFindType = tagFindType;
+            }
+        }
+
         public void OnMove(AxisEventData eventData)
         {
             if (EventSystem.current == null || _container == null)

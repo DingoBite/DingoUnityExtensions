@@ -34,7 +34,7 @@ namespace DingoUnityExtensions.uPaletteExtensions
                 _targetValue = 0;
                 var rectSize = Component.rectTransform.rect.size.magnitude * 0.5f;
                 _tween = _animation.Do(d => DOTween.To(() => Component.BorderWidth, v => Component.BorderWidth = v, rectSize, d));
-                _tween.OnComplete(() => Component.BorderWidth = _targetValue.Value);
+                // _tween.OnComplete(() => Component.BorderWidth = _targetValue.Value);
             }
             else
             {

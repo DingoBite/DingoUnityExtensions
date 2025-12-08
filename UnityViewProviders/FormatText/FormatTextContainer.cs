@@ -30,7 +30,8 @@ namespace DingoUnityExtensions.UnityViewProviders.FormatText
             catch (Exception e)
             {
                 _text.text = value.Fallback;
-                Debug.LogException(e);
+                Debug.LogError($"Error on format: {_formatTemplate} : {string.Join(", ", value.ArgsArray)}", this);
+                Debug.LogException(e, this);
             }
         }
     }

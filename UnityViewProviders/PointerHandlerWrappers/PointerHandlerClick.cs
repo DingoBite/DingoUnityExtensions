@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
@@ -11,6 +12,8 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         public event PointerWrapperDelegates.BaseEvent SelectEvent;
         public event PointerWrapperDelegates.BaseEvent DeselectEvent;
         
+        [SerializeField] private List<PointerEventData.InputButton> _clickFilter = new () { PointerEventData.InputButton.Left };
+
         private float _downTime;
         
         public float LastDownTime { get; private set; }
@@ -20,6 +23,8 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
 
         public virtual void OnPointerClick(PointerEventData eventData)
         {
+            if (!_clickFilter.Contains(eventData.button))
+                return;
             Down = false;
             Up = true;
             LastDownTime = Time.time - _downTime;

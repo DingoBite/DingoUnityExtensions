@@ -79,6 +79,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             _routes.Clear();
 
             CollectNodesAndRoutes(transform);
+            _isDirty = false;
         }
 
 #if VINSPECTOR_EXISTS
