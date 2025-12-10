@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
 {
-    public class PointerHandlerClickDrag : PointerHandlerClickEnter, IBeginDragEventWrapper, IEndDragEventWrapper, IDragEventWrapper
+    public class PointerHandlerClickDrag : PointerHandlerClickEnter, IBeginDragEventWrapper, IEndDragEventWrapper, IDragEventWrapper, IPointerMoveHandler
     {
         private const string HELD = "____held";
         
@@ -13,6 +13,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         public event PointerWrapperDelegates.Event BeginDragEvent;
         public event PointerWrapperDelegates.Event EndDragEvent;
         public event PointerWrapperDelegates.Event DragEvent;
+        public event PointerWrapperDelegates.Event PointerMoveEvent;
         public event PointerWrapperDelegates.Event HeldEvent;
         public event PointerWrapperDelegates.Event HeldTimeReachEvent;
         public event PointerWrapperDelegates.Event NonDragClickEvent;
@@ -80,6 +81,8 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
                 _heldTimeReached = true;
             }
         }
+
+        public void OnPointerMove(PointerEventData eventData) => PointerMoveEvent?.Invoke(eventData, Time.time - EnterTime);
 
         public void OnDrag(PointerEventData eventData)
         {

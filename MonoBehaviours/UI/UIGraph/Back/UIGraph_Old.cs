@@ -8,23 +8,25 @@ using UnityEngine.UI;
 
 namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
 {
-    public class UIGraph : MaskableGraphic
+    public class UIGraph_Old : MaskableGraphic
     {
         private static readonly Vector2 NullPoint = new(-1e6f, -1e6f);
         private static bool IsNullPoint(in Vector2 point) => point == NullPoint;
-        
+
         private static readonly int StencilComp = Shader.PropertyToID("_StencilComp");
 
         [SerializeField] private bool _xStepFromCount;
         [SerializeField] private List<Vector2> _uvPoints = new();
         [SerializeField] private float _thickness;
-        [SerializeField] private Gradient _gradient = new(){alphaKeys = new GradientAlphaKey[]{new(0,0), new(0, 1)}};
-        [SerializeField] private Gradient _underGraphGradient = new(){alphaKeys = new GradientAlphaKey[]{new(0,0), new(0, 1)}};
+        [SerializeField] private Gradient _gradient = new() { alphaKeys = new GradientAlphaKey[] { new(0, 0), new(0, 1) } };
+        [SerializeField] private Gradient _underGraphGradient = new() { alphaKeys = new GradientAlphaKey[] { new(0, 0), new(0, 1) } };
         [SerializeField] private bool _underGraphGradientNormalize;
-        
+
         [SerializeField] private bool _isSmooth;
         [SerializeField] private int _smoothMode = 4;
-        [SerializeField, ShowIf(nameof(_isSmooth))] private float _xStep = 0.1f;
+
+        [SerializeField, ShowIf(nameof(_isSmooth))]
+        private float _xStep = 0.1f;
 
         [SerializeField] private bool _debugElements;
 
@@ -37,7 +39,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
         [SerializeField] private int _indexOffsetForRemove = 128;
 
         [SerializeField] private CompareFunction _parentMaskCompareFunction = CompareFunction.Equal;
-        
+
         [SerializeField] private Material _invertedMaskMaterial;
         [SerializeField] private AnimationCurve _smoothCurve = new();
 
@@ -58,7 +60,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                 SetDirty();
             }
         }
-        
+
         public override Material materialForRendering
         {
             get
@@ -75,10 +77,11 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                     Debug.LogWarning(e);
 #endif
                 }
+
                 return _invertedMaskMaterial;
             }
         }
-        
+
         private readonly List<Vector2> _cacheUVGraphicPoints = new(1024);
 
         private float _width;
@@ -101,7 +104,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
             if (gradient != null)
                 _underGraphGradient = gradient;
         }
-        
+
         public void SetPoints(IEnumerable<Vector2> uvPoints)
         {
             _uvPoints.Clear();
@@ -110,7 +113,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                 AddPoint(uvPoint);
             }
         }
-        
+
         /// <summary>
         /// On Clearing UVPoints Array, index will be broken
         /// </summary>
@@ -124,7 +127,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                 index = _uvPoints.Count + index;
             if (index < 0)
                 return;
-            
+
             if (_clampUVValues)
                 value.x = Math.Max(value.x, 0);
             if (_overlappingPercent > 1 + Vector2.kEpsilon)
@@ -194,7 +197,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
         {
             IsDirty = false;
             vh.Clear();
-            
+
             var points = _cacheUVGraphicPoints;
             points.Clear();
             PreprocessPoints(points, _uvPoints);
@@ -246,6 +249,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                         {
                             vertex.color = _underGraphGradient.Evaluate(0);
                         }
+
                         vertex.position = p1;
                         vh.AddVert(vertex);
                         vertex.color = _underGraphGradient.Evaluate(1);
@@ -263,7 +267,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                     vertex.color = GetColor(0);
                     var p2 = new Vector2();
 
-                    // Zero edge
                     var uvP1 = points[0];
                     var uvP2 = points[1];
                     PutPoint(ref p1, uvP1);
@@ -273,7 +276,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                     AddThickEdge(vh, ref vertex, position, normal, _thickness);
                     AddTrianglesNullSafety(vh, startIndex, uvP1, uvP2);
 
-                    // TODO Beauty connections
                     for (var i = 1; i < pointsCount - 1; i++)
                     {
                         uvP1 = points[i];
@@ -281,7 +283,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                         PutPoint(ref p1, uvP1);
                         PutPoint(ref p2, uvP2);
                         position = _origin + p1;
-                        vertex.color = GetColor((float) i / points.Count);
+                        vertex.color = GetColor((float)i / points.Count);
                         AddThickEdge(vh, ref vertex, position, normal, _thickness);
 
                         PutNormalNullSafety(out normal, uvP1, uvP2);
@@ -291,7 +293,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                         AddTrianglesNullSafety(vh, startIndex + i * 4 - 2, uvP1, uvP2);
                     }
 
-                    // End edge
                     uvP1 = points[^2];
                     uvP2 = points[^1];
                     PutPoint(ref p1, uvP1);
@@ -306,7 +307,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
 
             foreach (var graphShape in _graphShapes)
             {
-                if (UIGraphShape.IsNull(graphShape) || Math.Abs(graphShape.Thickness) < Vector2.kEpsilon)
+                if (UIGraphShape.IsNull(graphShape) || graphShape.ShapeType is ShapeType.Line && Math.Abs(graphShape.Thickness) < Vector2.kEpsilon)
                     continue;
 
                 DrawGraphShape(vh, graphShape, ref vertex, ref startIndex);
@@ -323,7 +324,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
 
             return color * _gradient.Evaluate(progress);
         }
-        
+
         private void DrawGraphShape(VertexHelper vh, in UIGraphShape graphShape, ref UIVertex vertex, ref int startIndex)
         {
             var points = graphShape.Points.ToList();
@@ -338,8 +339,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                 case ShapeType.StrokeShape:
                     DrawStrokeShape(vh, points, ref vertex, in graphShape, ref startIndex);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                default: throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -349,7 +349,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
             var pointsCount = points.Count;
             if (pointsCount <= 1 || thickness < Vector2.kEpsilon)
                 return;
-            
+
             if (_xStepFromCount)
             {
                 var step = 1f / (pointsCount - 1);
@@ -364,31 +364,12 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
             var p1 = new Vector2();
 
             var c = graphShape.EvaluateColor(0);
-            // if (_underGraphFillColor.a > Vector2.kEpsilon)
-            // {
-            //     var uc = _underGraphFillColor;
-            //     uc.a = c.a;
-            //     vertex.color = uc;
-            //     for (var i = 0; i < pointsCount; i++)
-            //     {
-            //         PutPoint(ref p1, points[i]);
-            //         p1 += _origin;
-            //         var addPoint = p1;
-            //         addPoint.y = _origin.y;
-            //         AddEdge(vh, ref vertex, p1, addPoint);
-            //         if (i < pointsCount - 1)
-            //             AddTrianglesNullSafety(vh, startIndex + i * 2, p1);
-            //     }
-            //
-            //     startIndex += pointsCount * 2;
-            // }
 
             if (c.a > Vector2.kEpsilon)
             {
                 vertex.color = c;
                 var p2 = new Vector2();
 
-                // Zero edge
                 var uvP1 = points[0];
                 var uvP2 = points[1];
                 PutPoint(ref p1, uvP1);
@@ -398,7 +379,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                 AddThickEdge(vh, ref vertex, position, normal, thickness);
                 AddTrianglesNullSafety(vh, startIndex, uvP1, uvP2);
 
-                // TODO Beauty connections
                 for (var i = 1; i < pointsCount - 1; i++)
                 {
                     uvP1 = points[i];
@@ -406,8 +386,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                     PutPoint(ref p1, uvP1);
                     PutPoint(ref p2, uvP2);
                     position = _origin + p1;
-                    vertex.color = graphShape.EvaluateColor((float) i / points.Count);
-                    
+                    vertex.color = graphShape.EvaluateColor((float)i / points.Count);
+
                     AddThickEdge(vh, ref vertex, position, normal, thickness);
                     PutNormalNullSafety(out normal, uvP1, uvP2);
                     AddThickEdge(vh, ref vertex, position, normal, thickness);
@@ -416,7 +396,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                     AddTrianglesNullSafety(vh, startIndex + i * 4 - 2, uvP1, uvP2);
                 }
 
-                // End edge
                 uvP1 = points[^2];
                 uvP2 = points[^1];
                 PutPoint(ref p1, uvP1);
@@ -428,7 +407,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                 startIndex += (pointsCount - 1) * 4;
             }
         }
-        
+
         private void DrawStrokeShape(VertexHelper vh, IList<Vector2> points, ref UIVertex vertex, in UIGraphShape graphShape, ref int startIndex)
         {
             var thickness = graphShape.Thickness;
@@ -440,13 +419,11 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
             var p1 = new Vector2();
             var p2 = new Vector2();
 
-            // Zero edge
             var uvP1 = points[0];
             var uvP2 = points[1];
             PutPoint(ref p1, uvP1);
             PutPoint(ref p2, uvP2);
             var normal = Vector2.up;
-            // PutNormalNullSafety(out var normal, p1, p2);
             var position = _origin + p1;
             AddThickEdge(vh, ref vertex, position, normal, thickness);
             AddTrianglesNullSafety(vh, startIndex, uvP1, uvP2);
@@ -471,57 +448,45 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
             uvP2 = points[^1];
             PutPoint(ref p1, uvP1);
             PutPoint(ref p2, uvP2);
-            // PutNormalNullSafety(out normal, p1, p2);
             normal = Vector2.down;
             position = _origin + p2;
             AddThickEdge(vh, ref vertex, position, normal, thickness);
             startIndex += (pointsCount - 1) * 4;
         }
 
-        private void DrawFilledShape(VertexHelper vh, IList<Vector2> points, ref UIVertex vertex, in UIGraphShape c, ref int startIndex)
+        private void DrawFilledShape(VertexHelper vh, IList<Vector2> points, ref UIVertex vertex, in UIGraphShape graphShape, ref int startIndex)
         {
             var pointsCount = points.Count;
             if (pointsCount < 3)
                 return;
 
-            vertex.color = GetColor(0);
-            var p1 = new Vector2();
-            var p2 = new Vector2();
+            vertex.color = graphShape.EvaluateColor(0);
 
-            // Zero edge
-            var uvP1 = points[0];
-            var uvP2 = points[1];
-            PutPoint(ref p1, uvP1);
-            PutPoint(ref p2, uvP2);
-            PutNormalNullSafety(out var normal, uvP1, uvP2);
-            var position = _origin + p1;
-            // AddThickEdge(vh, ref vertex, position, normal, thickness);
-            AddTrianglesNullSafety(vh, startIndex, uvP1, uvP2);
-
-            // TODO Beauty connections
-            for (var i = 1; i < pointsCount - 1; i++)
+            var localVerts = new List<Vector2>(pointsCount);
+            for (var i = 0; i < pointsCount; i++)
             {
-                uvP1 = points[i];
-                uvP2 = points[i + 1];
-                PutPoint(ref p1, uvP1);
-                PutPoint(ref p2, uvP2);
-                position = _origin + p1;
-
-                PutNormalNullSafety(out normal, uvP1, uvP2);
-
-                AddTrianglesNullSafety(vh, startIndex + i * 4, uvP1, uvP2);
-                AddTrianglesNullSafety(vh, startIndex + i * 4 - 2, uvP1, uvP2);
+                var uv = points[i];
+                var p = new Vector2
+                {
+                    x = _width * uv.x,
+                    y = _height * uv.y
+                };
+                p += _origin;
+                localVerts.Add(p);
             }
 
-            // End edge
-            uvP1 = points[^2];
-            uvP2 = points[^1];
-            PutNormalNullSafety(out normal, uvP1, uvP2);
+            for (var i = 0; i < pointsCount; i++)
+            {
+                vertex.position = localVerts[i];
+                vh.AddVert(vertex);
+            }
 
-            PutPoint(ref p1, points[^1]);
-            position = _origin + p1;
-            // AddThickEdge(vh, ref vertex, position, normal, _thickness);
-            startIndex += (pointsCount - 1) * 4;
+            for (var i = 1; i < pointsCount - 1; i++)
+            {
+                vh.AddTriangle(startIndex, startIndex + i, startIndex + i + 1);
+            }
+
+            startIndex += pointsCount;
         }
 
         private void PreprocessPoints(List<Vector2> points, IReadOnlyList<Vector2> originPoints)
@@ -589,7 +554,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                     prevPoint.x += _xOffset;
                 }
 
-                // prevPoint.x bellow zero
                 var percent = -prevPoint.x / (uvPoint.x - prevPoint.x);
                 var newZeroYInNewSpace = Mathf.Lerp(prevPoint.y, uvPoint.y, percent);
                 points.Add(new Vector2(0, newZeroYInNewSpace));
@@ -654,13 +618,14 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                 AddPointToCollection(points, uvPoint);
                 return;
             }
-            
+
             AddVectorToSmoothCurve(uvPoint);
             for (var x = prevX + XStep; x < uvPoint.x - XStep; x += XStep)
             {
                 y = _smoothCurve.Evaluate(x);
                 points.Add(new Vector2(x, y));
             }
+
             points.Add(uvPoint);
         }
 
@@ -736,6 +701,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
                     _uvPoints[i] = new Vector2(x, newY ?? _uvPoints[Math.Max(i - 1, 0)].y);
                     break;
                 }
+
                 if (i > 0)
                 {
                     var prevPoint = _uvPoints[i - 1];
@@ -770,7 +736,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
             SetVerticesDirty();
             SetMaterialDirty();
         }
-        
+
         [Button, ShowIf(nameof(_debugElements))]
         private void PutNullPoint()
         {

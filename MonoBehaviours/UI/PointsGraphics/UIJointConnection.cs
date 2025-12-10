@@ -5,13 +5,13 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
 {
     public class UIJointConnection : UIBehaviour, IThicknessComponent, ILineComponent, IColorComponent, IClearable, IAlphaComponent
     {
-        [SerializeField] private UIGraph.UIGraph _graph;
+        [SerializeField] private UIGraph.UIGraph_Old _graphOld;
         [SerializeField] private Color _color;
         [SerializeField] private Vector2 _start;
         [SerializeField] private Vector2 _end;
         [SerializeField, Range(0, 1)] private float _alpha;
         
-        public Gradient LineGradient => _graph.Gradient;
+        public Gradient LineGradient => _graphOld.Gradient;
 
         public Vector2 Start
         {
@@ -35,8 +35,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
 
         public float Thickness
         {
-            get => _graph.Thickness;
-            set => _graph.Thickness = value;
+            get => _graphOld.Thickness;
+            set => _graphOld.Thickness = value;
         }
 
         public Color Color
@@ -45,7 +45,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
             set
             {
                 _color = value;
-                _graph.color = value;
+                _graphOld.color = value;
             }
         }
 
@@ -63,17 +63,17 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
         
         public void Clear()
         {
-            _graph.Clear();
+            _graphOld.Clear();
         }
         
         public void SetPoints(Vector2 p1, Vector2 p2)
         {
             _start = p1;
             _end = p2;
-            _graph.Clear();
-            _graph.AddPoint(p1);
-            _graph.AddPoint(p2);
-            _graph.SetDirty();
+            _graphOld.Clear();
+            _graphOld.AddPoint(p1);
+            _graphOld.AddPoint(p2);
+            _graphOld.SetDirty();
         }
 
         private void OnValidate()

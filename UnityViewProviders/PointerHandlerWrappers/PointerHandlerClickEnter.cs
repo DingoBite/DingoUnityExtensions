@@ -12,6 +12,7 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         
         protected bool Entered { get; private set; }
         protected bool Exit { get; private set; }
+        protected float EnterTime => _enterTime;
 
         private bool _blockNextEnter;
         

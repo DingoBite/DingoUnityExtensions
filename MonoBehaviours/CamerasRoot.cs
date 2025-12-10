@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.MonoBehaviours
 {
-    public abstract class CamerasRoot<TSelf, TEnum> : ProtectedSingletonBehaviour<TSelf> 
-        where TSelf : CamerasRoot<TSelf, TEnum> 
+    public abstract class CamerasRoot<TSelf, TKey> : ProtectedSingletonBehaviour<TSelf> 
+        where TSelf : CamerasRoot<TSelf, TKey> 
     {
-        [SerializeField] private SerializedDictionary<TEnum, Camera> _cameras;
+        [SerializeField] private SerializedDictionary<TKey, Camera> _cameras;
 
-        public static Camera GetCamera(TEnum key)
+        public static Camera GetCamera(TKey key)
         {
             if (Instance == null)
                 return null;
