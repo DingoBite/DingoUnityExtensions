@@ -2,12 +2,18 @@ using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using DG.Tweening.Core;
-using DiceGame.UI.Utils;
 using UnityEngine;
 using UnityEngine.UI.ProceduralImage;
 
 namespace DingoUnityExtensions.MicroAnimations
 {
+    [Serializable]
+    public class ProceduralImageParameters
+    {
+        public float BorderWidth;
+        public ModifierID ModifierID;
+    }
+    
     [Serializable]
     public class ProceduralImageMicroAnimation : TweenMicroAnimation
     {
