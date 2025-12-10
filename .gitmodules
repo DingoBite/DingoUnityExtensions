@@ -1,0 +1,3 @@
+[submodule "uPalette"]
+	path = uPalette
+	url = https://github.com/DingoBite/uPalette.git
