@@ -11,25 +11,31 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
         [SerializeField] private PointerHandlerClickDrag _pointerHandlerClick;
         [SerializeField] private Camera _camera;
 
-        [Header("Hover settings")] [SerializeField]
-        private Color32 _hoverColor = new Color32(0, 170, 255, 255);
+        [Header("Hover settings")]
+        [SerializeField] private Color32 _hoverColor = new(0, 170, 255, 255);
 
         private int _lastLinkIndex = -1;
-        private Color32? _normalColor;
 
         public void SetCamera(Camera c) => _camera = c;
-        
+
         public void OnPointerClick(PointerEventData eventData, float time)
         {
-            var linkIndex = TMP_TextUtilities.FindIntersectingLink(_text, eventData.position, _camera);
-            Debug.Log($"Click: {eventData.position}: {linkIndex}");
+            if (_text == null)
+                return;
 
-            if (linkIndex != -1)
-            {
-                var linkInfo = _text.textInfo.linkInfo[linkIndex];
-                var url = linkInfo.GetLinkID();
+            if (_lastLinkIndex == -1)
+                return;
+
+            var info = _text.textInfo;
+            if (info == null || _lastLinkIndex < 0 || _lastLinkIndex >= info.linkCount)
+                return;
+
+            var linkInfo = info.linkInfo[_lastLinkIndex];
+            var url = linkInfo.GetLinkID();
+
+            if (!string.IsNullOrEmpty(url))
                 Application.OpenURL(url);
-            }
+            SetLinkColor(_lastLinkIndex, _hoverColor);
         }
 
         private void OnPointerMove(PointerEventData data, float time)
@@ -37,46 +43,96 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             if (_text == null)
                 return;
 
+            var info = _text.textInfo;
+            if (info == null || info.linkCount == 0)
+            {
+                ClearHover();
+                return;
+            }
+
             var linkIndex = TMP_TextUtilities.FindIntersectingLink(_text, data.position, _camera);
+
             if (linkIndex == _lastLinkIndex)
                 return;
 
-            _normalColor ??= _text.color;
             if (_lastLinkIndex != -1)
-                SetLinkColor(_lastLinkIndex, _normalColor.Value);
+                RestoreColors();
 
             if (linkIndex != -1)
-                SetLinkColor(linkIndex, _hoverColor);
+                CoroutineParent.AddLateUpdater(this, () => SetLinkColor(linkIndex, _hoverColor));
 
             _lastLinkIndex = linkIndex;
         }
 
-        private void SetLinkColor(int linkIndex, Color32 color)
+        private void ClearHover()
         {
-            if (linkIndex < 0 || linkIndex >= _text.textInfo.linkCount)
+            if (_lastLinkIndex != -1 && _text != null)
+            {
+                RestoreColors();
+                _lastLinkIndex = -1;
+            }
+        }
+
+        private void RestoreColors()
+        {
+            if (_text == null)
                 return;
 
-            var linkInfo = _text.textInfo.linkInfo[linkIndex];
+            CoroutineParent.RemoveLateUpdater(this);
+            _text.ForceMeshUpdate();
+            _text.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
+        }
 
-            for (var i = 0; i < linkInfo.linkTextLength; i++)
+        private void SetLinkColor(int linkIndex, Color32 color)
+        {
+            if (_text == null)
+                return;
+            var info = _text.textInfo;
+            if (info == null || linkIndex < 0 || linkIndex >= info.linkCount)
+                return;
+
+            var linkInfo = info.linkInfo[linkIndex];
+
+            var firstCharIndex = linkInfo.linkTextfirstCharacterIndex;
+            var length = linkInfo.linkTextLength;
+
+            var charInfos = info.characterInfo;
+            var meshInfos = info.meshInfo;
+
+            for (var i = 0; i < length; i++)
             {
-                var charIndex = linkInfo.linkTextfirstCharacterIndex + i;
-                if (charIndex < 0 || charIndex >= _text.textInfo.characterCount)
+                var charIndex = firstCharIndex + i;
+                if (charIndex < 0 || charIndex >= info.characterCount)
                     continue;
 
-                var charInfo = _text.textInfo.characterInfo[charIndex];
+                var charInfo = charInfos[charIndex];
                 if (!charInfo.isVisible)
                     continue;
 
                 var meshIndex = charInfo.materialReferenceIndex;
                 var vertexIndex = charInfo.vertexIndex;
 
-                var colors = _text.textInfo.meshInfo[meshIndex].colors32;
+                var colors = meshInfos[meshIndex].colors32;
+                if (colors == null || colors.Length <= vertexIndex + 3)
+                    continue;
 
                 colors[vertexIndex + 0] = color;
                 colors[vertexIndex + 1] = color;
                 colors[vertexIndex + 2] = color;
                 colors[vertexIndex + 3] = color;
+
+                var underlineVertexIndex = charInfo.underlineVertexIndex;
+                if (underlineVertexIndex >= 0 && underlineVertexIndex + 7 < colors.Length)
+                {
+                    colors[underlineVertexIndex + 0] = color;
+                    colors[underlineVertexIndex + 1] = color;
+                    colors[underlineVertexIndex + 2] = color;
+                    colors[underlineVertexIndex + 3] = color;
+                    colors[underlineVertexIndex + 4] = color;
+                    colors[underlineVertexIndex + 5] = color;
+                    colors[underlineVertexIndex + 6] = color;
+                    colors[underlineVertexIndex + 7] = color;
+                }
             }
 
             _text.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
@@ -84,14 +140,24 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         protected override void SubscribeOnly()
         {
-            _pointerHandlerClick.PointerClickEvent += OnPointerClick;
+            if (_pointerHandlerClick == null)
+                return;
+
+            _pointerHandlerClick.PointerUpEvent += OnPointerMove;
+            _pointerHandlerClick.NonDragClickEvent += OnPointerClick;
             _pointerHandlerClick.PointerMoveEvent += OnPointerMove;
         }
 
         protected override void UnsubscribeOnly()
         {
-            _pointerHandlerClick.PointerClickEvent -= OnPointerClick;
+            if (_pointerHandlerClick == null)
+                return;
+
+            _pointerHandlerClick.PointerUpEvent -= OnPointerMove;
+            _pointerHandlerClick.NonDragClickEvent -= OnPointerClick;
             _pointerHandlerClick.PointerMoveEvent -= OnPointerMove;
+
+            ClearHover();
         }
     }
 }

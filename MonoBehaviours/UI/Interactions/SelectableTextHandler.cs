@@ -19,12 +19,12 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
     public class SelectableTextHandler : SubscribableBehaviour
     {
         [SerializeField] private TMP_Text _text;
-        [SerializeField] private UIGraphic _overlayGraphics;
+        [SerializeField] private UIShapes _overlayShapeses;
         [SerializeField] private PointerHandlerClickDrag _pointerHandlerClick;
         [SerializeField] private Camera _camera;
 
         [SerializeField] private float _maxClickMovePixels = 6f;
-        [SerializeField] private Color _selectionColor = new Color(0.26f, 0.52f, 0.96f, 0.35f);
+        [SerializeField] private Color _selectionColor = new(0.26f, 0.52f, 0.96f, 0.35f);
 
         private int _chainWordStart = -1;
         private int _chainWordEnd = -1;
@@ -55,7 +55,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         public void OnPointerDown(PointerEventData eventData, float time)
         {
-            if (_text == null || _overlayGraphics == null || eventData == null)
+            if (_text == null || _overlayShapeses == null || eventData == null)
                 return;
 
             _baseText = _text.text ?? "";
@@ -66,8 +66,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
                 _hasLastPointerDownPos = false;
                 return;
             }
-
-            _text.ForceMeshUpdate();
 
             var pos = eventData.position;
             var charIndex = TMP_TextUtilities.FindNearestCharacter(_text, pos, _camera, true);
@@ -229,7 +227,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         private void SelectWordRange(int start, int end)
         {
-            if (_text == null || _overlayGraphics == null)
+            if (_text == null || _overlayShapeses == null)
                 return;
 
             _baseText = _text.text ?? "";
@@ -249,10 +247,9 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         private void SelectParagraphByCharIndex(int charIndex)
         {
-            if (_text == null || _overlayGraphics == null)
+            if (_text == null || _overlayShapeses == null)
                 return;
 
-            _text.ForceMeshUpdate();
             var info = _text.textInfo;
             if (info == null || info.characterCount == 0)
             {
@@ -284,13 +281,12 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             if (_text == null)
                 return -1;
 
-            _text.ForceMeshUpdate();
             return TMP_TextUtilities.FindNearestCharacter(_text, position, _camera, true);
         }
 
         public void OnStartDrag(PointerEventData data, float time)
         {
-            if (_text == null || _overlayGraphics == null)
+            if (_text == null || _overlayShapeses == null)
                 return;
 
             _baseText = _text.text ?? "";
@@ -330,7 +326,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         private void OnEndDrag(PointerEventData data, float time)
         {
-            if (_text == null || _overlayGraphics == null)
+            if (_text == null || _overlayShapeses == null)
                 return;
 
             var idx = GetCharIndexFromPositionLineAware(data.position);
@@ -358,7 +354,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         private void OnPointerDrag(PointerEventData data, float time)
         {
-            if (_text == null || _overlayGraphics == null)
+            if (_text == null || _overlayShapeses == null)
                 return;
 
             var idx = GetCharIndexFromPositionLineAware(data.position);
@@ -398,10 +394,9 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         private void SelectAll()
         {
-            if (_text == null || _overlayGraphics == null)
+            if (_text == null || _overlayShapeses == null)
                 return;
 
-            _text.ForceMeshUpdate();
             var info = _text.textInfo;
             if (info == null || info.characterCount == 0)
             {
@@ -428,26 +423,25 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             _dragWordEndCharIndex = -1;
             _dragWordInitialCharIndex = -1;
 
-            if (_overlayGraphics != null)
-                _overlayGraphics.gameObject.SetActive(false);
+            if (_overlayShapeses != null)
+                _overlayShapeses.gameObject.SetActive(false);
         }
 
         private void UpdateHighlight()
         {
-            if (_overlayGraphics == null || _text == null)
+            if (_overlayShapeses == null || _text == null)
                 return;
 
             if (!_hasSelection)
             {
-                _overlayGraphics.gameObject.SetActive(false);
+                _overlayShapeses.gameObject.SetActive(false);
                 return;
             }
 
-            _text.ForceMeshUpdate();
             var info = _text.textInfo;
             if (info == null || info.characterCount == 0)
             {
-                _overlayGraphics.gameObject.SetActive(false);
+                _overlayShapeses.gameObject.SetActive(false);
                 return;
             }
 
@@ -456,23 +450,23 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
             if (start < 0 || start >= info.characterCount)
             {
-                _overlayGraphics.gameObject.SetActive(false);
+                _overlayShapeses.gameObject.SetActive(false);
                 return;
             }
 
             end = Mathf.Min(end, info.characterCount - 1);
 
-            _overlayGraphics.Clear();
+            _overlayShapeses.ClearShapes();
 
             var shapes = UIGraphSelectionBuilder.BuildTextSelectionShapes(_text, start, end, _selectionColor);
 
             foreach (var shape in shapes)
             {
                 if (!UIGraphShape.IsNull(in shape))
-                    _overlayGraphics.AddGraphShape(shape);
+                    _overlayShapeses.AddGraphShape(shape);
             }
 
-            _overlayGraphics.gameObject.SetActive(shapes.Count > 0);
+            _overlayShapeses.gameObject.SetActive(shapes.Count > 0);
         }
 
         private void Update()
@@ -484,7 +478,10 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
             if (ctrl && Input.GetKeyDown(KeyCode.A))
             {
-                SelectAll();
+                if (_hasSelection)
+                    SelectAll();
+                else 
+                    ClearSelection();
                 return;
             }
 
@@ -493,7 +490,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
                 if (_selectionStart < 0 || _selectionEnd < 0)
                     return;
 
-                _text.ForceMeshUpdate();
                 var info = _text.textInfo;
                 if (info == null || info.characterCount == 0)
                     return;

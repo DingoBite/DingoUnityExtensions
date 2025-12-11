@@ -6,7 +6,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
 {
     public class UIGraphCurve : UIBehaviour, IThicknessComponent, IColorComponent, IClearable, IAlphaComponent
     {
-        [SerializeField] private UIGraph.UIGraph_Old _graphOld;
+        [SerializeField] private UIGraph.UIGraph _graph;
         [SerializeField] private Color _color;
         [SerializeField, Range(0, 1)] private float _alpha;
         [SerializeField, Min(0)] private float _thickness;
@@ -14,11 +14,11 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
 
         public float Thickness
         {
-            get => _graphOld.Thickness;
+            get => _graph.Thickness;
             set
             {
                 _thickness = Math.Max(value, 0);
-                _graphOld.Thickness = _thickness;
+                _graph.Thickness = _thickness;
             }
         }
 
@@ -28,7 +28,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
             set
             {
                 _color = value;
-                _graphOld.color = value;
+                _graph.color = value;
             }
         }
 
@@ -46,19 +46,19 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
 
         public void DrawElasticLine(Vector2 p1, float r1, Vector2 p2, float r2, Rect? rect = null)
         {
-            _graphOld.Clear();
+            _graph.Clear();
             var points = MathUtils.CalculateElasticPoint(p1, r1, p2, r2, _step);
             foreach (var point in points)
             {
                 var uvPoint = rect == null ? point : new Vector2(point.x / rect.Value.width, point.y / rect.Value.height);
-                _graphOld.AddPoint(uvPoint);
+                _graph.AddPoint(uvPoint);
             }
-            _graphOld.SetDirty();
+            _graph.SetDirty();
         }
         
         public void Clear()
         {
-            _graphOld.Clear();
+            _graph.Clear();
         }
 
         private void OnValidate()

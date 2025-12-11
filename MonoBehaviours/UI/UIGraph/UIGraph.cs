@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace DingoUnityExtensions.MonoBehaviours.UI.UIGraph
 {
-    public class UIGraph_Old : MaskableGraphic
+    public class UIGraph : MaskableGraphic
     {
         private static readonly Vector2 NullPoint = new(-1e6f, -1e6f);
         private static bool IsNullPoint(in Vector2 point) => point == NullPoint;

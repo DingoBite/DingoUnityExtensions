@@ -10,6 +10,9 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         [SerializeField] private bool _dragAsHeld;
         [SerializeField] private float _timeToHeldReach = -1;
 
+        [SerializeField] private bool _clickPositionFilter;
+        [SerializeField] private float _positionFilterThreshold = 5f;
+
         public event PointerWrapperDelegates.Event BeginDragEvent;
         public event PointerWrapperDelegates.Event EndDragEvent;
         public event PointerWrapperDelegates.Event DragEvent;
@@ -26,6 +29,8 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         private bool _isDown;
         private bool _isDragging;
 
+        private Vector2 _pointerDownPos;
+
         public bool IsDragAsHeld => _dragAsHeld;
 
         public override void OnPointerDown(PointerEventData eventData)
@@ -37,6 +42,9 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
             _heldTimeReached = false;
             _isDragging = false;
             _isDown = true;
+
+            _pointerDownPos = eventData.position;
+
             base.OnPointerDown(eventData);
         }
 
@@ -44,8 +52,11 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
         {
             if (_dragAsHeld)
                 CoroutineParent.RemoveLateUpdater((this, HELD));
-            if (!_isDragging && _isDown && !_heldTimeReached)
+
+            var passFilter = (eventData.position - _pointerDownPos).sqrMagnitude < _positionFilterThreshold * _positionFilterThreshold;;
+            if (!_isDragging && _isDown && (!_dragAsHeld || !_heldTimeReached) && (!_clickPositionFilter || passFilter))
                 NonDragClickEvent?.Invoke(eventData, Time.time - _heldTime);
+
             _isDown = false;
             base.OnPointerUp(eventData);
         }
@@ -82,7 +93,8 @@ namespace DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers
             }
         }
 
-        public void OnPointerMove(PointerEventData eventData) => PointerMoveEvent?.Invoke(eventData, Time.time - EnterTime);
+        public void OnPointerMove(PointerEventData eventData) =>
+            PointerMoveEvent?.Invoke(eventData, Time.time - EnterTime);
 
         public void OnDrag(PointerEventData eventData)
         {
