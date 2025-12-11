@@ -1,4 +1,5 @@
-﻿using DingoUnityExtensions.MonoBehaviours.UI.UIGraph;
+﻿using System.Text;
+using DingoUnityExtensions.MonoBehaviours.UI.UIGraph;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,11 +24,12 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
         [SerializeField] private Camera _camera;
 
         [SerializeField] private float _maxClickMovePixels = 6f;
+        [SerializeField] private Color _selectionColor = new Color(0.26f, 0.52f, 0.96f, 0.35f);
 
         private int _chainWordStart = -1;
         private int _chainWordEnd = -1;
         private bool _chainWordValid = false;
-        
+
         private int _selectionStart = -1;
         private int _selectionEnd = -1;
         private string _baseText = "";
@@ -43,6 +45,11 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
         private bool _hasLastPointerDownPos = false;
 
         private SelectionOrigin _selectionOrigin = SelectionOrigin.None;
+
+        private bool _dragFromWordSelection = false;
+        private int _dragWordStartCharIndex = -1;
+        private int _dragWordEndCharIndex = -1;
+        private int _dragWordInitialCharIndex = -1;
 
         public void SetCamera(Camera c) => _camera = c;
 
@@ -91,7 +98,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
                         return;
                     }
 
-                    ClearSelection();
                     StartNewChain(charIndex, pos);
                     return;
                 }
@@ -152,6 +158,9 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         private void StartNewChain(int charIndex, Vector2 pos)
         {
+            if (_hasSelection)
+                ClearSelection();
+
             _clickChainCount = 1;
             _chainCharIndex = charIndex;
 
@@ -171,6 +180,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
                 _chainWordValid = false;
             }
 
+            _dragFromWordSelection = false;
+
             _lastPointerDownPos = pos;
             _hasLastPointerDownPos = true;
         }
@@ -186,8 +197,13 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             _chainWordStart = -1;
             _chainWordEnd = -1;
             _chainWordValid = false;
+
+            _dragFromWordSelection = false;
+            _dragWordStartCharIndex = -1;
+            _dragWordEndCharIndex = -1;
+            _dragWordInitialCharIndex = -1;
         }
-        
+
         private bool TryGetWordRangeByCharIndex(int charIndex, out int start, out int end)
         {
             start = -1;
@@ -197,7 +213,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             if (info == null || info.wordCount <= 0)
                 return false;
 
-            for (int i = 0; i < info.wordCount; i++)
+            for (var i = 0; i < info.wordCount; i++)
             {
                 var w = info.wordInfo[i];
                 if (charIndex >= w.firstCharacterIndex && charIndex <= w.lastCharacterIndex)
@@ -236,39 +252,40 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             if (_text == null || _overlayGraphics == null)
                 return;
 
-            _baseText = _text.text ?? "";
-            if (string.IsNullOrEmpty(_baseText))
+            _text.ForceMeshUpdate();
+            var info = _text.textInfo;
+            if (info == null || info.characterCount == 0)
             {
                 ClearSelection();
                 return;
             }
 
-            charIndex = Mathf.Clamp(charIndex, 0, _baseText.Length - 1);
+            charIndex = Mathf.Clamp(charIndex, 0, info.characterCount - 1);
 
-            var startNl = _baseText.LastIndexOf('\n', charIndex);
-            var endNl = _baseText.IndexOf('\n', charIndex);
-
-            var start = startNl < 0 ? 0 : startNl + 1;
-            var end = endNl < 0 ? _baseText.Length - 1 : endNl - 1;
-
-            if (start < _baseText.Length && _baseText[start] == '\r')
-                start++;
-
-            if (end >= 0 && end < _baseText.Length && _baseText[end] == '\r')
-                end--;
-
-            if (start > end)
+            var line = info.characterInfo[charIndex].lineNumber;
+            if (line < 0 || line >= info.lineCount)
             {
                 ClearSelection();
                 return;
             }
 
-            _selectionStart = start;
-            _selectionEnd = end;
+            var lineInfo = info.lineInfo[line];
+
+            _selectionStart = lineInfo.firstCharacterIndex;
+            _selectionEnd = lineInfo.lastCharacterIndex;
             _hasSelection = true;
             _selectionOrigin = SelectionOrigin.Paragraph;
 
             UpdateHighlight();
+        }
+
+        private int GetCharIndexFromPositionLineAware(Vector2 position)
+        {
+            if (_text == null)
+                return -1;
+
+            _text.ForceMeshUpdate();
+            return TMP_TextUtilities.FindNearestCharacter(_text, position, _camera, true);
         }
 
         public void OnStartDrag(PointerEventData data, float time)
@@ -278,7 +295,13 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
             _baseText = _text.text ?? "";
 
-            var idx = TMP_TextUtilities.GetCursorIndexFromPosition(_text, data.position, _camera);
+            var idx = GetCharIndexFromPositionLineAware(data.position);
+
+            if (idx < 0)
+            {
+                ClearSelection();
+                return;
+            }
 
             if (_hasSelection && _selectionOrigin == SelectionOrigin.Word && _selectionStart >= 0 && _selectionEnd >= 0)
             {
@@ -287,9 +310,15 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
                 if (idx >= min && idx <= max)
                 {
+                    _dragFromWordSelection = true;
+                    _dragWordStartCharIndex = min;
+                    _dragWordEndCharIndex = max;
+                    _dragWordInitialCharIndex = idx;
                     return;
                 }
             }
+
+            _dragFromWordSelection = false;
 
             _selectionStart = idx;
             _selectionEnd = _selectionStart;
@@ -301,20 +330,70 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         private void OnEndDrag(PointerEventData data, float time)
         {
-            if (!_hasSelection || _text == null || _overlayGraphics == null)
+            if (_text == null || _overlayGraphics == null)
                 return;
 
-            _selectionEnd = TMP_TextUtilities.GetCursorIndexFromPosition(_text, data.position, _camera);
+            var idx = GetCharIndexFromPositionLineAware(data.position);
+            if (idx < 0)
+            {
+                _dragFromWordSelection = false;
+                return;
+            }
+
+            if (_dragFromWordSelection)
+            {
+                ApplyDragFromWord(idx);
+                _selectionOrigin = SelectionOrigin.Drag;
+                _dragFromWordSelection = false;
+                UpdateHighlight();
+                return;
+            }
+
+            if (!_hasSelection)
+                return;
+
+            _selectionEnd = idx;
             UpdateHighlight();
         }
 
         private void OnPointerDrag(PointerEventData data, float time)
         {
-            if (!_hasSelection || _text == null || _overlayGraphics == null)
+            if (_text == null || _overlayGraphics == null)
                 return;
 
-            _selectionEnd = TMP_TextUtilities.GetCursorIndexFromPosition(_text, data.position, _camera);
+            var idx = GetCharIndexFromPositionLineAware(data.position);
+            if (idx < 0)
+                return;
+
+            if (_dragFromWordSelection)
+            {
+                ApplyDragFromWord(idx);
+                UpdateHighlight();
+                return;
+            }
+
+            if (!_hasSelection)
+                return;
+
+            _selectionEnd = idx;
             UpdateHighlight();
+        }
+
+        private void ApplyDragFromWord(int currentChar)
+        {
+            if (!_hasSelection || _dragWordStartCharIndex < 0 || _dragWordEndCharIndex < 0 || _dragWordInitialCharIndex < 0)
+                return;
+
+            if (currentChar >= _dragWordInitialCharIndex)
+            {
+                _selectionStart = _dragWordStartCharIndex;
+                _selectionEnd = Mathf.Max(currentChar, _dragWordEndCharIndex);
+            }
+            else
+            {
+                _selectionStart = Mathf.Min(currentChar, _dragWordStartCharIndex);
+                _selectionEnd = _dragWordEndCharIndex;
+            }
         }
 
         private void SelectAll()
@@ -322,15 +401,16 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             if (_text == null || _overlayGraphics == null)
                 return;
 
-            _baseText = _text.text ?? "";
-            if (string.IsNullOrEmpty(_baseText))
+            _text.ForceMeshUpdate();
+            var info = _text.textInfo;
+            if (info == null || info.characterCount == 0)
             {
                 ClearSelection();
                 return;
             }
 
             _selectionStart = 0;
-            _selectionEnd = _baseText.Length - 1;
+            _selectionEnd = info.characterCount - 1;
             _hasSelection = true;
             _selectionOrigin = SelectionOrigin.All;
 
@@ -343,6 +423,11 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             _hasSelection = false;
             _selectionOrigin = SelectionOrigin.None;
 
+            _dragFromWordSelection = false;
+            _dragWordStartCharIndex = -1;
+            _dragWordEndCharIndex = -1;
+            _dragWordInitialCharIndex = -1;
+
             if (_overlayGraphics != null)
                 _overlayGraphics.gameObject.SetActive(false);
         }
@@ -352,7 +437,15 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             if (_overlayGraphics == null || _text == null)
                 return;
 
-            if (!_hasSelection || _selectionStart < 0 || _selectionEnd < 0 || string.IsNullOrEmpty(_baseText))
+            if (!_hasSelection)
+            {
+                _overlayGraphics.gameObject.SetActive(false);
+                return;
+            }
+
+            _text.ForceMeshUpdate();
+            var info = _text.textInfo;
+            if (info == null || info.characterCount == 0)
             {
                 _overlayGraphics.gameObject.SetActive(false);
                 return;
@@ -361,18 +454,17 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             var start = Mathf.Min(_selectionStart, _selectionEnd);
             var end = Mathf.Max(_selectionStart, _selectionEnd);
 
-            if (start >= _baseText.Length)
+            if (start < 0 || start >= info.characterCount)
             {
                 _overlayGraphics.gameObject.SetActive(false);
                 return;
             }
 
-            end = Mathf.Min(end, _baseText.Length - 1);
+            end = Mathf.Min(end, info.characterCount - 1);
 
             _overlayGraphics.Clear();
 
-            var highlightColor = new Color(0.26f, 0.52f, 0.96f, 0.35f);
-            var shapes = UIGraphSelectionBuilder.BuildTextSelectionShapes(_text, start, end, highlightColor);
+            var shapes = UIGraphSelectionBuilder.BuildTextSelectionShapes(_text, start, end, _selectionColor);
 
             foreach (var shape in shapes)
             {
@@ -398,20 +490,43 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
             if (_hasSelection && ctrl && Input.GetKeyDown(KeyCode.C))
             {
-                if (_selectionStart < 0 || _selectionEnd < 0 || string.IsNullOrEmpty(_baseText))
+                if (_selectionStart < 0 || _selectionEnd < 0)
+                    return;
+
+                _text.ForceMeshUpdate();
+                var info = _text.textInfo;
+                if (info == null || info.characterCount == 0)
                     return;
 
                 var start = Mathf.Min(_selectionStart, _selectionEnd);
                 var end = Mathf.Max(_selectionStart, _selectionEnd);
 
-                if (start < 0 || start >= _baseText.Length)
+                if (start < 0 || start >= info.characterCount)
                     return;
 
-                end = Mathf.Min(end, _baseText.Length - 1);
+                end = Mathf.Min(end, info.characterCount - 1);
 
-                var selected = _baseText.Substring(start, end - start + 1);
-                GUIUtility.systemCopyBuffer = selected;
+                var sb = new StringBuilder();
+
+                for (var i = start; i <= end; i++)
+                {
+                    var chInfo = info.characterInfo[i];
+                    sb.Append(chInfo.character);
+                }
+
+                GUIUtility.systemCopyBuffer = sb.ToString();
                 return;
+            }
+
+            if (_hasSelection && IsMouseButtonDownAny())
+            {
+                var overText = _pointerHandlerClick != null && _pointerHandlerClick.Entered;
+
+                if (!overText)
+                {
+                    ClearSelection();
+                    return;
+                }
             }
 
             if (_hasSelection && Input.anyKeyDown && !ctrl && !IsMouseButtonDownAny())
