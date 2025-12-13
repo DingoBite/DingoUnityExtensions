@@ -8,6 +8,11 @@ using UnityEngine.EventSystems;
 
 namespace DingoUnityExtensions.UnityViewProviders.Navigation
 {
+    public interface INavigationMoveFilter
+    {
+        public bool AllowNavigationMove(AxisEventData eventData);
+    }
+    
     [Flags]
     public enum EdgeNavigationCase
     {
@@ -141,6 +146,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             if (!_container.Interactable || !_container.Selectable)
                 return;
 
+            if (eventData.selectedObject != null && eventData.selectedObject.TryGetComponent<INavigationMoveFilter>(out var filter))
+            {
+                if (!filter.AllowNavigationMove(eventData))
+                    return;
+            }
+
             var targetNode = GetTargetNode(eventData.moveDir);
             if (targetNode == null || targetNode._container == null)
                 return;
@@ -152,6 +163,20 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
 
             target.SelectViaUnity(eventData);
             eventData.Use();
+        }
+
+        public void ForceNavigationMove(MoveDirection dir)
+        {
+            var targetNode = GetTargetNode(dir);
+            if (targetNode == null || targetNode._container == null)
+                return;
+
+            var target = targetNode._container;
+
+            if (!target.Interactable || !target.Selectable)
+                return;
+
+            target.SelectViaUnity();
         }
 
         private ContainerNavigationNode GetTargetNode(MoveDirection dir)
