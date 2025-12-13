@@ -16,7 +16,7 @@ namespace DingoUnityExtensions.Pools.Core
         private readonly bool _layerFromPool;
 
         private readonly List<T> _pulledElements = new();
-        private readonly Queue<T> _queue = new();
+        private readonly Stack<T> _queue = new();
         private readonly Action<T, bool> _setActiveOverwrite;
         private readonly Func<GameObject, T> _factory;
         private readonly Func<GameObject, Task<T>> _asyncFactory;
@@ -57,7 +57,7 @@ namespace DingoUnityExtensions.Pools.Core
         
         public T PullElement()
         {
-            if (_queue.TryDequeue(out var element))
+            if (_queue.TryPop(out var element))
             {
                 ManageActiveness(element, true);
                 _pulledElements.Add(element);
@@ -75,7 +75,7 @@ namespace DingoUnityExtensions.Pools.Core
         {
             if (_asyncFactory == null)
                 return PullElement();
-            if (_queue.TryDequeue(out var element))
+            if (_queue.TryPop(out var element))
             {
                 ManageActiveness(element, true);
                 _pulledElements.Add(element);
@@ -101,7 +101,7 @@ namespace DingoUnityExtensions.Pools.Core
             if (_parent != null)
                 element.transform.SetParent(_parent.transform);
             ManageActiveness(element, false);
-            _queue.Enqueue(element);
+            _queue.Push(element);
             _pulledElements.Remove(element);
         }
 
@@ -111,7 +111,7 @@ namespace DingoUnityExtensions.Pools.Core
             {
                 var element = PulledElements[i];
                 ManageActiveness(element, false);
-                _queue.Enqueue(element);
+                _queue.Push(element);
             }
             _pulledElements.Clear();
         }

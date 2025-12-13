@@ -28,6 +28,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
             }
         }
         
+        public void SetDirty() => _isDirty = true;
+        
         private void Awake()
         {
             _isDirty = true;
@@ -35,6 +37,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
 
         private void OnEnable()
         {
+            _isDirty = true;
             RebuildNodes();
         }
 
@@ -113,10 +116,13 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
                 var route = root.GetComponent<ContainerNavigationRoute>();
                 if (route != null)
                 {
-                    if (!_routes.Contains(route))
+                    if (root.gameObject.activeSelf)
                     {
-                        route.RebuildNodes();
-                        _routes.Add(route);
+                        if (!_routes.Contains(route))
+                        {
+                            route.RebuildNodes();
+                            _routes.Add(route);
+                        }
                     }
                     return;
                 }

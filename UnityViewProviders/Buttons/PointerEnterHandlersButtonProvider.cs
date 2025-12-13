@@ -42,5 +42,25 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
                     microAnimation.BackwardAnimate();
             }
         }
+
+        protected override void OnDisable()
+        {
+            foreach (var enterAnimation in _enterAnimations)
+            {
+                enterAnimation.ResetView();
+            }
+            
+            base.OnDisable();
+        }
+
+        protected override void OnEnable()
+        {
+            foreach (var enterAnimation in _enterAnimations)
+            {
+                enterAnimation.ResetView();
+            }
+
+            base.OnEnable();
+        }
     }
 }

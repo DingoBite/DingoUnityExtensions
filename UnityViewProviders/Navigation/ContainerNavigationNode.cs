@@ -111,16 +111,22 @@ namespace DingoUnityExtensions.UnityViewProviders.Navigation
         private void ResolveEdgeCaseTag(EdgeNavigationCase edgeNavigationCase, EdgeNavigationCase checkEdgeCase, string edgeCaseTag)
         {
             if (edgeNavigationCase.HasFlag(checkEdgeCase))
-                Tags.Add(edgeCaseTag);
+            {
+                if (!Tags.Contains(edgeCaseTag))
+                    Tags.Add(edgeCaseTag);
+            }
             else
+            {
                 Tags.Remove(edgeCaseTag);
+            }
         }
         
         private void ResolveEdgeCaseFind(NavigationNodeSelectRule rule, EdgeNavigationCase newCase, EdgeNavigationCase check, string tags, bool manageNavigationType, bool manageNavigationRule)
         {
             if (newCase.HasFlag(check))
             {
-                rule.FindByTags.Add(tags);
+                if (!rule.FindByTags.Contains(tags))
+                    rule.FindByTags.Add(tags);
                 DefaultFilterTagsByNavigationType[rule] = rule.FilterTagsByNavigationType;
                 if (manageNavigationType)
                     rule.FilterTagsByNavigationType = false;

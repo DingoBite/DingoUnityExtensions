@@ -22,13 +22,14 @@ namespace DingoUnityExtensions.uPaletteExtensions
 
         public override void SetValue(Color value)
         {
-            if (!Application.isPlaying || _animation == null)
+            _tween?.Kill();
+            if (!Application.isPlaying || _animation == null || !gameObject.activeInHierarchy || FromStartObserving)
             {
                 Component.color = value;
+                _targetValue = value;
                 return;
             }
             _targetValue = value;
-            _tween?.Kill();
             _tween = _animation.Do(d => DOTween.To(() => Component.color, v => Component.color = v, value, d));
         }
     }

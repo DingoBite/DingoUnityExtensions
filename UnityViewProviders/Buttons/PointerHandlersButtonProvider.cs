@@ -59,7 +59,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
 
         protected override void OnSelected(bool value)
         {
-            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != gameObject)
+            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject != gameObject && value)
                 EventSystem.current.SetSelectedGameObject(gameObject);
             _selectToggle.SetViewActive(value.TimeContext(_selectImmediately));
         }

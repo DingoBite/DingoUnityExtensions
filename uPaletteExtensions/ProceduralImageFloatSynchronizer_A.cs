@@ -22,13 +22,14 @@ namespace DingoUnityExtensions.uPaletteExtensions
 
         public override void SetValue(float value)
         {
-            if (!Application.isPlaying || _animation == null)
+            _tween?.Kill();
+            if (!Application.isPlaying || _animation == null || !gameObject.activeInHierarchy || FromStartObserving)
             {
                 Component.BorderWidth = value;
+                _targetValue = 0;
                 return;
             }
 
-            _tween?.Kill();
             if (value < 0)
             {
                 _targetValue = 0;

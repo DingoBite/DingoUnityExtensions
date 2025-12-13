@@ -42,8 +42,16 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
             _libraryAccess = libraryAccess;
         }
 
-        public Task<TDescriptor> CreateBlankAsync() => _libraryAccess.CreateAsync(Factory);
-        
+        public Task<TDescriptor> CreateBlankAsync(Action<TDescriptor> mutateAction = null)
+        {
+            return _libraryAccess.CreateAsync(id =>
+            {
+                var descriptor = Factory(id);
+                mutateAction?.Invoke(descriptor);
+                return descriptor;
+            });
+        }
+
         public TAccessModel OpenAccess(TDescriptor descriptor)
         {
             if (descriptor == null)

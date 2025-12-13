@@ -13,13 +13,13 @@ namespace DingoUnityExtensions.Pools.Core
         [SerializeField] private bool _layerFromPool = true;
         
         private readonly List<T> _pulledElements = new();
-        private readonly Queue<T> _queue = new();
+        private readonly Stack<T> _queue = new();
         private string ComponentName => typeof(T).Name;
         public IReadOnlyList<T> PulledElements => _pulledElements;
 
         public T PullElement()
         {
-            if (_queue.TryDequeue(out var element))
+            if (_queue.TryPop(out var element))
             {
                 if (_manageActiveness)
                     element.gameObject.SetActive(true);
@@ -39,7 +39,7 @@ namespace DingoUnityExtensions.Pools.Core
         {
             if (_manageActiveness)
                 element.gameObject.SetActive(false);
-            _queue.Enqueue(element);
+            _queue.Push(element);
             _pulledElements.Remove(element);
         }
 
