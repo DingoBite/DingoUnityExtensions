@@ -84,6 +84,12 @@ namespace DingoUnityExtensions.Editor
                     select type).Any();
             if (vInspectorFound)
                 yield return "VINSPECTOR_EXISTS";
+            
+            var proceduralImageFound = (from type in types
+                where type.Namespace == "ProceduralImage"
+                select type).Any();
+            if (proceduralImageFound)
+                yield return "PROCEDURAL_IMAGE_EXISTS";
         }
     }
 }

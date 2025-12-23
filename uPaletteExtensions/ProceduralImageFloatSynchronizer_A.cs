@@ -1,3 +1,4 @@
+#if PROCEDURAL_IMAGE_EXISTS
 using DG.Tweening;
 using DingoUnityExtensions.Tweens;
 using UnityEngine;
@@ -45,3 +46,4 @@ namespace DingoUnityExtensions.uPaletteExtensions
         }
     }
 }
+#endif

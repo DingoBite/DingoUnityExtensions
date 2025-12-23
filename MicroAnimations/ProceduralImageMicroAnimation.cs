@@ -1,3 +1,4 @@
+#if PROCEDURAL_IMAGE_EXISTS
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -13,7 +14,7 @@ namespace DingoUnityExtensions.MicroAnimations
         public float BorderWidth;
         public ModifierID ModifierID;
     }
-    
+
     [Serializable]
     public class ProceduralImageMicroAnimation : TweenMicroAnimation
     {
@@ -53,3 +54,4 @@ namespace DingoUnityExtensions.MicroAnimations
         protected override void ResetViewValues() { }
     }
 }
+#endif
