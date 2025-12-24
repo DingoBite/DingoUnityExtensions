@@ -86,7 +86,7 @@ namespace DingoUnityExtensions.Editor
                 yield return "VINSPECTOR_EXISTS";
             
             var proceduralImageFound = (from type in types
-                where type.Namespace == "ProceduralImage"
+                where type.Namespace == "UnityEngine.UI.ProceduralImage"
                 select type).Any();
             if (proceduralImageFound)
                 yield return "PROCEDURAL_IMAGE_EXISTS";
