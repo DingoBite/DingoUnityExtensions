@@ -7,3 +7,6 @@
 [submodule "NaughtyAttributes"]
 	path = NaughtyAttributes
 	url = https://github.com/DingoBite/NaughtyAttributes.git
+[submodule "Newtonsoft.Json-for-Unity.Converters"]
+	path = Newtonsoft.Json-for-Unity.Converters
+	url = https://github.com/DingoBite/Newtonsoft.Json-for-Unity.Converters.git
