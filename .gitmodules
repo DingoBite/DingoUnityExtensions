@@ -4,3 +4,6 @@
 [submodule "MackySoft"]
 	path = MackySoft
 	url = https://github.com/DingoBite/Unity-SerializeReferenceExtensions.git
+[submodule "NaughtyAttributes"]
+	path = NaughtyAttributes
+	url = https://github.com/DingoBite/NaughtyAttributes.git
