@@ -1,3 +1,6 @@
 [submodule "uPalette"]
 	path = uPalette
 	url = https://github.com/DingoBite/uPalette.git
+[submodule "MackySoft"]
+	path = MackySoft
+	url = https://github.com/DingoBite/Unity-SerializeReferenceExtensions.git
