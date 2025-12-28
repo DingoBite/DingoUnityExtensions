@@ -90,6 +90,18 @@ namespace DingoUnityExtensions.Editor
                 select type).Any();
             if (proceduralImageFound)
                 yield return "PROCEDURAL_IMAGE_EXISTS";
+            
+            var proceduralUIFound = (from type in types
+                where type.Namespace == "DTT.UI.ProceduralUI"
+                select type).Any();
+            if (proceduralUIFound)
+                yield return "PROCEDURAL_UI_EXISTS";
+            
+            var mmFeelFound = (from type in types
+                where type.Namespace == "MoreMountains.Feedbacks"
+                select type).Any();
+            if (mmFeelFound)
+                yield return "MMFEEL_EXISTS";
         }
     }
 }
