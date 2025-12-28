@@ -4,7 +4,7 @@ using AYellowpaper.SerializedCollections;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using UnityEngine;
 
-namespace DingoUnityExtensions.UnityViewProviders
+namespace DingoUnityExtensions.UnityViewProviders.TimeContainers
 {
     public class TimeSpanContainer : ValueContainer<TimeSpan>
     {

@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
-using DingoUnityExtensions.Extensions;
-using DingoUnityExtensions.Pools;
 using DingoUnityExtensions.Pools.Core;
 using DingoUnityExtensions.UnityViewProviders.Core;
-using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using UnityEngine;
 
-namespace DingoUnityExtensions.UnityViewProviders
+namespace DingoUnityExtensions.UnityViewProviders.Pools
 {
     public interface IRemovableContainer
     {

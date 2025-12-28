@@ -2,7 +2,7 @@ using System;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using UnityEngine;
 
-namespace DingoUnityExtensions.UnityViewProviders
+namespace DingoUnityExtensions.UnityViewProviders.Vectors
 {
     public class VectorView : ValueContainer<Vector3>
     {

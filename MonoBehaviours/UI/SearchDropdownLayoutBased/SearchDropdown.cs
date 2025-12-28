@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DingoUnityExtensions.Extensions;
 using DingoUnityExtensions.UnityViewProviders;
+using DingoUnityExtensions.UnityViewProviders.Buttons;
 using DingoUnityExtensions.UnityViewProviders.Core;
 using DingoUnityExtensions.UnityViewProviders.Toggle.Core;
 using DingoUnityExtensions.Utils;

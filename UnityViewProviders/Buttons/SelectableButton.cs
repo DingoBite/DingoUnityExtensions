@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DingoUnityExtensions.UnityViewProviders
+namespace DingoUnityExtensions.UnityViewProviders.Buttons
 {
     public class SelectableButton : UnityViewProvider<Button>
     {
