@@ -1,11 +1,24 @@
-﻿using DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers;
+using System.Collections.Generic;
+using System.Linq;
+using AYellowpaper.SerializedCollections;
+using DingoUnityExtensions.UnityViewProviders.Core;
+using DingoUnityExtensions.UnityViewProviders.PointerHandlerWrappers;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 {
-    public class ClickableLinkHandler : SubscribableBehaviour
+    public static class TextLinkHelpers
+    {
+        public static string CreateLink(string linkId, string linkTitle)
+        {
+            return $"<link=\"{linkId}\">{linkTitle}</link>";
+        }
+    }
+    
+    public class ClickLinkHandler : ValueContainer<string>
     {
         [SerializeField] private TMP_Text _text;
         [SerializeField] private PointerHandlerClickDrag _pointerHandlerClick;
@@ -13,10 +26,15 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         [Header("Hover settings")]
         [SerializeField] private Color32 _hoverColor = new(0, 170, 255, 255);
-
+        [SerializeField] private SerializedDictionary<string, Color> _linkColors;
+        
         private int _lastLinkIndex = -1;
 
+        public IReadOnlyList<TMP_LinkInfo> Links => _text.textInfo.linkInfo;
+
         public void SetCamera(Camera c) => _camera = c;
+
+        protected override void OnSetInteractable(bool value) => _pointerHandlerClick.enabled = value;
 
         public void OnPointerClick(PointerEventData eventData, float time)
         {
@@ -34,8 +52,17 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             var url = linkInfo.GetLinkID();
 
             if (!string.IsNullOrEmpty(url))
-                Application.OpenURL(url);
-            SetLinkColor(_lastLinkIndex, _hoverColor);
+            {
+                ValueChangeInvoke(url);
+                UrlClickedHandle(eventData, linkInfo, url);
+            }
+
+            var color = _linkColors.GetValueOrDefault(url, _hoverColor);
+            SetLinkColor(_lastLinkIndex, color);
+        }
+
+        protected virtual void UrlClickedHandle(PointerEventData eventData, TMP_LinkInfo linkInfo, string url)
+        {
         }
 
         private void OnPointerMove(PointerEventData data, float time)
@@ -121,17 +148,35 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
                 colors[vertexIndex + 2] = color;
                 colors[vertexIndex + 3] = color;
 
-                var underlineVertexIndex = charInfo.underlineVertexIndex;
-                if (underlineVertexIndex >= 0 && underlineVertexIndex + 7 < colors.Length)
+                if ((info.textComponent.fontStyle & FontStyles.Underline) != 0)
                 {
-                    colors[underlineVertexIndex + 0] = color;
-                    colors[underlineVertexIndex + 1] = color;
-                    colors[underlineVertexIndex + 2] = color;
-                    colors[underlineVertexIndex + 3] = color;
-                    colors[underlineVertexIndex + 4] = color;
-                    colors[underlineVertexIndex + 5] = color;
-                    colors[underlineVertexIndex + 6] = color;
-                    colors[underlineVertexIndex + 7] = color;
+                    var underlineVertexIndex = charInfo.underlineVertexIndex;
+                    if (underlineVertexIndex >= 0 && underlineVertexIndex + 7 < colors.Length)
+                    {
+                        colors[underlineVertexIndex + 0] = color;
+                        colors[underlineVertexIndex + 1] = color;
+                        colors[underlineVertexIndex + 2] = color;
+                        colors[underlineVertexIndex + 3] = color;
+                        colors[underlineVertexIndex + 4] = color;
+                        colors[underlineVertexIndex + 5] = color;
+                        colors[underlineVertexIndex + 6] = color;
+                        colors[underlineVertexIndex + 7] = color;
+                    }
+                }
+                if ((info.textComponent.fontStyle & FontStyles.Strikethrough) != 0)
+                {
+                    var strikethroughVertexIndex = charInfo.strikethroughVertexIndex;
+                    if (strikethroughVertexIndex >= 0 && strikethroughVertexIndex + 7 < colors.Length)
+                    {
+                        colors[strikethroughVertexIndex + 0] = color;
+                        colors[strikethroughVertexIndex + 1] = color;
+                        colors[strikethroughVertexIndex + 2] = color;
+                        colors[strikethroughVertexIndex + 3] = color;
+                        colors[strikethroughVertexIndex + 4] = color;
+                        colors[strikethroughVertexIndex + 5] = color;
+                        colors[strikethroughVertexIndex + 6] = color;
+                        colors[strikethroughVertexIndex + 7] = color;
+                    }
                 }
             }
 
@@ -140,6 +185,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
 
         protected override void SubscribeOnly()
         {
+            SetupDictionary();
             if (_pointerHandlerClick == null)
                 return;
 
@@ -158,6 +204,39 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Interactions
             _pointerHandlerClick.PointerMoveEvent -= OnPointerMove;
 
             ClearHover();
+        }
+
+        private void OnValidate() => SetupDictionary();
+
+        private void SetupDictionary()
+        {
+            var linkInfos = _text.textInfo.linkInfo;
+            if (_linkColors.Count > 0)
+            {
+                foreach (var key in _linkColors.Keys.ToList())
+                {
+                    if (linkInfos.Any(l => l.GetLinkID() == key))
+                        continue;
+                    _linkColors.Remove(key);
+                }
+            }
+
+            foreach (var linkInfo in linkInfos)
+            {
+                if (_linkColors.ContainsKey(linkInfo.GetLinkID()))
+                    continue;
+                _linkColors[linkInfo.GetLinkID()] = _hoverColor;
+            }
+        }
+
+        public void SetTemplate(string template)
+        {
+            ClearHover();
+            _text.text = template;
+        }
+        
+        protected override void SetValueWithoutNotify(string value)
+        {
         }
     }
 }
