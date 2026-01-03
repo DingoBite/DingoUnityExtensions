@@ -130,13 +130,12 @@ namespace DingoUnityExtensions.UnityViewProviders.Core
         
         private const string FINALIZING_VIEW = "Finalizing View";
 
-        [Tooltip("Can be null")]
-        [SerializeField]
-        private Transform _blocker;
-
         [SerializeField] private bool _isInteractable = true;
         [SerializeField] private bool _isSelectable;
-        
+
+        [Tooltip("Can be null")]
+        [Foldout(FINALIZING_VIEW)]
+        [SerializeField] private Transform _blocker;
         [Foldout(FINALIZING_VIEW)]
         [SerializeField] private bool _debugDefaultValueUpdate;
         [Foldout(FINALIZING_VIEW), ShowIf(nameof(_debugDefaultValueUpdate))]

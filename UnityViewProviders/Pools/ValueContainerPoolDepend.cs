@@ -35,10 +35,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
             for (var i = 0; i < count; i++)
             {
                 var subValue = GetValue(value, i);
-                if (i < _pool.PulledElements.Count)
-                    _pool.PulledElements[i].UpdateValueWithoutNotify(subValue);
-                else
-                    _pool.PullElement().UpdateValueWithoutNotify(subValue);
+                var valueContainer = i < _pool.PulledElements.Count ? _pool.PulledElements[i] : _pool.PullElement();
+                SetValue(valueContainer, subValue);
             }
 
             if (count < _pool.PulledElements.Count)
@@ -50,6 +48,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
                 }
             }
         }
+
+        protected virtual void SetValue(TValueContainer valueContainer, TValue value) => valueContainer.UpdateValueWithoutNotify(value);
 
         protected abstract Pool<TValueContainer> Factory(TValueContainer prefab, GameObject parent);
         protected abstract int GetCount(TRootValue value);
