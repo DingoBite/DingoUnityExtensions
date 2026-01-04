@@ -12,10 +12,11 @@ namespace DingoUnityExtensions.MonoBehaviours
 
         public static Camera GetCamera(TKey key)
         {
-            if (Instance == null)
+            var instance = GetNoCheck();
+            if (instance == null)
                 return null;
 
-            return Instance._cameras.GetValueOrDefault(key);
+            return instance._cameras.GetValueOrDefault(key);
         }
     }
 }

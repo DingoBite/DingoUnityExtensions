@@ -20,7 +20,7 @@ namespace DingoUnityExtensions.MonoBehaviours
                 }
             }
 
-            private void Reset()
+            protected virtual void Reset()
             {
                 _component = GetComponent<T>();
             }
@@ -40,7 +40,7 @@ namespace DingoUnityExtensions.MonoBehaviours
             }
         }
 
-        private void Reset()
+        protected virtual void Reset()
         {
             _component = GetComponent<T>();
         }
