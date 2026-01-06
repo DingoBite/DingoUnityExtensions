@@ -26,10 +26,10 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform.Editor
                 if (t == null)
                     continue;
 
-                var ppu = t.Editor_GetAssetsPPU();
+                var ppu = t.GetAssetsPPU();
                 var snapStepWorld = 1f / Mathf.Max(1, ppu);
 
-                var pivotWorld = t.Editor_GetDesiredWorldPivotPoint();
+                var pivotWorld = t.GetDesiredWorldPivotPoint();
 
                 Handles.color = Color.yellow;
                 EditorGUI.BeginChangeCheck();
@@ -43,11 +43,11 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform.Editor
                     var d = newPivotWorld - pivotWorld;
                     var deltaPx = new Vector2Int(Mathf.RoundToInt(d.x * ppu), Mathf.RoundToInt(d.y * ppu));
 
-                    t.Editor_AddAnchoredPixels(deltaPx);
+                    t.AddAnchoredPixels(deltaPx);
                     EditorUtility.SetDirty(t);
                 }
 
-                var cur = t.Editor_GetPixelScale();
+                var cur = t.GetPixelScale();
                 var curScale = new Vector3(cur.x, cur.y, 1f);
 
                 Handles.color = Color.cyan;
@@ -62,7 +62,7 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform.Editor
                     var sx = Mathf.RoundToInt(newScale.x);
                     var sy = Mathf.RoundToInt(newScale.y);
 
-                    t.Editor_SetPixelScale(new Vector2Int(sx, sy));
+                    t.SetPixelScale(new Vector2Int(sx, sy));
                     EditorUtility.SetDirty(t);
                 }
             }

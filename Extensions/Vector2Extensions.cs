@@ -18,6 +18,8 @@ namespace DingoUnityExtensions.Extensions
         
         public static Vector3 XZ(this Vector2 vector) => new Vector3(vector.x, 0, vector.y);
 
+        public static Vector2 Clamp01(this Vector2 v) => new(Mathf.Clamp01(v.x), Mathf.Clamp01(v.y));
+        
         public static Vector2 Project(this Vector2 vector, Vector2 onNormal)
         {
             var result = Vector3.Project(vector.XZ(), onNormal.XZ());

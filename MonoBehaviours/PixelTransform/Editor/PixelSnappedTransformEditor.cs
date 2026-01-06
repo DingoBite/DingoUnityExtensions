@@ -11,7 +11,7 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform.Editor
         {
             var t = (PixelSnappedTransform)target;
 
-            var ppc = t.Editor_GetPixelPerfectCamera();
+            var ppc = t.GetPixelPerfectCamera();
             if (ppc == null)
                 return;
 
@@ -44,7 +44,7 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform.Editor
                 var delta = newPivotWorld - pivotWorld;
                 var deltaPx = new Vector2Int(Mathf.RoundToInt(delta.x * ppu), Mathf.RoundToInt(delta.y * ppu));
 
-                t.Editor_AddAnchoredPixels(deltaPx);
+                t.AddAnchoredPixels(deltaPx);
 
                 EditorUtility.SetDirty(t);
             }
