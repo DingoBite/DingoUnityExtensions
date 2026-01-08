@@ -18,6 +18,8 @@ namespace DingoUnityExtensions.Extensions
         
         public static Vector3 XZ(this Vector2 vector) => new Vector3(vector.x, 0, vector.y);
 
+        public static Vector2Int ToInt(this Vector2 vector2) => new Vector2Int((int)vector2.x, (int)vector2.y);
+        
         public static Vector2 Clamp01(this Vector2 v) => new(Mathf.Clamp01(v.x), Mathf.Clamp01(v.y));
         
         public static Vector2 Project(this Vector2 vector, Vector2 onNormal)
@@ -55,14 +57,7 @@ namespace DingoUnityExtensions.Extensions
             return v1.y.CompareTo(v2.y);
         }
 
-        public static bool Under(this Vector2Int v1, Vector2Int v2, bool isEq = false)
-        {
-            return isEq ? v1.x <= v2.x && v1.y <= v2.y : v1.x < v2.x && v1.y < v2.y;
-        }
-        
-        public static bool Over(this Vector2Int v1, Vector2Int v2, bool isEq = false)
-        {
-            return isEq ? v1.x >= v2.x && v1.y >= v2.y : v1.x > v2.x && v1.y > v2.y;
-        }
+        public static bool Under(this Vector2Int v1, Vector2Int v2, bool isEq = false) => isEq ? v1.x <= v2.x && v1.y <= v2.y : v1.x < v2.x && v1.y < v2.y;
+        public static bool Over(this Vector2Int v1, Vector2Int v2, bool isEq = false) => isEq ? v1.x >= v2.x && v1.y >= v2.y : v1.x > v2.x && v1.y > v2.y;
     }
 }

@@ -99,6 +99,9 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
 
         private void RefreshPosition(bool forceSnap = false)
         {
+            if (_ppc == null || _camera == null)
+                return;
+
             transform.position = ComputeWorldFromAnchoredPixels();
 
             if (_finalRoundToPixel || forceSnap)

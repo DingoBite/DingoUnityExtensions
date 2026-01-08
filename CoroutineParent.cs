@@ -45,7 +45,6 @@ namespace DingoUnityExtensions
         public const int MAX_PRIORITY = int.MaxValue - 10;
         public const int MAX_PRIORITY_SPECIAL = int.MaxValue - 1;
     }
-
     
     public class CoroutineParent : ProtectedSingletonBehaviour<CoroutineParent>
     {
