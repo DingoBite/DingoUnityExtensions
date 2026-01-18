@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using DingoUnityExtensions.Pools.Core;
 using DingoUnityExtensions.UnityViewProviders.Core;
@@ -5,7 +6,7 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.UnityViewProviders.Pools
 {
-    public abstract class ValueContainerPoolDepend<TRootValue, TValue, TValueContainer> : ValueContainer<TRootValue> where TValueContainer : ValueContainer<TValue>
+    public abstract class ValueContainerListPoolDepend<TRootValue, TValue, TValueContainer> : ValueContainer<TRootValue> where TValueContainer : ValueContainer<TValue>
     {
         [SerializeField] private GameObject _parent;
         [SerializeField] private TValueContainer _prefab;
