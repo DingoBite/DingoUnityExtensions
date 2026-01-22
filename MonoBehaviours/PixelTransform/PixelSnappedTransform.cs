@@ -9,20 +9,20 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
     [ExecuteAlways]
     public class PixelSnappedTransform : SubscribableBehaviour, IPixelPerfectCameraDepend, IPixelMovable
     {
-        [Header("Runtime")] 
-        [SerializeField] private bool _snapInEditMode = true;
+        [Header("Runtime")] [SerializeField] private bool _snapInEditMode = true;
         [SerializeField] private bool _snapInPlayMode = true;
 
-        [Header("Transform management")]
-        [SerializeField] private SpriteRenderer _spriteRenderer;
-        
+        [Header("Transform management")] [SerializeField]
+        private SpriteRenderer _spriteRenderer;
+
         [SerializeField] private Transform _parentOverride;
         [SerializeField] private bool _manageScale = true;
         [SerializeField] private bool _ignoreParentScale = true;
         [SerializeField] private bool _managePosition = true;
 
-        [Header("RectTransform-like positioning (reference pixels)")] 
-        [SerializeField] private PixelPerfectCamera _ppc;
+        [Header("RectTransform-like positioning (reference pixels)")] [SerializeField]
+        private PixelPerfectCamera _ppc;
+
         [SerializeField] private Vector2 _anchoredPositionPx;
 
         [SerializeField] private AnchorPreset _anchor = AnchorPreset.Center;
@@ -30,13 +30,17 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
         [SerializeField] private PivotPreset _pivot = PivotPreset.SpritePivot;
         [SerializeField] private Vector2Int _customPivotPx;
 
-        [Header("Pixel scale")] 
-        [SerializeField] private Vector2Int _pixelScale = Vector2Int.one;
+        [Header("Pixel scale")] [SerializeField]
+        private Vector2Int _pixelScale = Vector2Int.one;
 
         [SerializeField] private bool _finalRoundToPixel = true;
 
-        [Header("Layout frame (when no sprite)")] 
-        [SerializeField] private Vector2Int _frameSizePx = new(64, 64);
+        [Header("Layout frame (when no sprite)")] [SerializeField]
+        private Vector2Int _frameSizePx = new(64, 64);
+
+        [SerializeField] private bool _useExplicitSizePx;
+        [SerializeField] private bool _preserveAspect;
+        [SerializeField] private Vector2Int _explicitSizePx = new(64, 64);
 
         [SerializeField] private bool _drawFrameGizmo = true;
 
@@ -53,21 +57,17 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
             _anchoredPositionPx = position;
             SnapPosition();
         }
-        
+
         public void SetPosition(Vector2 position)
         {
             _anchoredPositionPx = position;
             RefreshTransform();
         }
-        
+
         public Vector2 GetAnchoredPosition() => _anchoredPositionPx;
         public Vector2Int GetAnchoredPixels() => new(Mathf.RoundToInt(_anchoredPositionPx.x), Mathf.RoundToInt(_anchoredPositionPx.y));
 
-        public Vector2 PositionPx
-        {
-            get => GetAnchoredPosition();
-            set => SetPosition(value);
-        }
+        public Vector2 PositionPx { get => GetAnchoredPosition(); set => SetPosition(value); }
 
         public Vector2Int PositionPxRounded => GetAnchoredPixels();
 
@@ -83,7 +83,7 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
             if (_manageScale)
                 RefreshScale();
         }
-        
+
         public void RefreshTransform()
         {
             EnsureCamera();
@@ -110,6 +110,54 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
 
         private void RefreshScale()
         {
+            if (_useExplicitSizePx)
+            {
+                EnsureCamera();
+
+                var ppu = (_ppc != null) ? Mathf.Max(1, _ppc.assetsPPU) : (_spriteRenderer != null && _spriteRenderer.sprite != null) ? Mathf.Max(1, Mathf.RoundToInt(_spriteRenderer.sprite.pixelsPerUnit)) : 1;
+
+                var desiredWorldW = _explicitSizePx.x / (float)ppu;
+                var desiredWorldH = _explicitSizePx.y / (float)ppu;
+
+                Vector3 newScale;
+
+                if (_spriteRenderer != null && _spriteRenderer.sprite != null)
+                {
+                    var spr = _spriteRenderer.sprite;
+
+                    var baseSize = spr.bounds.size;
+                    var sx = baseSize.x > 1e-6f ? (desiredWorldW / baseSize.x) : 1f;
+                    var sy = baseSize.y > 1e-6f ? (desiredWorldH / baseSize.y) : 1f;
+
+                    if (_preserveAspect)
+                    {
+                        var s = Mathf.Min(sx, sy);
+                        sx = sy = s;
+                    }
+
+                    newScale = new Vector3(sx, sy, transform.localScale.z);
+                }
+                else
+                {
+                    newScale = new Vector3(1f, 1f, transform.localScale.z);
+                }
+
+                var parent = _parentOverride == null ? transform.parent : _parentOverride;
+                if (_ignoreParentScale && parent != null)
+                {
+                    var ps = parent.lossyScale;
+                    if (Mathf.Abs(ps.x) > 1e-6f)
+                        newScale.x /= ps.x;
+                    if (Mathf.Abs(ps.y) > 1e-6f)
+                        newScale.y /= ps.y;
+                    if (Mathf.Abs(ps.z) > 1e-6f)
+                        newScale.z /= ps.z;
+                }
+
+                transform.localScale = newScale;
+                return;
+            }
+
             if (_spriteRenderer != null)
             {
                 var sx = _pixelScale.x * _spriteRenderer.sprite.pixelsPerUnit / _ppc.assetsPPU;
@@ -218,7 +266,7 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
             tr = br + up * hWorld;
             return true;
         }
-        
+
         private bool TryGetParentFrame(out Vector3 bl, out Vector3 rightVec, out Vector3 upVec, out Vector3 rightDir, out Vector3 upDir)
         {
             bl = default;
@@ -263,17 +311,6 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
             return new Vector2(deltaLocalUnits.x * s.x, deltaLocalUnits.y * s.y);
         }
 
-        protected override void SubscribeOnly()
-        {
-            if (_snapInPlayMode)
-                CoroutineParent.AddLateUpdater(this, RefreshTransform, CoroutineOrderLayers.MIN_PRIORITY_SPECIAL);
-        }
-
-        protected override void UnsubscribeOnly()
-        {
-            CoroutineParent.RemoveLateUpdater(this);
-        }
-
         public void AddAnchoredPixels(Vector2Int deltaPx)
         {
             _anchoredPositionPx += deltaPx;
@@ -307,8 +344,33 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
                 return transform.position;
             return ComputeDesiredWorldPivotPoint();
         }
-        
-                
+
+        public void SetSizePx(Vector2Int sizePx)
+        {
+            _explicitSizePx = new Vector2Int(Mathf.Max(1, sizePx.x), Mathf.Max(1, sizePx.y));
+            _useExplicitSizePx = true;
+
+            _frameSizePx = _explicitSizePx;
+            RefreshTransform();
+        }
+
+        public void ClearSizePx()
+        {
+            _useExplicitSizePx = false;
+            RefreshTransform();
+        }
+
+        protected override void SubscribeOnly()
+        {
+            if (_snapInPlayMode)
+                CoroutineParent.AddLateUpdater(this, RefreshTransform, CoroutineOrderLayers.MIN_PRIORITY_SPECIAL);
+        }
+
+        protected override void UnsubscribeOnly()
+        {
+            CoroutineParent.RemoveLateUpdater(this);
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
