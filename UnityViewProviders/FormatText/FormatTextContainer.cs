@@ -8,7 +8,7 @@ namespace DingoUnityExtensions.UnityViewProviders.FormatText
     public class FormatTextContainer : ValueContainer<PreFormatText>
     {
         [SerializeField] private TMP_Text _text;
-        [SerializeField] private string _formatTemplate;
+        [SerializeField, TextArea(2, 10)] private string _formatTemplate;
         
         private void Reset()
         {

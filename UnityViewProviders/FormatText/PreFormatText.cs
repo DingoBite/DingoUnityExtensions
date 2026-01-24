@@ -9,19 +9,13 @@ namespace DingoUnityExtensions.UnityViewProviders.FormatText
         public readonly object[] ArgsArray;
         public readonly string Fallback;
         
-        public PreFormatText(IEnumerable<BoxedValueWrapper> boxedValues = null, string fallback = null)
+        public PreFormatText(string fallback, IEnumerable<BoxedValueWrapper> boxedValues = null)
         {
             Fallback = fallback;
             ArgsArray = boxedValues?.Select(b => b.BoxedValue).ToArray();
         }
         
-        public PreFormatText(object value, string fallback = null)
-        {
-            Fallback = fallback;
-            ArgsArray = new[] { value };
-        }
-       
-        public PreFormatText(string fallback = null, params object[] values)
+        public PreFormatText(string fallback, params object[] values)
         {
             Fallback = fallback;
             ArgsArray = values;
