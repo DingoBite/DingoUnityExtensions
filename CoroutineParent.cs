@@ -85,23 +85,23 @@ namespace DingoUnityExtensions
         }
 
         public static void AddUpdater(object obj, Action updateAction, int order = 0) => Instance._updatersDelegates[obj] = (updateAction, order);
-        public static void RemoveUpdater(object obj) => Instance._updatersDelegates.Remove(obj);
+        public static void RemoveUpdater(object obj) => GetNoCheck()?._updatersDelegates.Remove(obj);
         public static void AddLateUpdater(object obj, Action updateAction, int order = 0) => Instance._lateUpdatersDelegates[obj] = (updateAction, order);
-        public static void RemoveLateUpdater(object obj) => Instance._lateUpdatersDelegates.Remove(obj);
+        public static void RemoveLateUpdater(object obj) => GetNoCheck()?._lateUpdatersDelegates.Remove(obj);
         public static void AddFixedUpdater(object obj, Action updateAction, int order = 0) => Instance._fixedUpdatersDelegates[obj] = (updateAction, order);
-        public static void RemoveFixedUpdater(object obj) => Instance._fixedUpdatersDelegates.Remove(obj);
+        public static void RemoveFixedUpdater(object obj) => GetNoCheck()?._fixedUpdatersDelegates.Remove(obj);
         
         public static void AddUpdater(IUpdater updater) => AddUpdater(updater, 0);
         public static void AddUpdater(IUpdater updater, int order) => Instance._updaters[updater] = (updater, order);
-        public static void RemoveUpdater(IUpdater updater) => Instance._updaters.Remove(updater);
+        public static void RemoveUpdater(IUpdater updater) => GetNoCheck()?._updaters.Remove(updater);
 
         public static void AddLateUpdater(ILateUpdater updater) => AddLateUpdater(updater, 0);
         public static void AddLateUpdater(ILateUpdater updater, int order) => Instance._lateUpdaters[updater] = (updater, order);
-        public static void RemoveLateUpdater(ILateUpdater updater) => Instance._lateUpdaters.Remove(updater);
+        public static void RemoveLateUpdater(ILateUpdater updater) => GetNoCheck()?._lateUpdaters.Remove(updater);
         
         public static void AddFixedUpdater(IFixedUpdater updater) => AddFixedUpdater(updater, 0);
         public static void AddFixedUpdater(IFixedUpdater updater, int order) => Instance._fixedUpdaters[updater] = (updater, order);
-        public static void RemoveFixedUpdater(IFixedUpdater updater) => Instance._fixedUpdaters.Remove(updater);
+        public static void RemoveFixedUpdater(IFixedUpdater updater) => GetNoCheck()?._fixedUpdaters.Remove(updater);
 
         public static Action AddSingleUpdate(Action action) => AddSingleUpdate(action, 0);
         public static Action AddSingleUpdate(Action action, int order)
