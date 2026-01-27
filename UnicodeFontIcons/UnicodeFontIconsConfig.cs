@@ -10,7 +10,7 @@ using UnityEngine.Scripting;
 
 namespace DingoUnityExtensions.UnicodeFontIcons
 {
-    [CreateAssetMenu(menuName = nameof(UnicodeFontIconsConfig), fileName = "S_" + nameof(UnicodeFontIconsConfig), order = 0)]
+    [CreateAssetMenu(menuName = nameof(UnicodeFontIconsConfig), fileName = S_PREFIX + nameof(UnicodeFontIconsConfig), order = 0)]
     public class UnicodeFontIconsConfig : ProtectedSingletonScriptableObject<UnicodeFontIconsConfig>
     {
         [Serializable, Preserve]

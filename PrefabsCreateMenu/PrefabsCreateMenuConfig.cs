@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DingoUnityExtensions.PrefabsCreateMenu
 {
-    [CreateAssetMenu(menuName = nameof(PrefabsCreateMenuConfig), fileName = "S_" + nameof(PrefabsCreateMenuConfig), order = 0)]
+    [CreateAssetMenu(menuName = nameof(PrefabsCreateMenuConfig), fileName = S_PREFIX + nameof(PrefabsCreateMenuConfig), order = 0)]
     public class PrefabsCreateMenuConfig : ProtectedSingletonScriptableObject<PrefabsCreateMenuConfig>
     {
         [SerializeField] private List<string> _assetSubPathsToPrefabs;

@@ -6,13 +6,20 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
     public abstract class SingletonBehaviour<T> : MonoBehaviour where T : SingletonBehaviour<T>
     {
         private static T _instance;
-        private static readonly object _lock = new();
+        private static readonly object Lock = new();
 
+        public static T GetNoCheck()
+        {
+            if (_instance == null)
+                _instance = FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None)?.FirstOrDefault();
+            return _instance;
+        }
+        
         public static T Instance
         {
             get
             {
-                lock (_lock)
+                lock (Lock)
                 {
                     if (_instance != null)
                         return _instance;
@@ -45,7 +52,7 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
     public abstract class ProtectedSingletonBehaviour<T> : MonoBehaviour where T : ProtectedSingletonBehaviour<T>
     {
         private static T _instance;
-        private static readonly object _lock = new();
+        private static readonly object Lock = new();
 
         public static T GetNoCheck()
         {
@@ -58,7 +65,7 @@ namespace DingoUnityExtensions.MonoBehaviours.Singletons
         {
             get
             {
-                lock (_lock)
+                lock (Lock)
                 {
                     if (_instance == null)
                     {
