@@ -1,3 +1,4 @@
+#if NEWTONSOFT_EXISTS
 using System;
 using System.Threading.Tasks;
 using Bind;
@@ -25,3 +26,4 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
         public Task SaveProfileAsync() => _dataAccess.SaveAsync(_subPath, _value.V);
     }
 }
+#endif

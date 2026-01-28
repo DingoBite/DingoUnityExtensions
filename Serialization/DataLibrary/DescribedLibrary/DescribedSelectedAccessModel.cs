@@ -1,3 +1,4 @@
+#if NEWTONSOFT_EXISTS
 namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
 {
     public abstract class DescribedSelectedAccessModel<TDescriptor> where TDescriptor : StructureRootDataDescriptor
@@ -15,3 +16,4 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
         }
     }
 }
+#endif

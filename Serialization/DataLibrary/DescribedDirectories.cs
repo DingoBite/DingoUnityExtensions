@@ -1,3 +1,4 @@
+#if NEWTONSOFT_EXISTS
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -167,3 +168,4 @@ namespace DingoUnityExtensions.Serialization.DataLibrary
         }
     }
 }
+#endif

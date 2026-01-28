@@ -141,18 +141,18 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
 
         protected override void SubscribeOnly()
         {
-            _start.SafeSubscribe(LastElementStart);
-            _continue.SafeSubscribe(Continue);
-            _back.SafeSubscribe(GoBack);
+            _start.OnEvent += LastElementStart;
+            _continue.OnEvent += Continue;
+            _back.OnEvent += GoBack;
             _scrollRectDragWrapper.BeginDragEvent += StartUserDrag;
             _scrollRectDragWrapper.EndDragEvent += EndUserDrag;
         }
         
         protected override void UnsubscribeOnly()
         {
-            _start.UnSubscribe(LastElementStart);
-            _continue.UnSubscribe(Continue);
-            _back.UnSubscribe(GoBack);
+            _start.OnEvent -= LastElementStart;
+            _continue.OnEvent -= Continue;
+            _back.OnEvent -= GoBack;
             _scrollRectDragWrapper.BeginDragEvent -= StartUserDrag;
             _scrollRectDragWrapper.EndDragEvent -= EndUserDrag;
         }

@@ -1,3 +1,4 @@
+#if NEWTONSOFT_EXISTS
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,3 +110,4 @@ namespace DingoUnityExtensions.Serialization.DataLibrary.DescribedLibrary
         protected abstract TAccessModel Factory(DataByPathLibrary dataByPathLibrary, TDescriptor descriptor);
     }
 }
+#endif

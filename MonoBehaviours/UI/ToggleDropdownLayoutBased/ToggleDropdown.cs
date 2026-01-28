@@ -128,7 +128,8 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.ToggleDropdownLayoutBased
             
             if (_closeDropdownBackground != null)
             {
-                _closeDropdownBackground.SafeSubscribe(Close);
+                _closeDropdownBackground.OnEvent -= Close;
+                _closeDropdownBackground.OnEvent += Close;
                 _closeDropdownBackground.gameObject.SetActive(true);
             }
             
@@ -196,7 +197,10 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.ToggleDropdownLayoutBased
             var toggle = _dropdownToggleContainerPool.PullElement();
             toggle.UpdateValueWithoutNotify(value);
             if (gameObject.activeInHierarchy)
-                toggle.SafeSubscribe(InvokeChanges);
+            {
+                toggle.OnValueChange -= InvokeChanges;
+                toggle.OnValueChange += InvokeChanges;
+            }
 
             toggle.Title.UpdateValueWithoutNotify(dropdownValue.OptionName);
             toggle.transform.SetAsLastSibling();
@@ -216,10 +220,10 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.ToggleDropdownLayoutBased
         
         protected override void SubscribeOnly()
         {
-            _openDropdownButton.SafeSubscribe(Open);
+            _openDropdownButton.OnEvent += Open;
             foreach (var toggle in _toggles.GetContainers())
             {
-                toggle.SafeSubscribe(InvokeChanges);
+                toggle.OnValueChange += InvokeChanges;
             }
         }
 
@@ -228,10 +232,10 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.ToggleDropdownLayoutBased
             if (_closeDropdownBackground != null)
                 _closeDropdownBackground.OnEvent -= Close;
 
-            _openDropdownButton.UnSubscribe(Open);
+            _openDropdownButton.OnEvent -= Open;
             foreach (var toggle in _toggles.GetContainers())
             {
-                toggle.UnSubscribe(InvokeChanges);
+                toggle.OnValueChange -= InvokeChanges;
             }
         }
         

@@ -1,3 +1,4 @@
+#if NEWTONSOFT_EXISTS
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -81,3 +82,4 @@ namespace DingoUnityExtensions.Serialization.DataLibrary
         protected string GetDataPath(string subPath) => $"{_rootDirectory.FullName}/{subPath}";
     }
 }
+#endif

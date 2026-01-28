@@ -11,7 +11,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.ToggleDropdownLayoutBased
 
         protected override void SetValueWithoutNotify(bool value) => _toggle.UpdateValueWithoutNotify(value);
 
-        protected override void SubscribeOnly() => _toggle.SafeSubscribe(SetValueWithNotify);
-        protected override void UnsubscribeOnly() => _toggle.UnSubscribe(SetValueWithNotify);
+        protected override void SubscribeOnly() => _toggle.OnValueChange += SetValueWithNotify;
+        protected override void UnsubscribeOnly() => _toggle.OnValueChange -= SetValueWithNotify;
     }
 }
