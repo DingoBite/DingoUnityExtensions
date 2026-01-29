@@ -16,6 +16,7 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
         private SpriteRenderer _spriteRenderer;
 
         [SerializeField] private Transform _parentOverride;
+        [SerializeField] private Transform _transformScaleOverride;
         [SerializeField] private bool _manageScale = true;
         [SerializeField] private bool _ignoreParentScale = true;
         [SerializeField] private bool _managePosition = true;
@@ -46,6 +47,8 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
 
         private Camera _camera;
 
+        private Transform ScaleTr => _transformScaleOverride == null ? transform : _transformScaleOverride;
+        
         public void SetupPixelPerfectCamera(Camera c)
         {
             _ppc = c == null ? null : c.GetComponent<PixelPerfectCamera>();
@@ -135,11 +138,11 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
                         sx = sy = s;
                     }
 
-                    newScale = new Vector3(sx, sy, transform.localScale.z);
+                    newScale = new Vector3(sx, sy, ScaleTr.localScale.z);
                 }
                 else
                 {
-                    newScale = new Vector3(1f, 1f, transform.localScale.z);
+                    newScale = new Vector3(1f, 1f, ScaleTr.localScale.z);
                 }
 
                 var parent = _parentOverride == null ? transform.parent : _parentOverride;
@@ -154,7 +157,7 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
                         newScale.z /= ps.z;
                 }
 
-                transform.localScale = newScale;
+                ScaleTr.localScale = newScale;
                 return;
             }
 
@@ -162,7 +165,7 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
             {
                 var sx = _pixelScale.x * _spriteRenderer.sprite.pixelsPerUnit / _ppc.assetsPPU;
                 var sy = _pixelScale.y * _spriteRenderer.sprite.pixelsPerUnit / _ppc.assetsPPU;
-                var newScale = new Vector3(sx, sy, transform.localScale.z);
+                var newScale = new Vector3(sx, sy, ScaleTr.localScale.z);
 
                 var parent = _parentOverride == null ? transform.parent : _parentOverride;
                 if (_ignoreParentScale && parent != null)
@@ -172,11 +175,11 @@ namespace DingoUnityExtensions.MonoBehaviours.PixelTransform
                     newScale.z /= parent.lossyScale.z;
                 }
 
-                transform.localScale = newScale;
+                ScaleTr.localScale = newScale;
             }
             else
             {
-                transform.localScale = new Vector3(_pixelScale.x, _pixelScale.y, transform.localScale.z);
+                ScaleTr.localScale = new Vector3(_pixelScale.x, _pixelScale.y, ScaleTr.localScale.z);
             }
         }
 
