@@ -14,6 +14,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
     /// <summary>
     /// Do not use UpdateValueWithoutNotify on this class
     /// </summary>
+    [Obsolete("Use Texture2DLoadHandle")]
     public class ImageLoadWrapper : ValueContainer<ImageLoadHandle>
     {
         [SerializeField] private RevealCanvasGroup _imageParent;

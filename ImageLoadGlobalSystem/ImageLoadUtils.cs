@@ -1,7 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace DingoUnityExtensions.ImageLoadGlobalSystem
 {
+    [Obsolete("Use Texture2DLoadHandle")]
     public static class ImageLoadUtils
     {
         private static int _counter;
