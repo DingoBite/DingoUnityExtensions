@@ -102,7 +102,7 @@ namespace DingoUnityExtensions.Utils
 
         private static async Task<string> GetDataFromRequest(string path)
         {
-            var unityWebRequest = UnityWebRequest.Get(path);
+            using var unityWebRequest = UnityWebRequest.Get(path);
             unityWebRequest.timeout = 5;
             var loadingRequest = await unityWebRequest.SendWebRequest();
             var data = loadingRequest.downloadHandler.text;

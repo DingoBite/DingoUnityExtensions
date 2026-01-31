@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -6,13 +7,8 @@ namespace DingoUnityExtensions.Utils
 {
     public static class PathUtils
     {
-        private const string HTTP = "http:/";
-        private const string HTTPS = "https:/";
-        
-        private const string DP_SLASH_1 = ":/";
-        private const string DP_SLASH_2 = "://";
-        private const string DP_SLASH_3 = ":///";
-        private const string FILE = "file";
+        private const string HTTP = "http://";
+        private const string HTTPS = "https://";
 
         private const string MP4 = ".mp4";
         private const string WAV = ".wav";
@@ -59,43 +55,36 @@ namespace DingoUnityExtensions.Utils
 #endif
         }
 
-        public static bool IsURL(string path) => path.StartsWith(HTTP) || path.StartsWith(HTTPS);
+        public static bool IsURL(string path) => path.StartsWith(HTTP, StringComparison.Ordinal) || path.StartsWith(HTTPS, StringComparison.Ordinal);
 
         public static string AbsoluteFilePathToUri(string path)
         {
-            if (!path.Contains(DP_SLASH_2))
-            {
-                if (path.Contains(DP_SLASH_2))
-                    path = path.Replace(DP_SLASH_2, DP_SLASH_3);
-                else if (path.Contains(DP_SLASH_1))
-                    path = path.Replace(DP_SLASH_1, DP_SLASH_3);
-                else
-                    path = FILE + DP_SLASH_3 + path;
-            }
+            if (string.IsNullOrEmpty(path))
+                return string.Empty;
 
-            return path;
+            if (Uri.TryCreate(path, UriKind.Absolute, out var uri))
+                return uri.AbsoluteUri;
+
+            return new Uri(path).AbsoluteUri;
         }
-        
+
         public static string MakeImagePath(string folder, string imageName)
         {
+            if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(imageName))
+                return null;
+
             if (IsURL(folder))
-            {
-                if (imageName.StartsWith('/') || folder.EndsWith('/'))
-                    return (folder + imageName);
-                return folder + '/' + imageName; 
-            }
-            
+                return JoinWithSlash(folder, imageName);
+
 #if UNITY_ANDROID
-            if (imageName.StartsWith('/') || folder.EndsWith('/'))
-                return (folder + imageName).Replace("//", "/");
-            return folder + '/' + imageName; 
+            return JoinWithSlash(folder, imageName);
 #endif
+            folder = NormalizePath(folder);
             imageName = Path.GetFileNameWithoutExtension(imageName);
-            foreach (var extension in ImageExtensions)
+
+            foreach (var ext in ImageExtensions)
             {
-                var fileName = imageName + extension;
-                folder = folder.Replace("\\", "/").Replace("//", "/");
-                var path = $"{folder}/{fileName}";
+                var path = JoinWithSlash(folder, imageName + ext);
                 if (File.Exists(path))
                     return path;
             }
@@ -104,68 +93,94 @@ namespace DingoUnityExtensions.Utils
         }
 
         public static string GetRootPathFromPrefix(PathPrefix pathPrefix) => PrefixDictionary[pathPrefix];
-        
+
         public static string MakePathWithPrefix(PathPrefix pathPrefix, string path, bool createDirectory = false, bool addEscape = false)
         {
-            path = path.Replace('\\', '/');
-            string fullPath;
-            var prefix = PrefixDictionary[pathPrefix];
+            path = (path ?? string.Empty).Replace('\\', '/');
+
+            var prefix = PrefixDictionary[pathPrefix] ?? string.Empty;
             if (addEscape)
                 prefix += "//";
-            if (path.StartsWith('/') || prefix == "")
-                fullPath = prefix + path;
-            else
-                fullPath = prefix + '/' + path;
+
+            var fullPath = string.IsNullOrEmpty(prefix) ? path : JoinWithSlash(prefix, path);
+
             if (pathPrefix is not PathPrefix.HTTP and not PathPrefix.HTTPS && createDirectory)
             {
 #if !UNITY_ANDROID
-                var directoryName = Path.GetDirectoryName(fullPath);
-                if (!string.IsNullOrWhiteSpace(directoryName) && directoryName != "/")
-                    Directory.CreateDirectory(directoryName);
+                var dir = Path.GetDirectoryName(fullPath);
+                if (!string.IsNullOrWhiteSpace(dir) && dir != "/")
+                    Directory.CreateDirectory(dir);
 #endif
             }
 
             return fullPath;
         }
 
-        // public static string NormalizePath(this string path) => path?.Replace("\\", "/").Replace("//", "/");
         public static string NormalizePath(this string path)
         {
             if (string.IsNullOrEmpty(path))
                 return string.Empty;
 
-            var length = path.Length;
-            var buffer = length <= 256 ? stackalloc char[length] : new char[length];
-            var writeIndex = 0;
-            var lastWasSlash = false;
+            path = path.Replace('\\', '/');
 
-            for (var i = 0; i < length; i++)
-            {
-                var c = path[i];
-                var normalized = c == '\\' ? '/' : c;
+            var schemeIdx = path.IndexOf("://", System.StringComparison.Ordinal);
+            if (schemeIdx < 0)
+                return CollapseDoubleSlashes(path);
 
-                if (normalized == '/')
-                {
-                    if (lastWasSlash)
-                        continue;
-                    lastWasSlash = true;
-                }
-                else
-                {
-                    lastWasSlash = false;
-                }
-
-                buffer[writeIndex++] = normalized;
-            }
-
-            return new string(buffer[..writeIndex]);
+            var head = path[..(schemeIdx + 3)];
+            var tail = path[(schemeIdx + 3)..];
+            return head + CollapseDoubleSlashes(tail);
         }
-        
+
         public static string GetPathWithoutExtensions(string path)
         {
             var dir = Path.GetDirectoryName(path);
             var fileName = Path.GetFileNameWithoutExtension(path);
             return dir + "/" + fileName;
+        }
+
+        private static string CollapseDoubleSlashes(string s)
+        {
+            var length = s.Length;
+            var buffer = length <= 256 ? stackalloc char[length] : new char[length];
+            var w = 0;
+            var lastSlash = false;
+
+            for (var i = 0; i < length; i++)
+            {
+                var c = s[i];
+                if (c == '/')
+                {
+                    if (lastSlash)
+                        continue;
+                    lastSlash = true;
+                }
+                else
+                {
+                    lastSlash = false;
+                }
+
+                buffer[w++] = c;
+            }
+
+            return new string(buffer[..w]);
+        }
+
+        private static string JoinWithSlash(string left, string right)
+        {
+            if (string.IsNullOrEmpty(left))
+                return right ?? string.Empty;
+            if (string.IsNullOrEmpty(right))
+                return left;
+
+            var lEnds = left.EndsWith("/", System.StringComparison.Ordinal);
+            var rStarts = right.StartsWith("/", System.StringComparison.Ordinal);
+
+            if (lEnds && rStarts)
+                return left + right.Substring(1);
+            if (!lEnds && !rStarts)
+                return left + "/" + right;
+            return left + right;
         }
     }
 }

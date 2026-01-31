@@ -154,7 +154,6 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         }
     }
 
-    [Obsolete("Use Texture2DLoadHandle")]
     public class ImageLoadHandle
     {
         public const string IMAGE_LOAD_HANDLE = "IMAGE_LOAD_HANDLE";
