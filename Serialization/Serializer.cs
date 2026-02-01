@@ -91,7 +91,6 @@ namespace DingoUnityExtensions.Serialization
                 {
                     await SerializationUtils.SaveAsync(uri, json, catchExceptions, cancellationTokenSource: cancellationTokenSource);
                 }
-                await SerializationUtils.SaveAsync(uri, json, catchExceptions, cancellationTokenSource: cancellationTokenSource);
             }
             catch (Exception e)
             {
