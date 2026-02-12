@@ -51,6 +51,8 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
             }
         }
 
+        public void Clear() => _pool.Clear();
+
         protected virtual void SetValue(TValueContainer valueContainer, TValue value) => valueContainer.UpdateValueWithoutNotify(value);
 
         protected abstract Pool<TValueContainer> Factory(TValueContainer prefab, GameObject parent);

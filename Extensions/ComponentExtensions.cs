@@ -10,6 +10,7 @@ namespace DingoUnityExtensions.Extensions
         
         public static void SetLayerRecursive(this Transform transform, int layer)
         {
+            transform.gameObject.layer = layer;
             foreach (var tr in transform.FindComponents<Transform>())
             {
                 tr.gameObject.layer = layer;
