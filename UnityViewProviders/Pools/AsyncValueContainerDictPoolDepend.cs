@@ -17,30 +17,25 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
 
         private Pool<TValueContainer> _pool;
         private readonly Dictionary<TKey, ActiveEntry> _activeEntries = new();
-        private readonly Dictionary<TKey, PendingEntry> _pendingEntries = new();
         private readonly List<TKey> _orderedKeys = new();
-
-        private CollectionViewSpawnOptions _pendingSpawnOptions;
-        private bool _hasPendingSpawnOptions;
-        private int _spawnVersion;
+        private int _entryVersion;
 
         public void DefaultUpdateValueWithoutNotify(TRootValue value) => UpdateValueWithoutNotify((value, CollectionViewSpawnOptions.Default));
-        
+
+        public IEnumerable<TValueContainer> GetOrderedActiveContainers() => _orderedKeys.Select(k => _activeEntries[k].Container);
+        public IEnumerable<TRequested> GetOrderedActiveContainers<TRequested>() => _orderedKeys.Select(k => _activeEntries[k].Container).OfType<TRequested>();
+
         protected override void SetValueWithoutNotify((TRootValue v, CollectionViewSpawnOptions o) pair)
         {
-            _pendingSpawnOptions = pair.o;
-            _hasPendingSpawnOptions = true;
             _pool ??= Factory(_prefab, _parent);
-            ApplyValue(pair.v, _pendingSpawnOptions);
+            ApplyValue(pair.v, ResolveSpawnOptions(pair.o));
         }
 
         public void Clear() => Clear(CollectionViewSpawnOptions.ImmediateFill);
 
         public void Clear(CollectionViewSpawnOptions spawnOptions)
         {
-            _pendingSpawnOptions = spawnOptions;
-            _hasPendingSpawnOptions = true;
-            base.UpdateValueWithoutNotify(default);
+            base.UpdateValueWithoutNotify((default, spawnOptions));
         }
 
         protected virtual void SetValue(TValueContainer valueContainer, TValue value) => valueContainer.UpdateValueWithoutNotify(value);
@@ -56,48 +51,34 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
 
         private void ApplyValue(TRootValue value, CollectionViewSpawnOptions spawnOptions)
         {
-            var resolvedOptions = ResolveSpawnOptions(spawnOptions);
-
             if (value == null)
             {
-                ReleaseAll(resolvedOptions);
+                ReleaseAll(spawnOptions);
                 return;
             }
 
             var count = GetCount(value);
             if (count == 0)
             {
-                ReleaseAll(resolvedOptions);
+                ReleaseAll(spawnOptions);
                 return;
             }
 
-            if (resolvedOptions.FullRebuild)
-                ReleaseAll(resolvedOptions);
+            if (spawnOptions.FullRebuild)
+                ReleaseAll(spawnOptions);
 
             var orderedKeys = GetOrderedKeys(value).ToList();
             _orderedKeys.Clear();
             _orderedKeys.AddRange(orderedKeys);
 
             var nextKeys = new HashSet<TKey>(orderedKeys);
-
             if (_activeEntries.Count > 0)
             {
-                var removedActiveKeys = _activeEntries.Keys.Where(k => !nextKeys.Contains(k)).ToList();
-                foreach (var removedKey in removedActiveKeys)
+                var removedKeys = _activeEntries.Keys.Where(k => !nextKeys.Contains(k)).ToList();
+                foreach (var removedKey in removedKeys)
                 {
-                    if (!_activeEntries.Remove(removedKey, out var activeEntry))
-                        continue;
-
-                    BeginRelease(removedKey, activeEntry.Value, activeEntry.Container, resolvedOptions);
-                }
-            }
-
-            if (_pendingEntries.Count > 0)
-            {
-                var removedPendingKeys = _pendingEntries.Keys.Where(k => !nextKeys.Contains(k)).ToList();
-                foreach (var removedKey in removedPendingKeys)
-                {
-                    _pendingEntries.Remove(removedKey);
+                    if (_activeEntries.Remove(removedKey, out var activeEntry))
+                        BeginRelease(removedKey, activeEntry.Value, activeEntry.Container, spawnOptions);
                 }
             }
 
@@ -114,23 +95,19 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
                     continue;
                 }
 
-                if (_pendingEntries.TryGetValue(key, out var pendingEntry))
-                {
-                    pendingEntry.Order = order;
-                    pendingEntry.Value = subValue;
-                    pendingEntry.SpawnOptions = resolvedOptions;
-                    continue;
-                }
+                var valueContainer = _pool.PullElement();
+                SetValue(valueContainer, subValue);
 
-                var version = ++_spawnVersion;
-                _pendingEntries[key] = new PendingEntry
+                var version = ++_entryVersion;
+                _activeEntries[key] = new ActiveEntry
                 {
                     Version = version,
                     Order = order,
                     Value = subValue,
-                    SpawnOptions = resolvedOptions,
+                    Container = valueContainer,
                 };
-                _ = EnsureEntryAsync(key, version);
+
+                _ = FinalizePullAsync(key, version, subValue, valueContainer, spawnOptions);
             }
 
             ApplyActiveOrder();
@@ -139,19 +116,11 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
         private void ReleaseAll(CollectionViewSpawnOptions spawnOptions)
         {
             _orderedKeys.Clear();
-            _pendingEntries.Clear();
-
             if (_activeEntries.Count == 0)
                 return;
 
             var activeEntries = _activeEntries.ToList();
             _activeEntries.Clear();
-
-            if (spawnOptions.Immediate)
-            {
-                _pool?.Clear();
-                return;
-            }
 
             foreach (var pair in activeEntries)
             {
@@ -168,46 +137,19 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
             _ = ReleaseEntryAsync(key, value, valueContainer, spawnOptions);
         }
 
-        private async UniTask EnsureEntryAsync(TKey key, int version)
+        private async UniTask FinalizePullAsync(TKey key, int version, TValue value, TValueContainer valueContainer, CollectionViewSpawnOptions spawnOptions)
         {
-            TValueContainer valueContainer = null;
             try
             {
-                if (!_pendingEntries.TryGetValue(key, out var pendingAtStart) || pendingAtStart.Version != version)
-                    return;
-
-                valueContainer = pendingAtStart.SpawnOptions.Immediate
-                    ? _pool.PullElement()
-                    : await _pool.PullElementAsync();
-
-                if (this == null)
-                {
-                    if (valueContainer != null)
-                        _pool.PushElement(valueContainer);
-                    return;
-                }
-
-                if (!_pendingEntries.TryGetValue(key, out var pendingEntry) || pendingEntry.Version != version)
-                {
-                    if (valueContainer != null)
-                        _pool.PushElement(valueContainer);
-                    return;
-                }
-
-                _pendingEntries.Remove(key);
-                SetValue(valueContainer, pendingEntry.Value);
-                _activeEntries[key] = new ActiveEntry
-                {
-                    Order = pendingEntry.Order,
-                    Value = pendingEntry.Value,
-                    Container = valueContainer,
-                };
-
-                await OnAfterPullAsync(key, pendingEntry.Value, valueContainer, pendingEntry.SpawnOptions);
+                await OnAfterPullAsync(key, value, valueContainer, spawnOptions);
 
                 if (this == null)
                     return;
-                if (!_activeEntries.TryGetValue(key, out var activeEntry) || !ReferenceEquals(activeEntry.Container, valueContainer))
+                if (!_activeEntries.TryGetValue(key, out var activeEntry))
+                    return;
+                if (activeEntry.Version != version)
+                    return;
+                if (!ReferenceEquals(activeEntry.Container, valueContainer))
                     return;
 
                 ApplyActiveOrder();
@@ -215,8 +157,6 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
             catch (Exception e)
             {
                 Debug.LogException(e, this);
-                if (valueContainer != null)
-                    _pool.PushElement(valueContainer);
             }
         }
 
@@ -234,17 +174,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
             if (this == null || valueContainer == null)
                 return;
 
-            try
-            {
-                if (spawnOptions.Immediate)
-                    _pool.PushElement(valueContainer);
-                else
-                    await _pool.PushElementAsync(valueContainer);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e, this);
-            }
+            _pool.PushElement(valueContainer);
         }
 
         private void ApplyActiveOrder()
@@ -262,37 +192,19 @@ namespace DingoUnityExtensions.UnityViewProviders.Pools
             }
         }
 
-        private CollectionViewSpawnOptions ConsumeSpawnOptions()
-        {
-            if (!_hasPendingSpawnOptions)
-                return _defaultSpawnOptions;
-
-            var spawnOptions = _pendingSpawnOptions;
-            _hasPendingSpawnOptions = false;
-            _pendingSpawnOptions = default;
-            return spawnOptions;
-        }
-
         private CollectionViewSpawnOptions ResolveSpawnOptions(CollectionViewSpawnOptions spawnOptions)
         {
-            return new CollectionViewSpawnOptions(
-                immediate: spawnOptions.Immediate,
-                fullRebuild: _fullRebuildOnChange || spawnOptions.FullRebuild);
+            var useDefaultOptions = spawnOptions.Equals(default(CollectionViewSpawnOptions));
+            var sourceOptions = useDefaultOptions ? _defaultSpawnOptions : spawnOptions;
+            return new CollectionViewSpawnOptions(immediate: sourceOptions.Immediate, fullRebuild: _fullRebuildOnChange || sourceOptions.FullRebuild);
         }
 
         private sealed class ActiveEntry
         {
-            public int Order;
-            public TValue Value;
-            public TValueContainer Container;
-        }
-
-        private sealed class PendingEntry
-        {
             public int Version;
             public int Order;
             public TValue Value;
-            public CollectionViewSpawnOptions SpawnOptions;
+            public TValueContainer Container;
         }
     }
 }
