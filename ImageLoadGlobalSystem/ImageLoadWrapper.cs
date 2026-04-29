@@ -54,7 +54,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
                 return;
             Unload();
             SetValue(imageLoadHandle);
-            if (Value.Path != null)
+            if (Value?.Path != null)
                 LoadOnly();
         }
 
@@ -73,9 +73,10 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         {
             if (_destroyed)
                 return;
-            if (_load != null && !_load.Value)
+            if (_load != null && !_load.Value && Value?.Path == null)
                 return;
-            _loadUnloadEvent?.Invoke(false);
+            if (_load == null || _load.Value)
+                _loadUnloadEvent?.Invoke(false);
             _load = false;
             UpdateImage(TextureLoadData.None);
             if (Value?.Path != null)
@@ -108,7 +109,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
         private void UpdateImage(TextureLoadData textureLoadData)
         {
-            if (_lastTextureLoadData != null && _lastTextureLoadData.Value.Texture == textureLoadData.Texture)
+            if (_lastTextureLoadData != null && IsSameTextureLoadData(_lastTextureLoadData.Value, textureLoadData))
                 return;
             
             _lastTextureLoadData = textureLoadData;
@@ -185,6 +186,11 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
             }
         }
 
+        private static bool IsSameTextureLoadData(TextureLoadData a, TextureLoadData b)
+        {
+            return a.Texture == b.Texture && a.State == b.State && a.Path == b.Path;
+        }
+
         protected override void SetValueWithoutNotify(ImageLoadHandle value) => SetValue(value);
 
         protected override void OnEnable()
@@ -203,8 +209,8 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 
         private void OnDestroy()
         {
+            this.UnloadAndCancelDelays();
             _destroyed = true;
-            Unload();
         }
     }
 }

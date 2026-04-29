@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Bind;
-using Cysharp.Threading.Tasks;
 using DingoUnityExtensions.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -14,13 +14,12 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
 {
     public static class ImageLoadGlobalCache
     {
-        private const string LOAD_COROUTINE = "IMAGE_LOAD_GLOBAL";
-
         private sealed class CacheEntry
         {
             public readonly Bind<TextureLoadData> Flow = new();
             public readonly HashSet<object> Receivers = new();
 
+            public CancellationTokenSource LoadCts;
             public int Generation;
         }
 
@@ -74,7 +73,7 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
                 return;
 
             entry.Generation++;
-            CoroutineParent.CancelCoroutine((entry, LOAD_COROUTINE));
+            CancelLoad(entry);
 
             if (entry.Flow.V.State == ImageLoadState.Loaded && entry.Flow.V.Texture != null)
                 Object.Destroy(entry.Flow.V.Texture);
@@ -99,32 +98,87 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         {
             entry.Generation++;
             var gen = entry.Generation;
+            CancelLoad(entry);
+            var cts = new CancellationTokenSource();
+            entry.LoadCts = cts;
 
             entry.Flow.V = new TextureLoadData(null, ImageLoadState.Loading, path);
 
-            CoroutineParent.StartCoroutineWithCanceling((entry, LOAD_COROUTINE), LoadImageCoroutine(entry, gen, path, disableLogException));
+            _ = LoadImageAsync(entry, gen, path, disableLogException, cts);
         }
 
-        private static IEnumerator LoadImageCoroutine(CacheEntry entry, int gen, string path, bool disableLogException)
+        private static async Task LoadImageAsync(CacheEntry entry, int gen, string path, bool disableLogException, CancellationTokenSource cts)
         {
-#if UNITY_EDITOR && EMULATE_DELAYS
-            yield return CoroutineParent.CachedWaiter((int)(Random.value * 3f));
-#endif
-            yield return MultiplatformLoadUtils.LoadTexture2DAsync(path, disableLogException).AsUniTask().ToCoroutine(t =>
+            var cancellationToken = cts.Token;
+            Texture2D texture = null;
+            
+            try
             {
+#if UNITY_EDITOR && EMULATE_DELAYS
+                await Task.Delay((int)(Random.value * 3000f), cancellationToken);
+#endif
+                texture = await MultiplatformLoadUtils.LoadTexture2DAsync(path, disableLogException, cancellationToken);
+
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
                 if (entry.Generation != gen || entry.Receivers.Count == 0)
                 {
-                    if (t != null)
-                        Object.Destroy(t);
-
                     return;
                 }
 
-                if (t == null)
+                if (texture == null)
                     entry.Flow.V = new TextureLoadData(null, ImageLoadState.NotFound, path);
                 else
-                    entry.Flow.V = new TextureLoadData(t, ImageLoadState.Loaded, path);
-            });
+                    entry.Flow.V = new TextureLoadData(texture, ImageLoadState.Loaded, path);
+
+                texture = null;
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception e)
+            {
+                if (!disableLogException)
+                {
+                    Debug.LogError(path);
+                    Debug.LogException(e);
+                }
+
+                if (!cancellationToken.IsCancellationRequested && entry.Generation == gen && entry.Receivers.Count > 0)
+                    entry.Flow.V = new TextureLoadData(null, ImageLoadState.NotFound, path);
+            }
+            finally
+            {
+                if (texture != null)
+                    Object.Destroy(texture);
+
+                if (ReferenceEquals(entry.LoadCts, cts))
+                {
+                    entry.LoadCts = null;
+                    cts.Dispose();
+                }
+            }
+        }
+
+        private static void CancelLoad(CacheEntry entry)
+        {
+            var cts = entry.LoadCts;
+            if (cts == null)
+                return;
+
+            entry.LoadCts = null;
+
+            try
+            {
+                if (!cts.IsCancellationRequested)
+                    cts.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+
+            cts.Dispose();
         }
 
         private static void CleanupDeadReceivers(CacheEntry entry)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -59,22 +60,28 @@ namespace DingoUnityExtensions.Utils
             }
         }
 
-        public static async Task<Texture2D> LoadTexture2DAsync(string path, bool disableLogException = false)
+        public static async Task<Texture2D> LoadTexture2DAsync(string path, bool disableLogException = false, CancellationToken cancellationToken = default)
         {
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 if (PathUtils.IsURL(path))
-                    return await GetTextureFromRequest(path);
+                    return await GetTextureFromRequest(path, cancellationToken);
                 
 #if UNITY_ANDROID
                 path = PathUtils.AbsoluteFilePathToUri(path);
-                var result = await GetTextureFromRequest(path);
+                var result = await GetTextureFromRequest(path, cancellationToken);
 #else
+                var thumbnailImageData = await File.ReadAllBytesAsync(path, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
                 var result = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                var thumbnailImageData = await File.ReadAllBytesAsync(path);
                 result.LoadImage(thumbnailImageData);
 #endif
                 return result;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return null;
             }
             catch (Exception e)
             {
@@ -87,11 +94,14 @@ namespace DingoUnityExtensions.Utils
             }
         }
 
-        private static async Task<Texture2D> GetTextureFromRequest(string path)
+        private static async Task<Texture2D> GetTextureFromRequest(string path, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             using var unityWebRequest = UnityWebRequestTexture.GetTexture(path);
+            using var cancellationRegistration = cancellationToken.Register(() => unityWebRequest.Abort());
             unityWebRequest.timeout = 5;
             var loadingRequest = await unityWebRequest.SendWebRequest();
+            cancellationToken.ThrowIfCancellationRequested();
             Texture2D result;
             if (loadingRequest.result == UnityWebRequest.Result.Success)
                 result = DownloadHandlerTexture.GetContent(unityWebRequest);

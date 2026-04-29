@@ -26,11 +26,15 @@ namespace DingoUnityExtensions.ImageLoadGlobalSystem
         public static void LoadNullUnloadWithRandomDelay(this ImageLoadWrapper imageLoadWrapper, string url, float minDelay, float maxDelay)
         {
             if (url == null)
+            {
+                imageLoadWrapper.UnloadAndCancelDelays();
                 return;
+            }
             // var delay = _counter++ % 2 * 1f;
             var delay = minDelay + Random.value * maxDelay;
             if (delay <= Vector3.kEpsilon)
             {
+                CoroutineParent.CancelCoroutine((imageLoadWrapper, LOAD_DELAY));
                 imageLoadWrapper.UpdateValueWithLoad(new ImageLoadHandle(url, true));
             }
             else
