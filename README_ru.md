@@ -156,8 +156,6 @@
   Используется в image loading, group binding helpers, data-library flows и нескольких UI/navigation integration points.
 - `TextMeshPro`
   Нужен для text- и icon-related providers.
-- `URP Pixel Perfect Camera`
-  Используется в `MonoBehaviours/PixelTransform`.
 - `Addressables`
   Активирует `Addressables/` wrappers и asset-handle flows.
 - `Newtonsoft.Json`
@@ -265,7 +263,6 @@ handle.TextureFlow.SafeSubscribe(OnTextureLoaded);
 
 - UI-heavy проекты могут быстро собирать reusable view layers, комбинируя `UnityViewProviders`, `Tweens`, `UnicodeFontIcons` и `Pools`.
 - Data-driven проекты могут сочетать `Serialization`, `ImageLoadGlobalSystem`, `Addressables` и `Bind` для content loading и presentation flows.
-- Pixel-perfect 2D проекты могут использовать `MonoBehaviours/PixelTransform` вместе с animation helpers для четкого движения и стабильного layout behavior.
 - Editor-heavy pipelines выигрывают от serialize-reference tooling, inspector attributes и prefab creation menus в одном поддерживаемом source tree.
 
 Главная польза организационная: domain code остается сфокусированным на gameplay или product logic, а сквозные технические задачи живут в одном поддерживаемом и версионируемом слое.

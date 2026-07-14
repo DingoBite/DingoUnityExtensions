@@ -156,8 +156,6 @@ In the current codebase, some integrations are effectively core companions rathe
   Used by image loading, group binding helpers, data-library flows, and several UI/navigation integrations.
 - `TextMeshPro`
   Required by text and icon-related providers.
-- `URP Pixel Perfect Camera`
-  Used by `MonoBehaviours/PixelTransform`.
 - `Addressables`
   Enables the `Addressables/` wrappers and asset-handle flows.
 - `Newtonsoft.Json`
@@ -265,7 +263,6 @@ This repository is valuable not because it is large, but because it groups the r
 
 - UI-heavy projects can combine `UnityViewProviders`, `Tweens`, `UnicodeFontIcons`, and `Pools` to build reusable view layers quickly.
 - Data-driven projects can combine `Serialization`, `ImageLoadGlobalSystem`, `Addressables`, and `Bind` for content loading and presentation flows.
-- Pixel-perfect 2D projects can use `MonoBehaviours/PixelTransform` together with animation helpers for crisp movement and stable layout behavior.
 - Editor-heavy pipelines benefit from serialize-reference tooling, inspector attributes, and prefab creation menus in one maintained source tree.
 
 The main benefit is organizational: domain code stays focused on gameplay or product logic while cross-cutting technical concerns live in one maintained, versioned layer.
