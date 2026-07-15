@@ -70,7 +70,6 @@ namespace RotaryHeart.Lib.AutoComplete
         string m_backText = string.Empty;
         bool m_useFullPath = true;
         bool m_allowCustom = false;
-        bool m_mouseIsOver = false;
         int m_selectionIndex = -1;
         
         void Awake()

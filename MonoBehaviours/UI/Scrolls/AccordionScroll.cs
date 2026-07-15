@@ -24,7 +24,6 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.Scrolls
         [SerializeField] private EventContainer _start;
         
         [SerializeField] private List<RectTransformPage> _pages;
-        [SerializeField] private double _stopThreshold = 0.01f;
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private ScrollRectEnsureVisible _scrollRectEnsureVisible;
         [SerializeField] private RectTransform _centerRevealRect;

@@ -17,7 +17,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
         [SerializeField] private Vector2 _start;
         [SerializeField] private Vector2 _end;
 
-        public Vector2 Start
+        public new Vector2 Start
         {
             get => _start;
             set => _start = value;

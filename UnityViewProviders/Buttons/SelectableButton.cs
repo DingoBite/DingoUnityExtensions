@@ -41,7 +41,7 @@ namespace DingoUnityExtensions.UnityViewProviders.Buttons
             Deselect();
         }
 
-        private void Reset()
+        private new void Reset()
         {
             RectTransform = GetComponent<RectTransform>();
         }

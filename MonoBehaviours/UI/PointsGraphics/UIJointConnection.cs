@@ -13,7 +13,7 @@ namespace DingoUnityExtensions.MonoBehaviours.UI.PointsGraphics
         
         public Gradient LineGradient => _graph.Gradient;
 
-        public Vector2 Start
+        public new Vector2 Start
         {
             get => _start;
             set
