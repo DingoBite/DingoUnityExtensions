@@ -8,6 +8,7 @@ using UnityEngine.UI;
 namespace DingoUnityExtensions.MicroAnimations
 {
     [Serializable]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, sourceAssembly: "Assembly-CSharp")]
     public class ColorMicroAnimation : TweenMicroAnimation
     {
         [SerializeField] private List<Graphic> _graphics;

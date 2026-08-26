@@ -16,6 +16,7 @@ namespace DingoUnityExtensions.MicroAnimations
     }
 
     [Serializable]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, sourceAssembly: "Assembly-CSharp")]
     public class ProceduralImageMicroAnimation : TweenMicroAnimation
     {
         [SerializeField] private List<ProceduralImage> _graphics;

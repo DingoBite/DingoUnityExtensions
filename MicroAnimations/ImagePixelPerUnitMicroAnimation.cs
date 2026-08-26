@@ -9,6 +9,7 @@ using UnityEngine.UI;
 namespace DingoUnityExtensions.MicroAnimations
 {
     [Serializable]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, sourceAssembly: "Assembly-CSharp")]
     public class ImagePixelPerUnitMicroAnimation : TweenMicroAnimation
     {
         [SerializeField] private List<Image> _graphics;

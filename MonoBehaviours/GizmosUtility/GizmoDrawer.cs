@@ -1,9 +1,9 @@
-﻿#if UNITY_EDITOR
-#endif
-using System;
+﻿using System;
 using System.Collections.Generic;
 using DingoUnityExtensions.MonoBehaviours.Singletons;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 using Object = UnityEngine.Object;
 

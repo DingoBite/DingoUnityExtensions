@@ -38,6 +38,7 @@ namespace DingoUnityExtensions.MaterialPropertiesAccess
     }
 
     [Serializable, Preserve]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, sourceAssembly: "Assembly-CSharp")]
     public class FloatMaterialPropertyByTimeAccess : MaterialPropertyByTimeAccess
     {
         public float DefaultValue;
@@ -58,6 +59,7 @@ namespace DingoUnityExtensions.MaterialPropertiesAccess
     }
 
     [Serializable, Preserve]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, sourceAssembly: "Assembly-CSharp")]
     public class IntMaterialPropertyByTimeAccess : MaterialPropertyByTimeAccess
     {
         public int DefaultValue;
@@ -78,6 +80,7 @@ namespace DingoUnityExtensions.MaterialPropertiesAccess
     }
 
     [Serializable, Preserve]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, sourceAssembly: "Assembly-CSharp")]
     public class ColorMaterialPropertyByTimeAccess : MaterialPropertyByTimeAccess
     {
         public Color DefaultValue;
@@ -98,6 +101,7 @@ namespace DingoUnityExtensions.MaterialPropertiesAccess
     }
 
     [Serializable, Preserve]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, sourceAssembly: "Assembly-CSharp")]
     public class Vector4MaterialPropertyByTimeAccess : MaterialPropertyByTimeAccess
     {
         public Vector4 DefaultValue;

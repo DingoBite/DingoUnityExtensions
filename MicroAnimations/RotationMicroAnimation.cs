@@ -6,6 +6,7 @@ using UnityEngine;
 namespace DingoUnityExtensions.MicroAnimations
 {
     [Serializable]
+    [UnityEngine.Scripting.APIUpdating.MovedFrom(true, sourceAssembly: "Assembly-CSharp")]
     public class RotationMicroAnimation : TweenMicroAnimation
     {
         [SerializeField] private List<Transform> _graphics;
